@@ -86,6 +86,7 @@ string DatabaseController::getLastError()
 {
 	return db->getLastError();
 }
+
 string DatabaseController::getTable(string tableName)
 {
 	string returnString;

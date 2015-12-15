@@ -15,7 +15,7 @@ void fillDirWithPath(HWND hDlg)
 
 	SetDlgItemText(hDlg, FILE_PATH_1, TEXT(MainApp::Instance()->dir.c_str()));
 
-	MainApp::Instance()->processPath(MainApp::Instance()->dir);
+	
 }
 // Message handler for add record...window dims are in resource.rc
 INT_PTR CALLBACK AddRecordBox(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)

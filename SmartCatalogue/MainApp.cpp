@@ -80,19 +80,7 @@ void MainApp::initVars()
 	}
 	mainWorkingPath = CFG::CFGReaderDLL::getCfgStringValue("mainWorkingPath");
 	dontDeleteList = CFG::CFGReaderDLL::getCfgListValue("dontDelete");
-	vector<string> meta = CFG::CFGReaderDLL::getCfgListValue("metaWords");
-	
-	dbCtrlr.openDatabase(CFG::CFGReaderDLL::getCfgStringValue("DBPath"));
-	pathToDB.setDBController(&dbCtrlr);
-	ignorePattern = CFG::CFGReaderDLL::getCfgStringValue("ignorePattern");
-	vector<string> dbTableValues = CFG::CFGReaderDLL::getCfgListValue("tableNames");
 
-	//if we cant find the table names in the cfg, thejust get out of here
-	if (dbTableValues.size() == 1 && dbTableValues[0].find("could not find") != string::npos)
-		return;
-
-	for (size_t i = 0; i < dbTableValues.size(); i++)
-		pathToDB.getDBTableValues(dbTableValues[i]);
 }
 void MainApp::setMainWindow(HWND hwnd)
 {
@@ -311,12 +299,6 @@ vector<string> MainApp::getDataFromEditWindow(HWND hwnd)
 
 	return returnData;
 }	
-void MainApp::processPath(string path)
-{
-	if(path != "")
-		dir = path;
-	pathToDB.getAllPaths(dir);
-}
 
 
 void MainApp::deleteFromFilePathList()

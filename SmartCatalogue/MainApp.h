@@ -5,7 +5,7 @@
 #include <commctrl.h>
 #include <stdio.h>
 
-#include "DatabaseDataParser.h"
+
 #include "DatabaseController.h"
 
 
@@ -47,7 +47,6 @@ public:
 	static MainApp* Instance();
 
 	DatabaseController dbCtrlr;
-	DatabaseDataParser pathToDB;
 	
 	int windowWidth;
 	int windowHeight;
@@ -89,10 +88,7 @@ public:
 	void DoFileSave(HWND hwnd, std::string &name);
 	std::string DoBrowseFolder(HWND hwnd);
 
-	void processPath(std::string path="");
-
-
-	
+		
 	
 	void sendDataToEditWindow(HWND hwnd, string data);
 	void sendDataToEditWindow(HWND hwnd, vector<string> &data);
