@@ -398,10 +398,10 @@ void DatabaseDataParser::testGalleryCalc()
 					printf("%s\n", gallery[j]->models[k].name.firstName.c_str());
 					printf("%s\n", gallery[j]->models[k].name.middleName.c_str());
 					printf("%s\n", gallery[j]->models[k].name.firstName.c_str());
-					if(true)
-					printf("%d\n", gallery[j]->models[k].outfit[0].clotingTypeIndex);
+					
+					/*printf("%d\n", gallery[j]->models[k].outfit[0].clotingTypeIndex);
 					printf("%d\n", gallery[j]->models[k].sexActionIndex);
-					printf("%d\n", gallery[j]->models[k].hairColorIndex);
+					printf("%d\n", gallery[j]->models[k].hairColorIndex);*/
 				}
 				printf("%s\n", gallery[j]->websiteName.c_str());
 				printf("%s\n", gallery[j]->category.c_str());

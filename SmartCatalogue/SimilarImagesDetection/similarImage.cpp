@@ -12,6 +12,7 @@
 #include "myfiledirdll.h"
 
 using namespace std;
+
 //Hash  
 string SimilarImage::HashValue(Mat &src)
 {
@@ -122,14 +123,24 @@ int SimilarImage::HanmingDistance(string &str1, string &str2)
 }
 
 
-int SimilarImage::test()
+int SimilarImage::test(string imgPath1, string imgPath2, bool viewImg)
 {
-	Mat img = cv::imread("\\\\OPTIPLEX-745\\photos\\porno pics\\mega sites\\twistys\\models\\Valentina Nappi\\black flower robe blue flower undies\\8_628.jpg", cv::IMREAD_COLOR); 
-	Mat img2 = cv::imread("\\\\OPTIPLEX-745\\photos\\porno pics\\mega sites\\twistys\\models\\Valentina Nappi\\black flower robe blue flower undies\\10_506.jpg", cv::IMREAD_COLOR);
-	//cvNamedWindow("MyOpenCV");
-	//cvShowImage("MyOpenCV", img);
-	//cvWaitKey(0);
-	//cvDestroyWindow("MyOpenCV");
+	Mat img = cv::imread(imgPath1.c_str(), cv::IMREAD_COLOR);
+	Mat img2 = cv::imread(imgPath2.c_str(), cv::IMREAD_COLOR);
+
+	if (img.empty() || img2.empty())
+	{
+		cout << "invlaid image or path(s)\n";
+		return -1;
+	}
+
+	if (viewImg)
+	{
+		cvNamedWindow("MyOpenCV");
+		cvShowImage("MyOpenCV", imgPath1.c_str());
+		cvWaitKey(0);
+		cvDestroyWindow("MyOpenCV");
+	}
 
 	string hash = HashValue(img);
 	string phash = pHashValue(img);
@@ -142,11 +153,19 @@ int SimilarImage::test()
 	long long num = getIntValueOfHash(phash);
 	long long num2 = getIntValueOfHash(phash2);
 
+	cout << "hash: " << hash << endl;
+	cout << "phash: " << phash << endl;
+	cout << "hash2: " << hash2 << endl;
+	cout << "phash2: " << phash2 << endl;
+	cout << "dist: " << dist << endl;
+	cout << "dist2: " << dist2 << endl;
+	cout << "int value of hash1: " << num << endl;
+	cout << "int value of hash2: " << num2 << endl;
 
 	return 0;
 }
 
-/*void SimilarImage::getAllImagePaths(string path, vector<string> & imgDirs)
+void SimilarImage::getAllImagePaths(string path, vector<string> & imgDirs)
 {
 	if (FileDir::MyFileDirDll::doesPathExist(path) == false)
 		return;
@@ -159,7 +178,8 @@ int SimilarImage::test()
 		if (FileDir::MyFileDirDll::getNumFilesInDir(allDirs[i]) != 0)
 			imgDirs.push_back(allDirs[i]);
 	}		
-}*/
+}
+
 long long SimilarImage::getIntValueOfHash(string bits)
 {
 	int multiplier = 1;
@@ -201,48 +221,54 @@ void SimilarImage::loadCalculatedHashes()
 
 	myfile.close();
 }
-void SimilarImage::findDupes(vector<string> & imgDirs, map<int,vector<int>> &dupeList)
+
+void SimilarImage::dumpImageDataToTTextFile(string filename)
 {
-	allImages.clear();
-	for (size_t i = 0; i < imgDirs.size(); i++)
-	{
-		vector<string> Allfiles = FileDir::MyFileDirDll::getAllFileNamesInDir(imgDirs[i]);
-		for (size_t j = 0; j < Allfiles.size(); j++)
-		{
-			Mat img = cv::imread(Allfiles[j], cv::IMREAD_COLOR);
-			if (img.data == NULL)
-				continue;
-			ImageFiles newImage;
-			newImage.hash = HashValue(img);
-			newImage.phash = pHashValue(img);
-			newImage.path = Allfiles[j];
-			allImages.push_back(newImage);
-		}
-		
-	}
 	ofstream myfile;
-	myfile.open("savedData.txt");
+	myfile.open(filename);
 	for (size_t i = 0; i < allImages.size(); i++)
 		myfile << allImages[i].ToString() << endl;
-	
+
 	myfile.close();
-	//now all hashes have been calculated, time to start the compare
+}
 
-	//bool *alreadyIncludedMap = new bool[allImages.size()](); //the parens should set every value to false
+void SimilarImage::calcImageHash(string imgPath)
+{
+	Mat img = cv::imread(imgPath, cv::IMREAD_COLOR);
+	if (img.data == NULL)
+		return;
+	ImageFiles newImage;
+	newImage.hash = HashValue(img);
+	newImage.phash = pHashValue(img);
+	newImage.path = imgPath;
+	//allImages.push_back(newImage);
+}
+
+void SimilarImage::calcImageHasesForDir(string imgDir)
+{
+	vector<string> Allfiles = FileDir::MyFileDirDll::getAllFileNamesInDir(imgDir);
+	for (size_t i = 0; i < Allfiles.size(); i++)
+		calcImageHash(Allfiles[i]);
+}
+
+void SimilarImage::findDupes(vector<string> & imgDirs, map<int, vector<int>> &dupeList)
+{
 	map<int, bool> alreadyIncludedMap;
-
 	for (int i = 0; i < allImages.size(); i++)
 	{
 		for (int j = i; j < allImages.size(); j++)
 		{
 			if (i == j)
 				continue;
+			//if we found these 2 to be a match alraedy, dont add it to the list again!
+			if (alreadyIncludedMap[i] && alreadyIncludedMap[j])
+				continue;
 
-			if (HanmingDistance(allImages[i].phash, allImages[j].phash) < 2)
+			if (HanmingDistance(allImages[i].phash, allImages[j].phash) < minHammingDist)
 			{			
 				//if we found these 2 to be a match alraedy, dont add it to the list again!
-				if (alreadyIncludedMap[i] && alreadyIncludedMap[j])
-					continue;
+				/*if (alreadyIncludedMap[i] && alreadyIncludedMap[j])
+					continue;*/
 
 				vector<int> temp;
 				if (dupeList.count(i) > 0)
@@ -256,30 +282,4 @@ void SimilarImage::findDupes(vector<string> & imgDirs, map<int,vector<int>> &dup
 			}
 		}
 	}
-}
-
-int main(int argc, const char *argv[])
-{
-	Mat img = cv::imread("\\\\OPTIPLEX-745\\photos\\porno pics\\mega sites\\twistys\\models\\Valentina Nappi\\black flower robe blue flower undies\\8_628.jpg", cv::IMREAD_COLOR);
-	Mat img2 = cv::imread("\\\\OPTIPLEX-745\\photos\\porno pics\\mega sites\\twistys\\models\\Valentina Nappi\\black flower robe blue flower undies\\10_506.jpg", cv::IMREAD_COLOR);
-	//cvNamedWindow("MyOpenCV");
-	//cvShowImage("MyOpenCV", img);
-	//cvWaitKey(0);
-	//cvDestroyWindow("MyOpenCV");
-	SimilarImage simImage;
-
-	string hash = simImage.HashValue(img);
-	string phash = simImage.pHashValue(img);
-	string hash2 = simImage.HashValue(img2);
-	string phash2 = simImage.pHashValue(img2);
-	int dist = simImage.HanmingDistance(hash, hash2);
-	int dist2 = simImage.HanmingDistance(phash, phash2);
-	cout << "hash: " << hash << endl;
-	cout << "phash: " << phash << endl;
-	cout << "hash2: " << hash2 << endl;
-	cout << "phash2: " << phash2 << endl;
-	cout << "dist: " << dist << endl;
-	cout << "dist2: " << dist2 << endl;
-
-	return 0;
 }

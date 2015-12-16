@@ -157,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\database.h" />
+    <ClInclude Include="DataBaseBuilder.h" />
     <ClInclude Include="DatabaseDataParser.h" />
     <ClInclude Include="DataBaseTableStructs.h" />
     <ClInclude Include="fileWalker.h" />

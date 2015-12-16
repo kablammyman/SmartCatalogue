@@ -10,7 +10,7 @@
 #include "opencv2/imgproc.hpp"
 
 
-
+#include "DatabaseController.h"
 
 using namespace std;
 using namespace cv;
@@ -29,8 +29,15 @@ struct ImageFiles
 
 class SimilarImage
 {
-public:
+	DatabaseController dbCtrlr;
+	int minHammingDist;
 	vector<ImageFiles> allImages;
+public:
+	
+	SimilarImage()
+	{
+		minHammingDist = 2;
+	}
 
 	//Hash  
 	string HashValue(Mat &src);
@@ -41,7 +48,10 @@ public:
 	//  
 	int HanmingDistance(string &str1, string &str2);
 
-	int test();
+	void calcImageHash(string imgPath);
+	void calcImageHasesForDir(string imgDir);
+	void dumpImageDataToTTextFile(string filename);
+	int test(string imgPath1, string imgPath2, bool viewImg = false);
 	void loadCalculatedHashes();
 	void getAllImagePaths(string path, vector<string> & imgDirs);
 	long long getIntValueOfHash(string bits);
