@@ -14,7 +14,12 @@ using namespace std;
 class DatabaseDataParser
 {
 	Trie* keyWords;
+	//first is the actual word, the second is the catogory
+	//ex: descriptiveWords["green"] -> color
+	//ex: descriptiveWords["pants"] -> colothingItem
+	map<string, string> descriptiveWords;
 
+	//why do i need this?
 	map<string, vector<string>*> DBTables;
 	/*map<int, string> actionPart;
 	map<int, string> colors;

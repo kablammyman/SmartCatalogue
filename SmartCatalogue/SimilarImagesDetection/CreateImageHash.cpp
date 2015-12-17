@@ -5,8 +5,12 @@
 
 void invalidParmMessageAndExit()
 {
-	cout << "invlaid parameters. You need to provide a path to the DB and a path where your images are\n";
-	cout << "CreateImageHash -dbPath \"C:\\somePath\\\" -imgPath \"C:\\photos\\myFunPhotos\\\"\n";
+	cout << "invlaid parameters. Here are the options:\n";
+	cout << "-compare <imgpath1> <imgpath2> -> compare 2 images\n";
+	cout << "-addToDB <imgPath> <dbPath> -> add either a single image to a DB\n";
+	cout << "-addToDB <imgDir> <dbPath> -> add a direcotry of images to a DB\n";
+	cout << "-compToDB <imgPath> <dbPath> -> compare an image to a a DB of image hashes\n";
+	cout << "-compToDir <imgPath> <imgDir> -> compare an image to a directory of images\n";
 	exit(1);
 }
 

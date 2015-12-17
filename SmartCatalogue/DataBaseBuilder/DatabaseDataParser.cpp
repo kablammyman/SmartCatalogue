@@ -5,7 +5,7 @@
 
 
 
-#define TEST_DATABASE_PARSER 1
+//#define TEST_DATABASE_PARSER 1
 
 DatabaseDataParser::DatabaseDataParser()
 {
@@ -16,6 +16,8 @@ DatabaseDataParser::DatabaseDataParser()
 
 	nameMarker = "models";//when we see this in a path, we know that the next token is a name for sure
 	fileWalker = new FileWalker();
+
+	
 
 #ifdef TEST_DATABASE_PARSER
 	//testNamelogic();
@@ -67,10 +69,38 @@ void DatabaseDataParser::getDBTableValues(string tableName)
 	{
 		vector<string> *newData = new vector<string>();
 		for (size_t i = 0; i < table[1].size(); i++)
-			newData->push_back(table[1][i]);
-
+		{ 
+			string tableEntry = table[1][i];
+			newData->push_back(tableEntry);
+			descriptiveWords[tableEntry] = tableName;
+		}
 		DBTables[tableName] = newData;
 	}
+
+
+	
+/*
+		map <word, index of db>
+
+		for each word:
+	is word in map ?
+		then save word to vector
+
+		go thru all saved words
+		get word's db index, then find the id of word in db
+
+		find clothing type, and keywords to extend it to other types
+		use what we have to "fifure out" what clothing item we have
+		fill out clopthign item for each clothing item
+	struct ClothingItem
+	{
+		int clotingTypeIndex;
+		int lingerieTypeIndex;
+		int ClothingMaterialIndex;
+		int ClothingPrintIndex;
+		int ColorIndex;
+		int BodyPartIndex;
+	};*/
 }
 
 //----------------------------------------------------------------------
@@ -399,8 +429,8 @@ void DatabaseDataParser::testGalleryCalc()
 					printf("%s\n", gallery[j]->models[k].name.middleName.c_str());
 					printf("%s\n", gallery[j]->models[k].name.firstName.c_str());
 					
-					/*printf("%d\n", gallery[j]->models[k].outfit[0].clotingTypeIndex);
-					printf("%d\n", gallery[j]->models[k].sexActionIndex);
+					printf("%d\n", gallery[j]->models[k].outfit[0].clotingTypeIndex);
+					/*printf("%d\n", gallery[j]->models[k].sexActionIndex);
 					printf("%d\n", gallery[j]->models[k].hairColorIndex);*/
 				}
 				printf("%s\n", gallery[j]->websiteName.c_str());
