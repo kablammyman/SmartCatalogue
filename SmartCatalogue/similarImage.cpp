@@ -2,7 +2,7 @@
 
 //hasing code came from this virus infected site:
 //http://www.developermemo.com/1262721/
-//#include "stdafx.h"
+#include "stdafx.h"
 
 #include "similarImage.h"
 
@@ -170,9 +170,10 @@ void SimilarImage::getAllImagePaths(string path, vector<string> & imgDirs)
 	if (FileDir::MyFileDirDll::doesPathExist(path) == false)
 		return;
 
-	FileDir::MyFileDirDll::processDirectory(path);
+	FileDir::MyFileDirDll::addDirTree(path,10);
 
-	vector<string> allDirs = FileDir::MyFileDirDll::dumpTreeToVector(true);
+	vector<string> allDirs;
+	FileDir::MyFileDirDll::dumpTreeToVector(path, allDirs, true);
 	for (size_t i = 0; i < allDirs.size(); i++)
 	{
 		if (FileDir::MyFileDirDll::getNumFilesInDir(allDirs[i]) != 0)

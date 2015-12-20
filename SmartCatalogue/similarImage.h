@@ -31,9 +31,9 @@ class SimilarImage
 {
 	DatabaseController dbCtrlr;
 	int minHammingDist;
-	vector<ImageFiles> allImages;
-public:
 	
+public:
+	vector<ImageFiles> allImages; //maybe this should be private, but we need to see this list so we can display it
 	SimilarImage()
 	{
 		minHammingDist = 2;

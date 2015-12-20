@@ -29,13 +29,15 @@ public:
 	FileWalker();
 	void takeDirSnapShot(string path, bool refresh = false);
 	
-	vector<string> getAllDirPaths();
-	//int getNumFiles();
+	void getAllDirPaths(vector<string> &ret);
+	void getAllEmptyDirs(vector<string> & emptyDirs);
+
+	int getNumFiles();
 	int getNumDirs();
 	
 	void deleteEmptyDirs(vector<string> & emptyDirs);
 
-	void getAllEmptyDirs(vector<string> & emptyDirs);
+	
 	void getAllDirsWithImgs(vector<string> & imgDirs, bool onlyLegalDirs = true);
 
 	bool isFileNew(string file);
