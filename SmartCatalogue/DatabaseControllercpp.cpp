@@ -3,7 +3,7 @@
 
 
 
-//#define TEST_DATABASE_CONTROLLER 1
+
 
 void DatabaseController::openDatabase(string path)
 {
@@ -21,10 +21,6 @@ void DatabaseController::openDatabase(string path)
 		db->closeDataBase(output);
 		return;
 	}
-
-#ifdef TEST_DATABASE_CONTROLLER
-	testGetTable();
-#endif
 	//curDBWindowData = db->viewData();
 	//sendDataToEditWindow(getDBViewHandle(), curDBWindowData);
 }

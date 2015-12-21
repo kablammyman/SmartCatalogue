@@ -8,6 +8,9 @@
 #include "DatabaseDataParser.h"
 #include "CFGReaderDll.h"
 
+#define TEST_DATABASE_PARSER 1
+//#define TEST_DATABASE_CONTROLLER 1
+
 void invalidParmMessageAndExit()
 {
 	cout << "invlaid parameters. You need to provide a path to the DB and a path where your images are\n";
@@ -47,10 +50,9 @@ int main(int argc, char *argv[])
 		dbCtrlr.openDatabase(dbPath);
 		dbDataParser.setDBController(&dbCtrlr);
 
-		if (pathToProcess != "")
-			dbDataParser.getAllPaths(pathToProcess);
+		
 
-
+		dbDataParser.fillPartOfSpeechTable("TableNamesPartOfSceech");
 		vector<string> dbTableValues = CFG::CFGReaderDLL::getCfgListValue("tableNames");
 		//if we cant find the table names in the cfg, thejust get out of here
 		if (dbTableValues.size() == 1 && dbTableValues[0].find("could not find") != string::npos)
@@ -93,8 +95,18 @@ int main(int argc, char *argv[])
 
 	if (dbPath == "" || pathToProcess == "")
 		invalidParmMessageAndExit();
-	
-	
+
+#ifdef TEST_DATABASE_PARSER
+	//testNamelogic();
+	//testSpellchecker();
+	dbDataParser.testGalleryCalc();
+#endif
+#ifdef TEST_DATABASE_CONTROLLER
+	testGetTable();
+#endif	
+
+	if (pathToProcess != "")
+		dbDataParser.getAllPaths(pathToProcess);
 
 	return 0;
 }

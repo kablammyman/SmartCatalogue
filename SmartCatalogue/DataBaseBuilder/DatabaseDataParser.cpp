@@ -1,11 +1,5 @@
 #include "stdafx.h"
-
-
 #include "DatabaseDataParser.h"
-
-
-
-//#define TEST_DATABASE_PARSER 1
 
 DatabaseDataParser::DatabaseDataParser()
 {
@@ -18,12 +12,6 @@ DatabaseDataParser::DatabaseDataParser()
 	fileWalker = new FileWalker();
 
 	
-
-#ifdef TEST_DATABASE_PARSER
-	//testNamelogic();
-	//testSpellchecker();
-	testGalleryCalc();
-#endif
 
 	//if (!meta.empty())
 	//	fileWalker->fillMetaWords(meta);
@@ -51,6 +39,36 @@ vector<string> DatabaseDataParser::tokenize(string path, string delims)
 	return returnVec;
 }
 
+void DatabaseDataParser::fillPartOfSpeechTable(string pofTableName)
+{
+	int numCol = 2;
+	string result = dbCtrl->getTable(pofTableName);
+
+	if (result == "")
+		return;
+
+	vector<vector<string>> table = parseDBOutput(result, numCol);
+
+	if (table.size() < (size_t)numCol)
+		return;
+	for (size_t i = 0; i < table[1].size(); i++)
+	{
+		string tableName = table[0][i];
+		string pos = table[1][i];
+		toProperNoun(tableName);
+		toProperNoun(pos);
+		if (pos == "Noun")
+			tableNamePartOfSpeech[tableName] = NOUN;
+		else if (pos == "Adj")
+			tableNamePartOfSpeech[tableName] = ADJ;
+		else if (pos == "Verb")
+			tableNamePartOfSpeech[tableName] = VERB;
+		else
+			tableNamePartOfSpeech[tableName] = UNKNOWN;
+		
+	}
+	
+}
 //we have quite a few tables that act like drop down..we will need theri values for parsing data
 void DatabaseDataParser::getDBTableValues(string tableName)
 {
@@ -64,7 +82,8 @@ void DatabaseDataParser::getDBTableValues(string tableName)
 	
 	if (table.size() < (size_t)numCol)
 		return;
-
+	
+	toProperNoun(tableName);
 	if (!DBTables[tableName])
 	{
 		vector<string> *newData = new vector<string>();
@@ -72,35 +91,12 @@ void DatabaseDataParser::getDBTableValues(string tableName)
 		{ 
 			string tableEntry = table[1][i];
 			newData->push_back(tableEntry);
+			if (tableName.empty() || tableEntry.empty())
+				printf("wtf\n");
 			descriptiveWords[tableEntry] = tableName;
 		}
 		DBTables[tableName] = newData;
 	}
-
-
-	
-/*
-		map <word, index of db>
-
-		for each word:
-	is word in map ?
-		then save word to vector
-
-		go thru all saved words
-		get word's db index, then find the id of word in db
-
-		find clothing type, and keywords to extend it to other types
-		use what we have to "fifure out" what clothing item we have
-		fill out clopthign item for each clothing item
-	struct ClothingItem
-	{
-		int clotingTypeIndex;
-		int lingerieTypeIndex;
-		int ClothingMaterialIndex;
-		int ClothingPrintIndex;
-		int ColorIndex;
-		int BodyPartIndex;
-	};*/
 }
 
 //----------------------------------------------------------------------
@@ -170,7 +166,8 @@ vector<ModelName> DatabaseDataParser::doNameLogic(string allNames)
 		vector<string> names = tokenize(modelNames[i], " ");
 		if (!names.empty())
 		{
-			names[0][0] = toupper(names[0][0]);//capatolize the first letter of each name
+			toProperNoun(names[0]);
+			//names[0][0] = toupper(names[0][0]);//capatolize the first letter of each name
 			model.firstName = names[0];
 		}
 		if (names.size() > 1)
@@ -178,7 +175,8 @@ vector<ModelName> DatabaseDataParser::doNameLogic(string allNames)
 			bool useMiddleName = names.size() > 2 ? true : false;
 			for (size_t j = 1; j < names.size(); j++)
 			{
-				names[j][0] = toupper(names[j][0]);//capatolize the first letter of each name
+				toProperNoun(names[j]);
+				//names[j][0] = toupper(names[j][0]);//capatolize the first letter of each name
 				if (useMiddleName && j == 1)
 					model.middleName = names[j];
 				else //we may have a 4 named person...? if so this should cover that
@@ -336,9 +334,76 @@ void DatabaseDataParser::addMetaWordsToData(string path, GalleryData &data)
 	}
 
 }
+int DatabaseDataParser::getPartfOfSpeech(string word)
+{
+	//make these its own table
+	return 0;
+}
+int DatabaseDataParser::getEntryIDFromDBTable(string table, string word)
+{
+	vector<string> *dbEntries = DBTables[table];
+	for (size_t i = 0; i < dbEntries->size(); i++)
+		if ((*dbEntries)[i] == word)
+			return i;
+	return -1;
+}
+//must be used with desciptive words only! otherwise we will need to add a check before, and i dont want to do that
+bool DatabaseDataParser::isClothingNoun(string noun)
+{
+	//this will make sure we will only check values, not add non-existant ones, but this should be nesc if used properely
+	//if (tableNamePartOfSpeech.count(noun))
+	if (tableNamePartOfSpeech[noun] != NOUN)
+		return false;
+	if (noun != "Ethnicity" && noun != "Furniture" && noun != "Locations" && noun != "BodyPart")
+		return true;
+	return false;
+}
+bool DatabaseDataParser::isConjunction(string word)
+{
+	if (word == "And" || word == "&")
+		return true;
+	return false;
+}
 vector <ClothingItem> DatabaseDataParser::getOutfitFromGalleryName(string galleryName)
 {
 	vector <ClothingItem> clothes;
+	vector<string> tokens = tokenize(galleryName, "- _");
+	ClothingItem curItem;
+
+	for (size_t i = 0; i < tokens.size(); i++)
+	{
+		string curWordDB = descriptiveWords[tokens[i]];
+		if (!curWordDB.empty())
+		{			
+			//when we get a noun, we are probaly done describing cur object
+			if (isClothingNoun(curWordDB))
+			{
+				curItem.type = curWordDB;
+				curItem.index = getEntryIDFromDBTable(curWordDB, tokens[i]);
+				clothes.push_back(curItem);
+				//if our next word is an "and", we prob mean to extend the adjs to the next noun
+				if (i < tokens.size() - 2)
+				{
+					if (isConjunction(tokens[i + 1]) && isClothingNoun(descriptiveWords[tokens[i + 2]]))
+						continue;
+				}
+				curItem.clear();
+			}
+			else if (tableNamePartOfSpeech[curWordDB] == ADJ)
+			{
+				int index = getEntryIDFromDBTable(curWordDB, tokens[i]);
+				if (index == -1)
+					continue;
+				else index++; //the db index starts at 1, not 0
+				if (curWordDB == "Clothingmaterial")
+					curItem.ClothingMaterialIndex = index;
+				else if (curWordDB == "Clothingprint")
+					curItem.ClothingPrintIndex = index;
+				else if (curWordDB == "Colors")
+					curItem.ColorIndex = index;
+			}
+		}
+	}
 
 	return clothes;
 }
@@ -398,14 +463,22 @@ void DatabaseDataParser::testNamelogic()
 void DatabaseDataParser::testGalleryCalc()
 {
 	vector<string> testPaths;
-	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\teens\\18-only-girls\\539");//no name
+	/*testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\teens\\18-only-girls\\539");//no name
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\teens\\18-only-girls\\models\\anita e\\a-lonely-dreamer");//one model
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\teens\\18-only-girls\\models\\eveline and nancay\\outdoor play in panties");//two models
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\penthouse\\models\\Austin, Alyssa Reece, Yurizan Beltran and Melanie Jayne\\waterfall");//4 models
 	
+	//test clthing item dectetion from gallery name
+	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\strap on threesome in black dress");//
+	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\blue-transparent-bikini");//
+	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\pink-fishnet-bikini");//
+	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\blonde in red tartan skirt white pantyhose");//
+	*/
+	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\colege-girl-in-white-pantyhose-and-bra");//pantyhose and bra are both white, it should detect that
+
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\swank\\leg action\\59561");//sub website, no name
-	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\swank\\leg action\\models\\anita pearl\\black lace bustier black pattern pantyhose");//sub website, 1 model
-	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\swank\\leg action\\models\\Kristina Blond, Jennifer Stone and Thalia Festiny");//sub website, 3 models
+	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\swank\\leg action\\models\\anita pearl\\black lace bustier black pattern pantyhose");//good sub website, 1 model
+	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\swank\\leg action\\models\\Kristina Blond, Jennifer Stone and Thalia Festiny");//bad path sub website, 3 models, no gallery
 
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\teens\\18-only-girls"); //bad format...not enough info
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\teens\\18-only-girls\\539\\fakeDir"); //bad format...no model name
@@ -429,9 +502,12 @@ void DatabaseDataParser::testGalleryCalc()
 					printf("%s\n", gallery[j]->models[k].name.middleName.c_str());
 					printf("%s\n", gallery[j]->models[k].name.firstName.c_str());
 					
-					printf("%d\n", gallery[j]->models[k].outfit[0].clotingTypeIndex);
-					/*printf("%d\n", gallery[j]->models[k].sexActionIndex);
-					printf("%d\n", gallery[j]->models[k].hairColorIndex);*/
+					if (gallery[j]->models[k].outfit.size() > 0)
+					{
+						printf("%s\n", gallery[j]->models[k].outfit[0].type);
+						/*printf("%d\n", gallery[j]->models[k].sexActionIndex);
+						printf("%d\n", gallery[j]->models[k].hairColorIndex);*/
+					}
 				}
 				printf("%s\n", gallery[j]->websiteName.c_str());
 				printf("%s\n", gallery[j]->category.c_str());

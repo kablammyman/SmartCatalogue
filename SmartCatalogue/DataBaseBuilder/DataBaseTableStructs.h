@@ -7,12 +7,29 @@ using namespace std;
 //i guess shoes are included in this list...?
 struct ClothingItem
 {
-	int clotingTypeIndex;
-	int lingerieTypeIndex;
+	string type; //clothing type, panty type, legwear, etc
+	int index; //what index in its table can we find the actual name
 	int ClothingMaterialIndex;
 	int ClothingPrintIndex;
 	int ColorIndex;
 	int BodyPartIndex;
+	//if type is empty, we can assume either nothing else is filled out or the data is junk
+	// even if we have some aux info (like color), we dont know what this item is
+	bool isEmpty()
+	{
+		return type.empty();
+	}
+	void clear()
+	{
+		type.clear();
+		index = -1; 
+		ClothingMaterialIndex = -1;
+		ClothingPrintIndex = -1;
+		ColorIndex = -1;
+		BodyPartIndex = -1;
+	}
+	ClothingItem() :type(""), index(-1), ClothingMaterialIndex(-1), ClothingPrintIndex(-1), ColorIndex(-1), BodyPartIndex(-1)
+	{}
 };
 
 struct ModelName

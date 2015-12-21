@@ -11,6 +11,11 @@
 
 using namespace std;
 
+#define UNKNOWN 0
+#define NOUN 1
+#define ADJ  2
+#define VERB 3
+
 class DatabaseDataParser
 {
 	Trie* keyWords;
@@ -18,25 +23,18 @@ class DatabaseDataParser
 	//ex: descriptiveWords["green"] -> color
 	//ex: descriptiveWords["pants"] -> colothingItem
 	map<string, string> descriptiveWords;
-
-	//why do i need this?
+	map<string, int> tableNamePartOfSpeech;
 	map<string, vector<string>*> DBTables;
-	/*map<int, string> actionPart;
-	map<int, string> colors;
-	map<int, string> material;
-	map<int, string> print;
-	map<int, string> toy;
-	map<int, string> lingerie;
-	map<int, string> clothing;
-	map<int, string> scenery;*/
+	
 
 	FileWalker *fileWalker;
 	DatabaseController *dbCtrl;
 
 	string nameMarker;
 	string seaerchForGalleryDescriptor(vector<string> &tokens, Trie *treeType);
-	
-	
+	int getPartfOfSpeech(string word);
+	bool isClothingNoun(string noun);
+	bool isConjunction(string word);
 
 	bool hasDataFromTable(string data, map<int,string> dbValues);
 	string getModelName(string path);
@@ -46,13 +44,13 @@ class DatabaseDataParser
 	void addMetaWordsToData(string path, GalleryData &data);
 	void toProperNoun(string &input);
 	vector <ClothingItem> getOutfitFromGalleryName(string galleryName);
-
+	int getEntryIDFromDBTable(string trable, string word);
 	//int getNameMarkerIndexInTokens(vector<string> & tokens);
 	//int isNameMarkerInTokens(vector<string> & tokens);
 public:
 	void getDBTableValues(string tableName);
 	vector <vector<string>>parseDBOutput(string &inputData, int numFields);
-
+	void fillPartOfSpeechTable(string pofTableName);
 	DatabaseDataParser();
 	void setDBController(DatabaseController *dbc);
 	void getAllPaths(string path);
@@ -61,7 +59,12 @@ public:
 	
 	void fillTreeWords(vector<string> &meta, Trie *trieType);
 	
-	
+	/*
+	bool addToField(string type) {
+	if(type == "Pantytypes")
+		doSomethingt...
+	}
+	*/
 	
 	void GetAllBadPaths();
 
