@@ -91,30 +91,14 @@ string DatabaseController::getTable(string tableName)
 
 	return returnString;
 }
-
-///////////////////////////////////////////////////////////test methods
-void DatabaseController::createTable(string tableName, string fields)
-{
-	db->createTable(tableName, fields);
-}
-
-void DatabaseController::testGetTable()
-{
-	string result = getTable("BodyPart");
-	printf("%s", result.c_str());
-
-	/*DatabaseDataParser temp;
-	temp.parseDBOutput(result, 2);*/
-}
-
 //returns true when successful
 bool DatabaseController::insertNewDataEntry(string table, dbDataPair data, string &output)
 {
-	string querey = ("INSERT INTO " + table + " ("+data.first +")");
-	string values = "VALUES ( \" + data.second +  \");";
+	string querey = ("INSERT INTO " + table + " (" + data.first + ")");
+	string values = "VALUES ( \""+ data.second +  "\");";
 
 	return db->executeSQL(querey + values, output);
-	
+
 }
 
 //returns true when successful
@@ -138,4 +122,36 @@ bool DatabaseController::insertNewDataEntry(string table, vector<dbDataPair> dat
 
 	return db->executeSQL(querey + values, output);
 
+}
+///////////////////////////////////////////////////////////test methods
+void DatabaseController::createTable(string tableName, string fields)
+{
+	db->createTable(tableName, fields);
+}
+
+void DatabaseController::testGetTable()
+{
+	string result = getTable("BodyPart");
+	printf("%s", result.c_str());
+
+	/*DatabaseDataParser temp;
+	temp.parseDBOutput(result, 2);*/
+}
+void DatabaseController::testDBEntry()
+{
+	string output;
+	dbDataPair test1 = make_pair("name","test");
+	insertNewDataEntry("Category", test1, output);
+
+	vector<dbDataPair> data;
+
+	data.push_back(make_pair("ID", "000"));
+	data.push_back(make_pair("WebsiteID", "001"));
+	data.push_back(make_pair("SubWebsiteID", "002"));
+	data.push_back(make_pair("path", "C:\\some\\fake\\path"));
+	data.push_back(make_pair("tags", "test,testData,wow doge"));
+
+	insertNewDataEntry("Gallery", data, output);
+
+	
 }

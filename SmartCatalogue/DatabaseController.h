@@ -28,4 +28,5 @@ public:
 	//test methods
 	void createTable(string tableName, string fields);
 	void testGetTable();
+	void testDBEntry();
 };

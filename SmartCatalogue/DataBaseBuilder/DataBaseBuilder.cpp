@@ -8,8 +8,8 @@
 #include "DatabaseDataParser.h"
 #include "CFGReaderDll.h"
 
-#define TEST_DATABASE_PARSER 1
-//#define TEST_DATABASE_CONTROLLER 1
+//#define TEST_DATABASE_PARSER 1
+#define TEST_DATABASE_CONTROLLER 1
 
 void invalidParmMessageAndExit()
 {
@@ -102,7 +102,8 @@ int main(int argc, char *argv[])
 	dbDataParser.testGalleryCalc();
 #endif
 #ifdef TEST_DATABASE_CONTROLLER
-	testGetTable();
+	dbCtrlr.testGetTable();
+	dbCtrlr.testDBEntry();
 #endif	
 
 	vector<string> imageDirs;
