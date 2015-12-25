@@ -307,3 +307,28 @@ void MainApp::deleteFromFilePathList()
 	curFileWindowData.clear();
 	sendDataToEditWindow(getFileViewHandle(), curFileWindowData);
 }
+//this used to be the beggining of how i would read all the text strings (they were paths) in a window, calc some data fron the path, then add to the DB.
+//things are differnt now, but i feel ill need this still, so here is the main "logic"
+
+void MainApp::oldGetPathData()
+{
+	vector<string> data = getDataFromEditWindow(getFileViewHandle());
+
+	if (data.empty())
+		curDBWindowData.push_back("nothing to add to DB");
+
+	for (size_t i = 0; i < data.size(); i++)
+	{
+		/*vector <GalleryData *>d;
+		if (!fileWalker->calcGalleryData(data[i], ignorePattern, d))
+		{
+			string err = "invalid file path: " + data[i];
+			curDBWindowData.push_back(err);
+			continue;
+		}
+
+		for (size_t j = 0; j < d.size(); j++)
+		{
+		}*/
+	}
+}

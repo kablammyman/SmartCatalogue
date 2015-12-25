@@ -5,7 +5,7 @@
 #include "SmartCatalogue.h"
 #include "MainApp.h"
 
-
+#include <utility>      // std::pair
 #include <string>
 
 #include <iostream>
@@ -261,8 +261,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if(!MainApp::Instance()->dbCtrlr.isDBOpen())
 				 MessageBox(hWnd, "Open a database first!","db not open", MB_OKCANCEL);
 			else
-			//we need to figure out how to make sure MainApp::Instance()->dir exists
-			MainApp::Instance()->dbCtrlr.insertDataFromCurDir();
+			{
+				//we need to figure out how to make sure MainApp::Instance()->dir exists
+				string output;
+				MainApp::Instance()->dbCtrlr.insertNewDataEntry("someTableName", make_pair("some field", "some value"), output);
+			}
 		}
 		else if(LOWORD(wParam) == BTN_DELETE_FROM_FILE_PATH_LIST)
 		{

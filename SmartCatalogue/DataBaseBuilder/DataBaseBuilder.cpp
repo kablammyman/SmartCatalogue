@@ -105,8 +105,11 @@ int main(int argc, char *argv[])
 	testGetTable();
 #endif	
 
+	vector<string> imageDirs;
+	//get all the paths and put the info in memory
 	if (pathToProcess != "")
-		dbDataParser.getAllPaths(pathToProcess);
+		dbDataParser.getAllPaths(pathToProcess, imageDirs);
+	//now, lets start to break down the info we can get from the paths into our structs/classes
 
 	return 0;
 }

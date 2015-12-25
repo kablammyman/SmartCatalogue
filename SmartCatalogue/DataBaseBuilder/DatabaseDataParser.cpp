@@ -6,7 +6,7 @@ DatabaseDataParser::DatabaseDataParser()
 	/*in the cfg file, theres a list of all the "drop down" db tables name
 	we use that list to know what values are allowed...we dont want miss-spellings
 	*/
-	keyWords = new Trie();
+	dictionary = new Trie();
 
 	nameMarker = "models";//when we see this in a path, we know that the next token is a name for sure
 	fileWalker = new FileWalker();
@@ -91,9 +91,10 @@ void DatabaseDataParser::getDBTableValues(string tableName)
 		{ 
 			string tableEntry = table[1][i];
 			newData->push_back(tableEntry);
-			if (tableName.empty() || tableEntry.empty())
-				printf("wtf\n");
+		//	if (tableName.empty() || tableEntry.empty())
+		//		printf("wtf\n");
 			descriptiveWords[tableEntry] = tableName;
+			dictionary->addWord(tableEntry);
 		}
 		DBTables[tableName] = newData;
 	}
@@ -197,7 +198,7 @@ vector<ModelName> DatabaseDataParser::doNameLogic(string allNames)
 bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, vector<GalleryData *> &gallery)
 {
 	/*
-	use a state machine tofigure thigns out.
+	use a state machine to figure thigns out.
 	we will go thru the tokens, and with each token, transition to a new state
 	biggest one is once we see a "models" token, transition to getName state. from there, we know we wont see a subwebsite for example. only more models or a gallery
 
@@ -286,7 +287,8 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, vec
 		galleryData->websiteName = website;
 		galleryData->subWebsiteName = subwebsite;
 		galleryData->galleryName = galleryName;
-
+		galleryData->location = getVerfiedWordFromGalleryName(galleryName, "Locations");
+		galleryData->location = getVerfiedWordFromGalleryName(galleryName, "Sextoys");
 		//if we dont have a name, skip this
 		if (index < names.size())
 		{
@@ -297,7 +299,8 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, vec
 			tempModel.outfit = getOutfitFromGalleryName(galleryName);
 			galleryData->models.push_back(tempModel);
 		}
-		addMetaWordsToData(path, (*galleryData));
+	// what should we do with this...is this still needed?
+	//	addMetaWordsToData(path, (*galleryData));
 
 		gallery.push_back(galleryData);
 		index++;
@@ -364,11 +367,95 @@ bool DatabaseDataParser::isConjunction(string word)
 		return true;
 	return false;
 }
+//since this will be used after things are capitolized, all the checks will reflect that
+void DatabaseDataParser::transformClothingNameAlias(string &phrase)
+{
+	size_t found = phrase.find("School Girl");
+	if (found != string::npos)
+		phrase.replace(found, 11, "Schoolgirl");
+	found = phrase.find("School-Girl");
+	if (found != string::npos)
+		phrase.replace(found, 11, "Schoolgirl");
+	//knee highs can be socks or nylons....or even legwarmers
+	found = phrase.find("Knee Highs");
+	if (found != string::npos)
+		phrase.replace(found, 9, "Kneehighsocks");
+	found = phrase.find("Knee High Socks");
+	if (found != string::npos)
+		phrase.replace(found, 15, "Kneehighsocks");
+
+
+	found = phrase.find("Thigh Highs");
+	if (found != string::npos)
+		phrase.replace(found, 10, "Thighhighsocks");
+
+	found = phrase.find("Thigh High Socks");
+	if (found != string::npos)
+		phrase.replace(found, 16, "Thighhighsocks");
+
+
+	found = phrase.find("Undies");
+	if (found != string::npos)
+		phrase.replace(found, 6, "Bra and Panties");
+
+	found = phrase.find("T Shirt");
+	if (found != string::npos)
+		phrase.replace(found, 7, "Tshirt");
+	found = phrase.find("T-Shirt");
+	if (found != string::npos)
+		phrase.replace(found, 7, "Tshirt");
+
+	found = phrase.find("G-String");
+	if (found != string::npos)
+		phrase.replace(found, 8, "Gstring");
+
+	found = phrase.find("Tank Top");
+	if (found != string::npos)
+		phrase.replace(found, 7, "Tanktop");
+
+	found = phrase.find("Leg Warmers");
+	if (found != string::npos)
+		phrase.replace(found, 7, "Legwarmers");
+
+	found = phrase.find("Crotchless Pantyhose");
+	if (found != string::npos)
+		phrase.replace(found, 7, "Crotchlesspantyhose");
+
+	found = phrase.find("Seamless Pantyhose");
+	if (found != string::npos)
+		phrase.replace(found, 7, "Seamlesspantyhose");
+}
+
+void DatabaseDataParser::transformSexToyAlias(string &phrase)
+{
+	size_t found = phrase.find("Strap On");
+	if (found != string::npos)
+		phrase.replace(found, 8, "Strapon");
+	
+	found = phrase.find("Strap-on");
+	if (found != string::npos)
+		phrase.replace(found, 8, "Strapon");
+
+	found = phrase.find("Butt Plug");
+	if (found != string::npos)
+		phrase.replace(found, 9, "Buttplug");
+
+	found = phrase.find("Fucking Machine");
+	if (found != string::npos)
+		phrase.replace(found, 15, "Fuckingmachine");
+
+	found = phrase.find("Anal Beads");
+	if (found != string::npos)
+		phrase.replace(found, 10, "Analbeads");
+}
+
 vector <ClothingItem> DatabaseDataParser::getOutfitFromGalleryName(string galleryName)
 {
+	transformClothingNameAlias(galleryName);
 	vector <ClothingItem> clothes;
 	vector<string> tokens = tokenize(galleryName, "- _");
 	ClothingItem curItem;
+	
 
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
@@ -404,8 +491,24 @@ vector <ClothingItem> DatabaseDataParser::getOutfitFromGalleryName(string galler
 			}
 		}
 	}
-
+	//this is for when we have some description for a noun we dont recognize...we still should collect the data we do know.
+	//a black <blank> is better than no data at all
+	if(!curItem.isEmpty())
+		clothes.push_back(curItem);
 	return clothes;
+}
+string DatabaseDataParser::getVerfiedWordFromGalleryName(string galleryName, string dbTableName)
+{
+	vector<string> tokens = tokenize(galleryName, "- _");
+
+	for (size_t i = 0; i < tokens.size(); i++)
+	{
+		string curWordDB = descriptiveWords[tokens[i]];
+		if (curWordDB == dbTableName)
+			return  tokens[i];
+	}
+
+	return "";
 }
 
 //----------------------------------------------------------------------
@@ -414,9 +517,10 @@ bool DatabaseDataParser::hasDataFromTable(string data, map<int, string> dbValues
 	return false;
 }
 //----------------------------------------------------------------------
-void DatabaseDataParser::getAllPaths(string path)
+void DatabaseDataParser::getAllPaths(string path, vector<string> &dirsWithImages)
 {
 	fileWalker->takeDirSnapShot(path);
+	fileWalker->getAllDirsWithImgs(dirsWithImages);
 }
 
 //----------------------------------------------------------------------
@@ -473,8 +577,15 @@ void DatabaseDataParser::testGalleryCalc()
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\blue-transparent-bikini");//
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\pink-fishnet-bikini");//
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\blonde in red tartan skirt white pantyhose");//
-	*/
+	
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\colege-girl-in-white-pantyhose-and-bra");//pantyhose and bra are both white, it should detect that
+	*/
+	//string replace tests
+	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\school-girl-in-white-pantyhose-and-bra");//school-gril should be turned into schoolgirl
+	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\strap-on sex");//
+	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\purple g-string");//
+	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\seamless pantyhose");//
+	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\black lace undies");//
 
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\swank\\leg action\\59561");//sub website, no name
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\swank\\leg action\\models\\anita pearl\\black lace bustier black pattern pantyhose");//good sub website, 1 model
@@ -504,7 +615,7 @@ void DatabaseDataParser::testGalleryCalc()
 					
 					if (gallery[j]->models[k].outfit.size() > 0)
 					{
-						printf("%s\n", gallery[j]->models[k].outfit[0].type);
+						printf("%s\n", gallery[j]->models[k].outfit[0].type.c_str());
 						/*printf("%d\n", gallery[j]->models[k].sexActionIndex);
 						printf("%d\n", gallery[j]->models[k].hairColorIndex);*/
 					}

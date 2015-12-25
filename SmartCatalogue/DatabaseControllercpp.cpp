@@ -48,7 +48,7 @@ bool DatabaseController::executeSQL(string command)
 
 }
 
-bool DatabaseController::createNewDataBase()
+bool DatabaseController::createNewDataBase(string newDBName)
 {
 	//curDBWindowData.clear();
 	//close teh current one
@@ -56,7 +56,6 @@ bool DatabaseController::createNewDataBase()
 	db->closeDataBase(output);
 	//curDBWindowData.push_back(output);
 
-	string newDBName = dbName; //"pornoPics2.db";
 	FILE * pFile;
 	pFile = fopen(newDBName.c_str(), "w");
 	fclose(pFile);
@@ -108,78 +107,35 @@ void DatabaseController::testGetTable()
 	temp.parseDBOutput(result, 2);*/
 }
 
-void DatabaseController::insertDataFromCurDir()
+//returns true when successful
+bool DatabaseController::insertNewDataEntry(string table, dbDataPair data, string &output)
 {
-	/*string querey, output, values;
-	vector<string> data = getDataFromEditWindow(getFileViewHandle());
+	string querey = ("INSERT INTO " + table + " ("+data.first +")");
+	string values = "VALUES ( \" + data.second +  \");";
 
-	if (data.empty())
-		curDBWindowData.push_back("nothing to add to DB");
+	return db->executeSQL(querey + values, output);
+	
+}
 
+//returns true when successful
+bool DatabaseController::insertNewDataEntry(string table, vector<dbDataPair> data, string &output)
+{
+	string querey = ("INSERT INTO " + table + " (");
+	string values = "VALUES ( ";
 	for (size_t i = 0; i < data.size(); i++)
 	{
-		vector <GalleryData *>d;
-		if (!fileWalker->calcGalleryData(data[i], ignorePattern, d))
+		querey += data[i].first;
+		values += "\"" + data[i].second + "\"";
+
+		if (i < data.size() - 1)
 		{
-			string err = "invalid file path: " + data[i];
-			curDBWindowData.push_back(err);
-			continue;
-		}
-
-		for (size_t j = 0; j < d.size(); j++)
-		{
-			querey = "INSERT INTO galleries (path";
-			values = "VALUES ( \"" + d[j]->path + "\"";
-
-			if (!d[j]->model.firstName.empty())
-			{
-				querey += ",modelFirstName";
-				values += ",\"" + d[j]->model.firstName + "\"";
-
-				if (!d[j]->model.lastName.empty())
-				{
-					querey += ",modelLastName";
-					values += ",\"" + d[j]->model.lastName + "\"";
-				}
-			}
-
-			if (!d[j]->websiteName.empty())
-			{
-				querey += ",websiteName";
-				values += ",\"" + d[j]->websiteName + "\"";
-			}
-
-			if (!d[j]->category.empty())
-			{
-				querey += ",category";
-				values += ",\"" + d[j]->category + "\"";
-			}
-
-			if (!d[j]->subWebsiteName.empty())
-			{
-				querey += ",subWebsiteName";
-				values += ",\"" + d[j]->subWebsiteName + "\"";
-			}
-
-			querey += ",galleryName";
-			values += ",\"" + d[j]->galleryName + "\"";
-
-			if (!d[j]->metaData.empty())
-			{
-				querey += ",metaData)";
-				values += ",\"" + d[j]->metaData + "\");";
-			}
-			else
-			{
-				querey += ")";
-				values += ");";
-			}
-
-			if (db->executeSQL(querey + values, output))
-			{
-				curDBWindowData.push_back(data[i]);
-			}
+			querey += ",";
+			values += ",";
 		}
 	}
-	sendDataToEditWindow(getDBViewHandle(), curDBWindowData);*/
+	querey += ")";
+	values += ");";
+
+	return db->executeSQL(querey + values, output);
+
 }

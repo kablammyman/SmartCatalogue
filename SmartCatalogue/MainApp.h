@@ -96,5 +96,6 @@ public:
 
 	void deleteFromFilePathList();
 
+	void oldGetPathData();
 };
 #endif //MAINAPP_H
