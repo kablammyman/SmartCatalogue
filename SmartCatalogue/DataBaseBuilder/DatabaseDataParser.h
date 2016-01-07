@@ -65,7 +65,7 @@ public:
 	DatabaseDataParser();
 	void setDBController(DatabaseController *dbc);
 	void getAllPaths(string path, vector<string> &dirsWithImages);
-	bool calcGalleryData(string input, string ignorePattern, vector<GalleryData *> &gallery);
+	bool calcGalleryData(string input, string ignorePattern, GalleryData &gallery);
 	void transformClothingNameAlias(string &phrase);
 	void transformSexToyAlias(string &phrase);
 	void fillTreeWords(vector<string> &meta, Trie *trieType);

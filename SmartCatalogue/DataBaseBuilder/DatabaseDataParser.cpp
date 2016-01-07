@@ -195,7 +195,7 @@ vector<ModelName> DatabaseDataParser::doNameLogic(string allNames)
 	return nameVec;
 }
 
-bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, vector<GalleryData *> &gallery)
+bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, GalleryData &gallery)
 {
 	/*
 	use a state machine to figure thigns out.
@@ -277,37 +277,33 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, vec
 	if (galleryName.empty())
 		return false;
 
+	
+	
+	gallery.path = path;
+
+	gallery.category = catogory;
+	gallery.websiteName = website;
+	gallery.subWebsiteName = subwebsite;
+	gallery.galleryName = galleryName;
+	gallery.location = getVerfiedWordFromGalleryName(galleryName, "Locations");
+	gallery.toy = getVerfiedWordFromGalleryName(galleryName, "Sextoys");
+	
 	//now, make as many gallery data structs as there are names
 	size_t index = 0;
-	do {
-		GalleryData *galleryData = new GalleryData();
-		galleryData->path = path;
-
-		galleryData->category = catogory;
-		galleryData->websiteName = website;
-		galleryData->subWebsiteName = subwebsite;
-		galleryData->galleryName = galleryName;
-		galleryData->location = getVerfiedWordFromGalleryName(galleryName, "Locations");
-		galleryData->location = getVerfiedWordFromGalleryName(galleryName, "Sextoys");
+	while (index < names.size()) 
+	{
 		//if we dont have a name, skip this
-		if (index < names.size())
-		{
-			GalleryModel tempModel;
-			tempModel.name = names[index];
-			//ClothingItem item;
 
-			tempModel.outfit = getOutfitFromGalleryName(galleryName);
-			galleryData->models.push_back(tempModel);
-		}
+		GalleryModel tempModel;
+		tempModel.name = names[index];
+		tempModel.outfit = getOutfitFromGalleryName(galleryName);
+		gallery.models.push_back(tempModel);
+			
+		index++;
+	} 
 	// what should we do with this...is this still needed?
 	//	addMetaWordsToData(path, (*galleryData));
-
-		gallery.push_back(galleryData);
-		index++;
-	} while (index < names.size());
-
 	return true;
-
 }
 //----------------------------------------------------------------------
 void DatabaseDataParser::fillTreeWords(vector<string> &meta, Trie *trieType)
@@ -473,6 +469,8 @@ vector <ClothingItem> DatabaseDataParser::getOutfitFromGalleryName(string galler
 				{
 					if (isConjunction(tokens[i + 1]) && isClothingNoun(descriptiveWords[tokens[i + 2]]))
 						continue;
+					if (isClothingNoun(descriptiveWords[tokens[i + 1]]))
+						continue;
 				}
 				curItem.clear();
 			}
@@ -567,7 +565,7 @@ void DatabaseDataParser::testNamelogic()
 void DatabaseDataParser::testGalleryCalc()
 {
 	vector<string> testPaths;
-	/*testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\teens\\18-only-girls\\539");//no name
+	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\teens\\18-only-girls\\539");//no name
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\teens\\18-only-girls\\models\\anita e\\a-lonely-dreamer");//one model
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\teens\\18-only-girls\\models\\eveline and nancay\\outdoor play in panties");//two models
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\penthouse\\models\\Austin, Alyssa Reece, Yurizan Beltran and Melanie Jayne\\waterfall");//4 models
@@ -579,7 +577,7 @@ void DatabaseDataParser::testGalleryCalc()
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\blonde in red tartan skirt white pantyhose");//
 	
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\colege-girl-in-white-pantyhose-and-bra");//pantyhose and bra are both white, it should detect that
-	*/
+	
 	//string replace tests
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\school-girl-in-white-pantyhose-and-bra");//school-gril should be turned into schoolgirl
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\someMag\\models\\fake person\\strap-on sex");//
@@ -596,39 +594,41 @@ void DatabaseDataParser::testGalleryCalc()
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\teens\\18-only-girls\\models\\anita e\\a-lonely\\fake dir");//bad format, too many dirs after model name
 	testPaths.push_back("\\\\OPTIPLEX-745\\photos\\porno pics\\magazines\\swank\\leg action\\models\\Kristina Blond, Jennifer Stone and Thalia Festiny\\something fake");//sub website, 3 models
 
+	printf("starting calcGalleryData test \n");
 
 	for (size_t i = 0; i < testPaths.size(); i++)
 	{
-		vector<GalleryData *> gallery;
-		bool ret = calcGalleryData(testPaths[i], "\\\\OPTIPLEX-745\\photos\\porno pics", gallery);
+		GalleryData galleryData;
+		printf("%s: ", testPaths[i].c_str());
+		bool ret = calcGalleryData(testPaths[i], "\\\\OPTIPLEX-745\\photos\\porno pics", galleryData);
 		if (ret)
 		{
-			printf("its good!");
-			for (size_t j = 0; j < gallery.size(); j++)
+			printf("\n");
+			for (size_t k = 0; k < galleryData.models.size(); k++)
 			{
-				printf("%s\n", gallery[j]->path.c_str());
-				for (size_t k = 0; k < gallery[j]->models.size(); k++)
+				printf("model %d name:", k + 1);
+				printf("%s %s %s\n", galleryData.models[k].name.firstName.c_str(), galleryData.models[k].name.middleName.c_str(), galleryData.models[k].name.lastName.c_str());
+				
+				
+				if (galleryData.models[k].outfit.size() > 0)
 				{
-					printf("%s\n", gallery[j]->models[k].name.firstName.c_str());
-					printf("%s\n", gallery[j]->models[k].name.middleName.c_str());
-					printf("%s\n", gallery[j]->models[k].name.firstName.c_str());
-					
-					if (gallery[j]->models[k].outfit.size() > 0)
-					{
-						printf("%s\n", gallery[j]->models[k].outfit[0].type.c_str());
-						/*printf("%d\n", gallery[j]->models[k].sexActionIndex);
-						printf("%d\n", gallery[j]->models[k].hairColorIndex);*/
-					}
+					printf("model %d first outfit:", k + 1);
+					printf("%s\n", galleryData.models[k].outfit[0].type.c_str());
+					/*printf("%d\n", galleryData.models[k].sexActionIndex);
+					printf("%d\n", galleryData.models[k].hairColorIndex);*/
 				}
-				printf("%s\n", gallery[j]->websiteName.c_str());
-				printf("%s\n", gallery[j]->category.c_str());
-				printf("%s\n", gallery[j]->subWebsiteName.c_str());
-				printf("%s\n", gallery[j]->galleryName.c_str());
-				//printf("%s\n", gallery[j]->metaData.c_str());
 			}
+			printf("category:       %s\n", galleryData.category.c_str());
+			printf("websiteName:    %s\n", galleryData.websiteName.c_str());
+			printf("subWebsiteName: %s\n", galleryData.subWebsiteName.c_str());
+			printf("galleryName:    %s\n", galleryData.galleryName.c_str());
+			//printf("%s\n", galleryData.metaData.c_str());
+			printf("\n");
+
+
 		}
 		else
-			printf("its bad!");
+			printf("its bad!\n");
 	}
 }
 //-------------------------------------------------------------------------------------
@@ -660,7 +660,7 @@ void DatabaseDataParser::getAllDirsWithBadPath(string ignorePattern, vector<stri
 {
 	
 	//dont in FileWalker
-	vector<string> allDirs = FileDir::MyFileDirDll::dumpTreeToVector(true);
+	vector<string> allDirs = MyFileDirDll::dumpTreeToVector(true);
 	for (size_t i = 0; i < allDirs.size(); i++)
 	{
 		string input = allDirs[i];

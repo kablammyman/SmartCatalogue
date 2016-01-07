@@ -390,7 +390,7 @@ void lilMenu(HWND handle, int x, int y)
 		if (selectedText.size() > 3)// I guess the min length is 4... C:\a can be a legit file
 		{
 			string fileName(selectedText.begin(), selectedText.end());
-			FileDir::MyFileDirDll::deleteFile(fileName);
+			MyFileDirDll::deleteFile(fileName);
 		}
 		
 	}

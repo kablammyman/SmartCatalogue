@@ -24,9 +24,13 @@ public:
 
 	bool insertNewDataEntry(string table, dbDataPair data, string &output);
 	bool insertNewDataEntry(string table, vector<dbDataPair> data, string &output);
+	bool doDBQuerey(string table, string data, string &output);
+	bool doDBQuerey(string table, vector<string> data, string &output);
+	bool doDBQuerey(string table, vector<dbDataPair> data, string &output);
 
 	//test methods
 	void createTable(string tableName, string fields);
 	void testGetTable();
 	void testDBEntry();
+	void testDBQuerey();
 };

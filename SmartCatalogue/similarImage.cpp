@@ -167,16 +167,16 @@ int SimilarImage::test(string imgPath1, string imgPath2, bool viewImg)
 
 void SimilarImage::getAllImagePaths(string path, vector<string> & imgDirs)
 {
-	if (FileDir::MyFileDirDll::doesPathExist(path) == false)
+	if (MyFileDirDll::doesPathExist(path) == false)
 		return;
 
-	FileDir::MyFileDirDll::addDirTree(path,10);
+	MyFileDirDll::addDirTree(path,10);
 
 	vector<string> allDirs;
-	FileDir::MyFileDirDll::dumpTreeToVector(path, allDirs, true);
+	MyFileDirDll::dumpTreeToVector(path, allDirs, true);
 	for (size_t i = 0; i < allDirs.size(); i++)
 	{
-		if (FileDir::MyFileDirDll::getNumFilesInDir(allDirs[i]) != 0)
+		if (MyFileDirDll::getNumFilesInDir(allDirs[i]) != 0)
 			imgDirs.push_back(allDirs[i]);
 	}		
 }
@@ -247,7 +247,7 @@ void SimilarImage::calcImageHash(string imgPath)
 
 void SimilarImage::calcImageHasesForDir(string imgDir)
 {
-	vector<string> Allfiles = FileDir::MyFileDirDll::getAllFileNamesInDir(imgDir);
+	vector<string> Allfiles = MyFileDirDll::getAllFileNamesInDir(imgDir);
 	for (size_t i = 0; i < Allfiles.size(); i++)
 		calcImageHash(Allfiles[i]);
 }

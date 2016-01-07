@@ -6,10 +6,13 @@
 #include <iostream>
 
 #include "DatabaseDataParser.h"
-#include "CFGReaderDll.h"
+#include "DatabaseController.h"
 
-//#define TEST_DATABASE_PARSER 1
-#define TEST_DATABASE_CONTROLLER 1
+#include "CFGReaderDll.h"
+#include "myFileDirDll.h"
+
+//#define TEST_DATABASE_PARSER 0
+//#define TEST_DATABASE_CONTROLLER 1
 
 void invalidParmMessageAndExit()
 {
@@ -104,14 +107,112 @@ int main(int argc, char *argv[])
 #ifdef TEST_DATABASE_CONTROLLER
 	dbCtrlr.testGetTable();
 	dbCtrlr.testDBEntry();
+	dbCtrlr.testDBQuerey();
 #endif	
 
+	/*// old and inefficnet way
+	//becasue i do 1 treversal to create the tree, then another to process the data i need
 	vector<string> imageDirs;
 	//get all the paths and put the info in memory
 	if (pathToProcess != "")
 		dbDataParser.getAllPaths(pathToProcess, imageDirs);
-	//now, lets start to break down the info we can get from the paths into our structs/classes
+	for (size_t i = 0; i < imageDirs.size(); i++)
+		dbDataParser.calcGalleryData(imageDirs[i], ignorePattern, galleryData);
+		etc etc etc
+	*/
 
+	//this time, I'm gonna get the data AS i build the dir tree
+	MyFileDirDll::startDirTreeStep(pathToProcess);
+
+	while(!MyFileDirDll::isFinished())
+	{
+		string curDir = MyFileDirDll::nextDirTreeStep();
+		
+		//if the current node has folders in it, then it should NOT have images. even if it does, those images
+		//will be ignored since its not following the protocol
+		if (MyFileDirDll::getCurNodeNumFolders() > 0)
+			continue;
+
+		GalleryData galleryData;
+		printf("%s: ", curDir.c_str());
+		bool ret = dbDataParser.calcGalleryData(curDir, ignorePattern, galleryData);
+		if (ret)
+		{
+			printf("\n");
+
+			if (galleryData.models.size() > 0)
+			{
+				
+				for (size_t k = 0; k < galleryData.models.size(); k++)
+				{
+					printf("model %d name:", k + 1);
+					printf("%s %s %s\n", galleryData.models[k].name.firstName.c_str(), galleryData.models[k].name.middleName.c_str(), galleryData.models[k].name.lastName.c_str());
+					//chyeck to see if we have this model in the DB already, if so, use her ID
+					string output;
+					vector<DatabaseController::dbDataPair> data;
+					data.push_back(make_pair("ID", ""));
+					data.push_back(make_pair("firstName", galleryData.models[k].name.firstName));
+					data.push_back(make_pair("middleName", galleryData.models[k].name.middleName));
+					data.push_back(make_pair("lastName", galleryData.models[k].name.lastName));
+					dbCtrlr.doDBQuerey("Models", data, output);
+
+					//empty output means there name wasnt found
+					if (!output.empty())
+					{
+						vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 3);
+						printf("model id in db = %s\n", modelsInDB[0][0].c_str());
+						galleryData.models[k].name.dbID = atoi(modelsInDB[0][0].c_str());
+					}
+					else
+					{
+						vector<DatabaseController::dbDataPair> dbModelInfo;
+						dbModelInfo.push_back(make_pair("firstName", galleryData.models[k].name.firstName));
+						dbModelInfo.push_back(make_pair("middleName", galleryData.models[k].name.middleName));
+						dbModelInfo.push_back(make_pair("lastName", galleryData.models[k].name.lastName));
+						dbCtrlr.insertNewDataEntry("Models", dbModelInfo, output);
+
+
+						dbModelInfo.push_back(make_pair("ID", ""));
+						dbCtrlr.doDBQuerey("Models", dbModelInfo, output);
+						vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 4);
+						galleryData.models[k].name.dbID = atoi(modelsInDB[0][0].c_str());
+					}
+					if (galleryData.models[k].outfit.size() > 0)
+					{
+						printf("model %d first outfit:", k + 1);
+						printf("%s\n", galleryData.models[k].outfit[0].type.c_str());
+						/*printf("%d\n", galleryData.models[k].sexActionIndex);
+						printf("%d\n", galleryData.models[k].hairColorIndex);*/
+					}
+				}
+			}
+			string output;
+			vector<DatabaseController::dbDataPair> dbGalleryInfo;
+
+			printf("path:       %s\n", galleryData.path.c_str());
+			dbGalleryInfo.push_back(make_pair("path", galleryData.category));
+
+			printf("websiteName:    %s\n", galleryData.websiteName.c_str());
+			dbGalleryInfo.push_back(make_pair("websiteName", galleryData.websiteName));
+
+			printf("subWebsiteName: %s\n", galleryData.subWebsiteName.c_str());
+			dbGalleryInfo.push_back(make_pair("subWebsiteName", galleryData.subWebsiteName));
+
+			printf("galleryName:    %s\n", galleryData.galleryName.c_str());
+			dbGalleryInfo.push_back(make_pair("galleryName", galleryData.galleryName));
+			
+			//insert gallery info into DB
+			dbCtrlr.insertNewDataEntry("Gallery", dbGalleryInfo, output);
+
+			//how do i get the model id and the gallery id?
+
+
+			//printf("%s\n", galleryData.metaData.c_str());
+			printf("\n");
+		}
+		else
+			printf("its bad!\n");
+	}
 	return 0;
 }
 

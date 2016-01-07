@@ -33,41 +33,41 @@ void FileWalker::takeDirSnapShot(string path, bool refresh)
 	//ofstream myfile;
 	//myfile.open ("emptyDirs.txt");
 
-	if(FileDir::MyFileDirDll::doesPathExist(path) == false)
+	if(MyFileDirDll::doesPathExist(path) == false)
 		return;
 	
 	if(curPath == path && !refresh)
 		return;
 
-	FileDir::MyFileDirDll::addDirTree(path);
+	MyFileDirDll::addDirTree(path);
 	
 	curPath = path;
 }
 //----------------------------------------------------------------------
 void FileWalker::getAllDirPaths(vector<string> &ret)
 {
-	FileDir::MyFileDirDll::dumpTreeToVector(curPath, ret, true);
+	MyFileDirDll::dumpTreeToVector(curPath, ret, true);
 }
 //----------------------------------------------------------------------
 int FileWalker::getNumFiles()
 {
-	return FileDir::MyFileDirDll::getNumFilesInTree(curPath);
+	return MyFileDirDll::getNumFilesInTree(curPath);
 }
 //----------------------------------------------------------------------
 int FileWalker::getNumDirs()
 {
-	return FileDir::MyFileDirDll::getNumDirsInTree(curPath);
+	return MyFileDirDll::getNumDirsInTree(curPath);
 }
 
 //----------------------------------------------------------------------
 void FileWalker::getAllEmptyDirs(vector<string> & emptyDirs)
 {
 	vector<string> allDirs; 
-	FileDir::MyFileDirDll::dumpTreeToVector(curPath, allDirs, false);
+	MyFileDirDll::dumpTreeToVector(curPath, allDirs, false);
 	for(size_t i = 0; i < allDirs.size(); i++)
 	{
-		if( FileDir::MyFileDirDll::getNumFilesInDir(allDirs[i]) == 0 &&
-			FileDir::MyFileDirDll::getAllFolderNamesInDir(allDirs[i]).size() ==0 )
+		if( MyFileDirDll::getNumFilesInDir(allDirs[i]) == 0 &&
+			MyFileDirDll::getAllFolderNamesInDir(allDirs[i]).size() ==0 )
 		{
 			emptyDirs.push_back(allDirs[i]);
 		}
@@ -77,12 +77,12 @@ void FileWalker::getAllEmptyDirs(vector<string> & emptyDirs)
 void FileWalker::getAllDirsWithImgs(vector<string> & imgDirs, bool onlyLegalDirs)
 {
 	vector<string> allDirs; 
-	FileDir::MyFileDirDll::dumpTreeToVector(curPath, allDirs, true);
+	MyFileDirDll::dumpTreeToVector(curPath, allDirs, true);
 	for(size_t i = 0; i < allDirs.size(); i++)
 	{
-		if( FileDir::MyFileDirDll::getNumFilesInDir(allDirs[i]) != 0)
+		if( MyFileDirDll::getNumFilesInDir(allDirs[i]) != 0)
 		{ 
-			if(onlyLegalDirs && FileDir::MyFileDirDll::getAllFolderNamesInDir(allDirs[i]).size() ==0)
+			if(onlyLegalDirs && MyFileDirDll::getAllFolderNamesInDir(allDirs[i]).size() ==0)
 				imgDirs.push_back(allDirs[i]);
 			else
 				imgDirs.push_back(allDirs[i]);
@@ -94,7 +94,7 @@ void FileWalker::getAllDirsWithImgs(vector<string> & imgDirs, bool onlyLegalDirs
 void FileWalker::deleteEmptyDirs(vector<string> & emptyDirs)
 {
 	for(size_t i = 0; i < emptyDirs.size(); i++)
-		FileDir::MyFileDirDll::deleteFile(emptyDirs[i]);
+		MyFileDirDll::deleteFile(emptyDirs[i]);
 }
 
 

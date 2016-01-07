@@ -91,6 +91,60 @@ string DatabaseController::getTable(string tableName)
 
 	return returnString;
 }
+
+bool DatabaseController::doDBQuerey(string table, string data, string &output)
+{
+	string querey = ("SELECT " + data + " FROM " + table + ";");
+	return db->executeSQL(querey, output);
+}
+
+bool DatabaseController::doDBQuerey(string table, vector<string> data, string &output)
+{
+	string querey = "SELECT "; 
+
+	for (size_t i = 0; i < data.size(); i++)
+	{
+		querey += data[i];
+		if (i < data.size() - 1)
+			querey += ",";
+	}
+	querey += (" FROM " + table + ";");
+	return db->executeSQL(querey, output);
+}
+
+bool DatabaseController::doDBQuerey(string table, vector<dbDataPair> data, string &output)
+{
+	string querey = "SELECT ";
+	string whereString = " WHERE ";
+	string fromString = (" FROM " + table);
+
+	//count how many specific items to querey
+	//ex select * from table where name ="bla" and age = "bla"; \\2 whereArgs here
+	int numWhereArgs = 0;
+
+	for (size_t i = 0; i < data.size(); i++)
+	{
+		if (i > 0)
+			querey += ",";
+		
+
+		querey += data[i].first;
+
+		if (!data[i].second.empty())
+		{
+			if(numWhereArgs > 1)
+				whereString += " AND ";
+			whereString += (data[i].first +" = \"" + data[i].second + "\"");
+			numWhereArgs++;
+		}
+
+		
+	}
+	whereString += ";";
+
+	return db->executeSQL(querey+ fromString+ whereString, output);
+}
+
 //returns true when successful
 bool DatabaseController::insertNewDataEntry(string table, dbDataPair data, string &output)
 {
@@ -137,10 +191,11 @@ void DatabaseController::testGetTable()
 	/*DatabaseDataParser temp;
 	temp.parseDBOutput(result, 2);*/
 }
+
 void DatabaseController::testDBEntry()
 {
 	string output;
-	dbDataPair test1 = make_pair("name","test");
+	dbDataPair test1 = make_pair("name", "test");
 	insertNewDataEntry("Category", test1, output);
 
 	vector<dbDataPair> data;
@@ -152,6 +207,32 @@ void DatabaseController::testDBEntry()
 	data.push_back(make_pair("tags", "test,testData,wow doge"));
 
 	insertNewDataEntry("Gallery", data, output);
+
+
+}
+
+
+void DatabaseController::testDBQuerey()
+{
+	string output;
+	 
+	doDBQuerey("Category", "name", output);
+
+	//DatabaseDataParser temp;
+	//vector <vector<string>> returnData1  = temp.parseDBOutput(output, 2);
+
+	vector<string> test2;
+	test2.push_back("WebsiteID");
+	test2.push_back("path");
+	doDBQuerey("Gallery", test2, output);
+
+	vector<dbDataPair> data;
+	data.push_back(make_pair("ID", "000"));
+	data.push_back(make_pair("WebsiteID", "001"));
+	data.push_back(make_pair("SubWebsiteID", "002"));
+	data.push_back(make_pair("path", "C:\\some\\fake\\path"));
+
+	doDBQuerey("Gallery", data, output);
 
 	
 }
