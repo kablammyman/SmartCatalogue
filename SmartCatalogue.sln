@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataBaseManager", "SmartCat
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dupeImageFinder", "SmartCatalogue\DupeImageFinder\dupeImageFinder.vcxproj", "{F55FB916-4311-40DD-B7FB-4CA86C9862AD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CreateNewDB", "SmartCatalogue\createNewDB\CreateNewDB.vcxproj", "{EE4A54C2-CD28-4251-96F5-02C35B6CE0D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -61,6 +63,14 @@ Global
 		{F55FB916-4311-40DD-B7FB-4CA86C9862AD}.Release|Win32.Build.0 = Release|Win32
 		{F55FB916-4311-40DD-B7FB-4CA86C9862AD}.Release|x64.ActiveCfg = Release|x64
 		{F55FB916-4311-40DD-B7FB-4CA86C9862AD}.Release|x64.Build.0 = Release|x64
+		{EE4A54C2-CD28-4251-96F5-02C35B6CE0D5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EE4A54C2-CD28-4251-96F5-02C35B6CE0D5}.Debug|Win32.Build.0 = Debug|Win32
+		{EE4A54C2-CD28-4251-96F5-02C35B6CE0D5}.Debug|x64.ActiveCfg = Debug|x64
+		{EE4A54C2-CD28-4251-96F5-02C35B6CE0D5}.Debug|x64.Build.0 = Debug|x64
+		{EE4A54C2-CD28-4251-96F5-02C35B6CE0D5}.Release|Win32.ActiveCfg = Release|Win32
+		{EE4A54C2-CD28-4251-96F5-02C35B6CE0D5}.Release|Win32.Build.0 = Release|Win32
+		{EE4A54C2-CD28-4251-96F5-02C35B6CE0D5}.Release|x64.ActiveCfg = Release|x64
+		{EE4A54C2-CD28-4251-96F5-02C35B6CE0D5}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
