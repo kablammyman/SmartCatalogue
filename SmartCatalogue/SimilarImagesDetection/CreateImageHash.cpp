@@ -11,6 +11,8 @@ void invalidParmMessageAndExit()
 	cout << "-addToDB <imgDir> <dbPath> -> add a direcotry of images to a DB\n";
 	cout << "-compToDB <imgPath> <dbPath> -> compare an image to a a DB of image hashes\n";
 	cout << "-compToDir <imgPath> <imgDir> -> compare an image to a directory of images\n";
+	cout << "-hash <imgpath> create and return the hash of an image\n";
+	cout << "-phash <imgpath> create and return the phash of an image\n";
 	exit(1);
 }
 
@@ -33,14 +35,38 @@ int main(int argc, const char *argv[])
 			if (i >= argc)
 				invalidParmMessageAndExit();
 
-			dbPath = argv[i + 1];
+			dbPath = argv[i];
 		}
 		else if (strcmp(argv[i], "-imgPath") == 0)
 		{
 			i++;
 			if (i >= argc)
 				invalidParmMessageAndExit();
-			pathToProcess = argv[i + 1];
+			pathToProcess = argv[i];
+		}
+		else if (strcmp(argv[i], "-hash") == 0)
+		{
+			i++;
+			if (i >= argc)
+				invalidParmMessageAndExit();
+
+			SimilarImage simImage;
+			string returnVal = simImage.getImageHash(argv[i]);
+			cout << returnVal << endl;
+			
+			return 0;
+		}
+		else if (strcmp(argv[i], "-phash") == 0)
+		{
+			i++;
+			if (i >= argc)
+				invalidParmMessageAndExit();
+
+			SimilarImage simImage;
+			string returnVal = simImage.getImagePHash(argv[i]);
+			cout << returnVal << endl;
+
+			return 0;
 		}
 		i++;
 	}

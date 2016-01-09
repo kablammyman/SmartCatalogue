@@ -56,4 +56,7 @@ public:
 	void getAllImagePaths(string path, vector<string> & imgDirs);
 	long long getIntValueOfHash(string bits);
 	void findDupes(vector<string> & imgDirs, map<int, vector<int>> &dupeList);
+
+	string getImageHash(string imgPath);
+	string getImagePHash(string imgPath);
 };

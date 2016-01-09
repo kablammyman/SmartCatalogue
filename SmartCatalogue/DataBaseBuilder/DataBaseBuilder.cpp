@@ -2,40 +2,22 @@
 //
 
 #include "stdafx.h"
-#include <string>
-#include <iostream>
-
-#include "DatabaseDataParser.h"
-#include "DatabaseController.h"
-
-#include "CFGReaderDll.h"
-#include "myFileDirDll.h"
+#include "DataBaseBuilder.h"
+#include <algorithm>
 
 //#define TEST_DATABASE_PARSER 0
 //#define TEST_DATABASE_CONTROLLER 1
 
-void invalidParmMessageAndExit()
-{
-	cout << "invlaid parameters. You need to provide a path to the DB and a path where your images are\n";
-	cout << "DataBaseManager -dbPath \"C:\\somePath\\\" -dataPath \"C:\\photos\\myFunPhotos\\\"\n";
-	exit(-1);
-}
 
 int main(int argc, char *argv[])
 {
 	string temp = argv[0];
 	size_t found = temp.find_last_of("/\\");
-	string filePathBase = temp.substr(0, found);
-	string cfgPath = filePathBase + "\\imageViewCfg.txt";
-	
 
-	DatabaseDataParser dbDataParser;
-	DatabaseController dbCtrlr;
-	string dbPath;
-	string pathToProcess;
-	string ignorePattern;//we dont need the base path for all processing, since it wont change
+	filePathBase = temp.substr(0, found);
+	cfgPath = filePathBase + "\\imageViewCfg.txt";
 	int i = 0;
-
+	doImageHash = true;
 	//read from cfg if theres no commandline args
 	if (argc < 4)
 	{
@@ -93,6 +75,11 @@ int main(int argc, char *argv[])
 				invalidParmMessageAndExit();
 			ignorePattern = argv[i + 1];
 		}
+
+		else if (strcmp(argv[i], "-imgHash") == 0)
+		{
+			doImageHash = true;
+		}
 		i++;
 	}
 
@@ -134,58 +121,10 @@ int main(int argc, char *argv[])
 			continue;
 
 		GalleryData galleryData;
-		printf("%s: ", curDir.c_str());
+		//printf("%s: ", curDir.c_str());
 		bool ret = dbDataParser.calcGalleryData(curDir, ignorePattern, galleryData);
 		if (ret)
 		{
-			printf("\n");
-
-			if (galleryData.models.size() > 0)
-			{
-				
-				for (size_t k = 0; k < galleryData.models.size(); k++)
-				{
-					printf("model %d name:", k + 1);
-					printf("%s %s %s\n", galleryData.models[k].name.firstName.c_str(), galleryData.models[k].name.middleName.c_str(), galleryData.models[k].name.lastName.c_str());
-					//chyeck to see if we have this model in the DB already, if so, use her ID
-					string output;
-					vector<DatabaseController::dbDataPair> data;
-					data.push_back(make_pair("ID", ""));
-					data.push_back(make_pair("firstName", galleryData.models[k].name.firstName));
-					data.push_back(make_pair("middleName", galleryData.models[k].name.middleName));
-					data.push_back(make_pair("lastName", galleryData.models[k].name.lastName));
-					dbCtrlr.doDBQuerey("Models", data, output);
-
-					//empty output means there name wasnt found
-					if (!output.empty())
-					{
-						vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 3);
-						printf("model id in db = %s\n", modelsInDB[0][0].c_str());
-						galleryData.models[k].name.dbID = atoi(modelsInDB[0][0].c_str());
-					}
-					else
-					{
-						vector<DatabaseController::dbDataPair> dbModelInfo;
-						dbModelInfo.push_back(make_pair("firstName", galleryData.models[k].name.firstName));
-						dbModelInfo.push_back(make_pair("middleName", galleryData.models[k].name.middleName));
-						dbModelInfo.push_back(make_pair("lastName", galleryData.models[k].name.lastName));
-						dbCtrlr.insertNewDataEntry("Models", dbModelInfo, output);
-
-
-						dbModelInfo.push_back(make_pair("ID", ""));
-						dbCtrlr.doDBQuerey("Models", dbModelInfo, output);
-						vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 4);
-						galleryData.models[k].name.dbID = atoi(modelsInDB[0][0].c_str());
-					}
-					if (galleryData.models[k].outfit.size() > 0)
-					{
-						printf("model %d first outfit:", k + 1);
-						printf("%s\n", galleryData.models[k].outfit[0].type.c_str());
-						/*printf("%d\n", galleryData.models[k].sexActionIndex);
-						printf("%d\n", galleryData.models[k].hairColorIndex);*/
-					}
-				}
-			}
 			string output;
 			vector<DatabaseController::dbDataPair> dbGalleryInfo;
 
@@ -200,18 +139,83 @@ int main(int argc, char *argv[])
 
 			printf("galleryName:    %s\n", galleryData.galleryName.c_str());
 			dbGalleryInfo.push_back(make_pair("galleryName", galleryData.galleryName));
-			
+
+			printf("num named models:    %d\n", galleryData.models.size());
+			dbGalleryInfo.push_back(make_pair("numModels", to_string(galleryData.models.size())));
+
 			//insert gallery info into DB
 			dbCtrlr.insertNewDataEntry("Gallery", dbGalleryInfo, output);
 
-			//how do i get the model id and the gallery id?
+			int galleryID = getLatestID();
+				
+			for (size_t k = 0; k < galleryData.models.size(); k++)
+			{
+				//printf("model %d name:", k + 1);
+				//printf("%s %s %s\n", galleryData.models[k].name.firstName.c_str(), galleryData.models[k].name.middleName.c_str(), galleryData.models[k].name.lastName.c_str());
+				//chyeck to see if we have this model in the DB already, if so, use her ID
 
+				vector<DatabaseController::dbDataPair> data;
+				data.push_back(make_pair("ID", ""));
+				data.push_back(make_pair("firstName", galleryData.models[k].name.firstName));
+				data.push_back(make_pair("middleName", galleryData.models[k].name.middleName));
+				data.push_back(make_pair("lastName", galleryData.models[k].name.lastName));
+				dbCtrlr.doDBQuerey("Models", data, output);
 
-			//printf("%s\n", galleryData.metaData.c_str());
-			printf("\n");
+				//empty output means there name wasnt found
+				if (!output.empty())
+				{
+					vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 3);
+					//printf("model id in db = %s\n", modelsInDB[0][0].c_str());
+					galleryData.models[k].name.dbID = atoi(modelsInDB[0][0].c_str());
+				}
+				else
+				{
+					vector<DatabaseController::dbDataPair> dbModelInfo;
+					dbModelInfo.push_back(make_pair("firstName", galleryData.models[k].name.firstName));
+					dbModelInfo.push_back(make_pair("middleName", galleryData.models[k].name.middleName));
+					dbModelInfo.push_back(make_pair("lastName", galleryData.models[k].name.lastName));
+					dbCtrlr.insertNewDataEntry("Models", dbModelInfo, output);
+												
+					galleryData.models[k].name.dbID = getLatestID();
+				}
+
+				for (size_t i = 0; i < galleryData.models[k].outfit.size(); i++)
+				{
+					//printf("%s\n", galleryData.models[k].outfit[0].type.c_str());
+					vector<DatabaseController::dbDataPair> dbOutfitInfo;
+					dbOutfitInfo.push_back(make_pair("Type", galleryData.models[k].outfit[i].type));
+					dbOutfitInfo.push_back(make_pair("ColorID", to_string(galleryData.models[k].outfit[i].ColorIndex)));
+					dbOutfitInfo.push_back(make_pair("MaterialID", to_string(galleryData.models[k].outfit[i].ClothingMaterialIndex)));
+					dbOutfitInfo.push_back(make_pair("PrintID", to_string(galleryData.models[k].outfit[i].ClothingPrintIndex)));
+					dbOutfitInfo.push_back(make_pair("ModelID", to_string(galleryData.models[k].name.dbID)));
+					dbOutfitInfo.push_back(make_pair("GalleryID", to_string(galleryID)));
+					dbCtrlr.insertNewDataEntry("Outfit", dbOutfitInfo, output);
+
+				}
+					
+			}
+			if (doImageHash)
+			{
+				list<string> imgFiles = MyFileDirDll::getCurNodeFileList();
+
+				for (list<string>::iterator it = imgFiles.begin(); it != imgFiles.end(); ++it)
+				{
+					//when the path has spaces,we need DOUBLE quotes aka ""C:\some dir\run.exe"" 
+					string fileImg = "\"\"" + filePathBase + "\\CreateImageHash.exe\"  -hash \"" + curDir;
+					fileImg += *it;
+					fileImg += "\"\"";
+
+					//cout << fileImg << endl;
+					string cmdOutput = exec(fileImg.c_str());
+					cout << cmdOutput << endl;
+				}
+			}
+
+			
+			//printf("\n");
 		}
-		else
-			printf("its bad!\n");
+		//else
+		//	printf("its bad!\n");
 	}
 	return 0;
 }

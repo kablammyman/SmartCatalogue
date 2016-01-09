@@ -36,9 +36,8 @@ bool DatabaseController::isDBOpen()
 	return true;
 }
 
-bool DatabaseController::executeSQL(string command)
+bool DatabaseController::executeSQL(string command, string &output)
 {
-	string output;
 	return db->executeSQL(command, output);
 	//curDBWindowData.clear();
 

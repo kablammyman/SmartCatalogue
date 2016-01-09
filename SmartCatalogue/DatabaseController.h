@@ -17,7 +17,7 @@ public:
 	void openDatabase(string path);
 	bool isDBOpen();
 	bool createNewDataBase(string newDbName);
-	bool executeSQL(string command);
+	bool executeSQL(string command, string &output);
 	string getDBName();
 	string getTable(string tableName);
 	string getLastError();
