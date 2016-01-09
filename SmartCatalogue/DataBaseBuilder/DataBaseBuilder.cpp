@@ -201,13 +201,19 @@ int main(int argc, char *argv[])
 				for (list<string>::iterator it = imgFiles.begin(); it != imgFiles.end(); ++it)
 				{
 					//when the path has spaces,we need DOUBLE quotes aka ""C:\some dir\run.exe"" 
-					string fileImg = "\"\"" + filePathBase + "\\CreateImageHash.exe\"  -hash \"" + curDir;
-					fileImg += *it;
-					fileImg += "\"\"";
+					string imgeFilePath = (curDir+ *it);
 
-					//cout << fileImg << endl;
-					string cmdOutput = exec(fileImg.c_str());
-					cout << cmdOutput << endl;
+					string hashingCommand = "\"\"" + filePathBase + "\\CreateImageHash.exe\"  -hash \"";
+					hashingCommand += imgeFilePath;
+					hashingCommand += "\"\"";
+
+					string hash = exec(hashingCommand.c_str());
+
+					vector<DatabaseController::dbDataPair> dbImgInfo;
+					dbImgInfo.push_back(make_pair("path", imgeFilePath));
+					dbImgInfo.push_back(make_pair("hash", hash));
+					dbImgInfo.push_back(make_pair("galleryID", to_string(galleryID)));
+					dbCtrlr.insertNewDataEntry("Images", dbImgInfo, output);
 				}
 			}
 

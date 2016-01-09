@@ -55,8 +55,7 @@ struct GalleryModel
 {
 	ModelName name;
 	vector <ClothingItem> outfit;
-	int 
-		;
+	int sexActionIndex;
 	int hairColorIndex; //uses colors.color
 	
 	/*

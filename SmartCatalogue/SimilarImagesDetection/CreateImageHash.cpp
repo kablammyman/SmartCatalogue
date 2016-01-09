@@ -52,7 +52,8 @@ int main(int argc, const char *argv[])
 
 			SimilarImage simImage;
 			string returnVal = simImage.getImageHash(argv[i]);
-			cout << returnVal << endl;
+			cout << returnVal;
+			//cout << endl; //when other programs read from this programs stdout, we dont want the new line with the actual data
 			
 			return 0;
 		}
@@ -64,7 +65,8 @@ int main(int argc, const char *argv[])
 
 			SimilarImage simImage;
 			string returnVal = simImage.getImagePHash(argv[i]);
-			cout << returnVal << endl;
+			cout << returnVal; 
+		//	cout << endl;
 
 			return 0;
 		}

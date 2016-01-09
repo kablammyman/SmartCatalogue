@@ -119,7 +119,8 @@ INT_PTR CALLBACK selectOrDeleteQuereyBox(HWND hDlg, UINT message, WPARAM wParam,
 				}
 				//MessageBox(NULL,SQLQuery.c_str(),"checks",NULL);
 			}
-			MainApp::Instance()->dbCtrlr.executeSQL(SQLQuery);
+			string output;
+			MainApp::Instance()->dbCtrlr.executeSQL(SQLQuery,output);
 			return TRUE;
 		}
 		}

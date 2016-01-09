@@ -30,7 +30,8 @@ INT_PTR CALLBACK SQLQuereyBox(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPa
 			GetDlgItemText(hDlg, FILE_PATH_1, buffer, MAX_PATH);
 			//fill string with data in text box (incase they typed in a path)
 			MainApp::Instance()->curDBCommand = (char *)buffer;
-			MainApp::Instance()->dbCtrlr.executeSQL(MainApp::Instance()->curDBCommand);
+			string output;
+			MainApp::Instance()->dbCtrlr.executeSQL(MainApp::Instance()->curDBCommand, output);
 
 			EndDialog(hDlg, LOWORD(wParam));
 			//UpdateWindow();

@@ -53,6 +53,12 @@ string exec(const char* cmd)
 	
 	while (fgets(buffer, 128, pipe) != NULL)
 	{
+		//hack until i figure out how to get rid of this message
+		//***** VIDEOINPUT LIBRARY - 0.1995 - TFW07 *****
+		if (strcmp(buffer, "***** VIDEOINPUT LIBRARY - 0.1995 - TFW07 *****\n") == 0)
+			continue;
+		if (strcmp(buffer, "\n") == 0)
+			continue;
 		result += buffer;
 	}
 	_pclose(pipe);
