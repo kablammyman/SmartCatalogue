@@ -13,10 +13,12 @@ class DatabaseController
 
 public:
 	typedef pair <string, string> dbDataPair;
+	DatabaseController();
+	~DatabaseController();
 
 	void openDatabase(string path);
 	bool isDBOpen();
-	bool createNewDataBase(string newDbName);
+	bool createNewDataBase(string newDBName, string createCommand="");
 	bool executeSQL(string command, string &output);
 	string getDBName();
 	string getTable(string tableName);

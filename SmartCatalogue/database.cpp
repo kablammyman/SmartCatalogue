@@ -8,10 +8,25 @@
 using namespace std;
 string DataBase::returnData;
 bool DataBase::gettingData;
+DataBase::DataBase()
+{
+	returnCode = 0;
+	db = NULL;
+	lastError ="";
+	databaseName="";
+	curTableName="";
+	returnData ="";
+	gettingData = false;
+}
+
 DataBase::DataBase(string name)
 {
-	string output;
-	openDataBase(name,output);
+	returnCode = 0;
+	lastError = "";
+	databaseName = "";
+	curTableName = "";
+	gettingData = false;
+	openDataBase(name, returnData);
 }
 //--------------------------------------------------------------------------------------------------
 DataBase::~DataBase()
@@ -24,7 +39,6 @@ DataBase::~DataBase()
  {
 	 // Open Database
 	databaseName = name;
-	output = "Opening MyDb.db ...\n"; 
 	
 	if(name[name.size() -3] != '.' || name[name.size() -2] != 'd' || name[name.size() -1] != 'b')
 		name +=".db";
@@ -46,7 +60,9 @@ DataBase::~DataBase()
 //--------------------------------------------------------------------------------------------------
  void DataBase::closeDataBase(string &output)
  {
-	  // Close Database
+	  // Close Database if its open
+	if (db == NULL)
+		 return;
    output = ("Attepmting to Close " + databaseName + "...");
    sqlite3_close(db);
    output +=  "Closed";

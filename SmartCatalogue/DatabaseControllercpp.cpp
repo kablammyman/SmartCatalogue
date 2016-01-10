@@ -1,9 +1,20 @@
 #include "stdafx.h"
 #include "DatabaseController.h"
 
+DatabaseController::DatabaseController()
+{
+	db = NULL;
+	dbName = "";
+}
 
-
-
+DatabaseController::~DatabaseController()
+{
+	if (isDBOpen())
+	{
+		string output;
+		db->closeDataBase(output);
+	}
+}
 
 void DatabaseController::openDatabase(string path)
 {
@@ -47,33 +58,29 @@ bool DatabaseController::executeSQL(string command, string &output)
 
 }
 
-bool DatabaseController::createNewDataBase(string newDBName)
+bool DatabaseController::createNewDataBase(string newDBName, string createCommand)
 {
-	//curDBWindowData.clear();
-	//close teh current one
+	//close the current db before making a new one
 	string output;
-	db->closeDataBase(output);
-	//curDBWindowData.push_back(output);
+	if (isDBOpen())
+	{
+		db->closeDataBase(output);
+		delete db;
+		db = NULL;
+	}
 
 	FILE * pFile;
 	pFile = fopen(newDBName.c_str(), "w");
 	fclose(pFile);
 
-	//create the new one
-	db->openDataBase(newDBName, output);
-	//curDBWindowData.push_back(output);
+	//create the new db
+	db = new DataBase(newDBName);
 
-	string command = "CREATE TABLE 'galleries' ('path'	TEXT,'category'	TEXT,'websiteName' TEXT,'subWebsiteName' TEXT,'modelFirstName' TEXT,'modelLastName' TEXT,'galleryName' TEXT,'timesViewed'	INTEGER,'metaData' TEXT);";
-	bool returnVal = db->executeSQL(command, output);
-	//curDBWindowData.push_back(output);
+	//create the table, if we have a create command
+	if(createCommand != "")
+		return db->executeSQL(createCommand, output);
 
-	command = "CREATE TABLE 'models' ('firstName' TEXT, lastName' TEXT,'Alias' TEXT,'ethnicity'	TEXT,'faceImages' BLOB);";
-	returnVal = db->executeSQL(command, output);
-	//curDBWindowData.push_back(output);
-
-	//sendDataToEditWindow(getDBViewHandle(), curDBWindowData);
-
-	return returnVal;
+	return true;
 }
 
 string DatabaseController::getLastError()

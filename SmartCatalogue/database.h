@@ -17,6 +17,7 @@ class DataBase
 	static bool gettingData;
 public:
 	DataBase(std::string name);
+	DataBase();
 	~DataBase();
 	bool openDataBase(std::string name, std::string &output);
 	void closeDataBase(std::string &output);
