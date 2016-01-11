@@ -355,7 +355,7 @@ bool DatabaseDataParser::isClothingNoun(string noun)
 	//if (tableNamePartOfSpeech.count(noun))
 	if (tableNamePartOfSpeech[noun] != NOUN)
 		return false;
-	if (noun != "Ethnicity" && noun != "Furniture" && noun != "Locations" && noun != "BodyPart")
+	if (noun != "Ethnicity" && noun != "Furniture" && noun != "Locations" && noun != "Bodypart" && noun != "Sextoys")
 		return true;
 	return false;
 }
@@ -467,7 +467,8 @@ vector <ClothingItem> DatabaseDataParser::getOutfitFromGalleryName(string galler
 				curItem.index = getEntryIDFromDBTable(curWordDB, tokens[i]);
 				clothes.push_back(curItem);
 				//if our next word is an "and", we prob mean to extend the adjs to the next noun
-				if (i < tokens.size() - 2)
+				//since its size_t it wont ever be negative...so lets check to make sure the size > 1 first
+				if (tokens.size() > 1 && i < (tokens.size() - 2))
 				{
 					if (isConjunction(tokens[i + 1]) && isClothingNoun(descriptiveWords[tokens[i + 2]]))
 						continue;

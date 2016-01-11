@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 	filePathBase = temp.substr(0, found);
 	cfgPath = filePathBase + "\\imageViewCfg.txt";
 	
-	doImageHash = false;
+	doImageHash = true;
 
 	//read from cfg by default
 	if (!CFG::CFGReaderDLL::readCfgFile(cfgPath, '|'))
@@ -56,8 +56,6 @@ int main(int argc, char *argv[])
 	}
 
 	//vector<string> meta = CFG::CFGReaderDLL::getCfgListValue("metaWords");
-	doImageHash = true;
-
 
 	//command line args can add extra options
 	int i = 0;
@@ -86,8 +84,8 @@ int main(int argc, char *argv[])
 				invalidParmMessageAndExit();
 			ignorePattern = argv[i + 1];
 		}
-		else if (strcmp(argv[i], "-imgHash") == 0)
-			doImageHash = true;
+		else if (strcmp(argv[i], "-NoimgHash") == 0)
+			doImageHash = false;
 		
 		else if (strcmp(argv[i], "-verbose") == 0)
 			verboseOutput = true;
@@ -172,6 +170,8 @@ int main(int argc, char *argv[])
 			int websiteID = insertWebsiteInfoIntoDB(galleryData);
 			if (websiteID == -1)
 				goto DB_INPUT_ERROR;
+
+			//a zero for subwebsite means there is no subwesite
 			int subWebsiteID = insertSubWebsiteInfoIntoDB(galleryData, websiteID);
 			if (subWebsiteID == -1)
 				goto DB_INPUT_ERROR;
@@ -185,33 +185,17 @@ int main(int argc, char *argv[])
 				if (verboseOutput)
 					cout << "model " << k + 1 << " name: " << galleryData.models[k].name.firstName << " "<< galleryData.models[k].name.middleName << " " << galleryData.models[k].name.lastName << endl;
 
-				//check to see if we have this model in the DB already, if so, use her ID
-				vector<DatabaseController::dbDataPair> data;
-				data.push_back(make_pair("ID", ""));
-				data.push_back(make_pair("firstName", galleryData.models[k].name.firstName));
-				data.push_back(make_pair("middleName", galleryData.models[k].name.middleName));
-				data.push_back(make_pair("lastName", galleryData.models[k].name.lastName));
-				dbCtrlr.doDBQuerey("Models", data, output);
-
-				//empty output means there name wasnt found
-				if (!output.empty())
-				{
-					vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 3);
-					galleryData.models[k].name.dbID = atoi(modelsInDB[0][0].c_str());
-				}
-				else
-				{
-					if(!insertModelInfoIntoDB(galleryData.models[k]))
-						goto DB_INPUT_ERROR;
-				}
+				if(!insertModelInfoIntoDB(galleryData.models[k]))
+					goto DB_INPUT_ERROR;
+				
 
 				for (size_t i = 0; i < galleryData.models[k].outfit.size(); i++)
 				{
 					if(!insertModelOutfitInfoIntoDB(galleryData.models[k], i, galleryID))
 						goto DB_INPUT_ERROR;
-				}
-					
+				}		
 			}
+
 			if (doImageHash)
 			{
 				list<string> imgFiles = MyFileDirDll::getCurNodeFileList();
@@ -220,6 +204,23 @@ int main(int argc, char *argv[])
 				{
 					//when the path has spaces,we need DOUBLE quotes aka ""C:\some dir\run.exe"" 
 					string imgeFilePath = (curDir+ *it);
+					//we have this querey seperated from the method, so we dont do un nesc hashing!
+					vector<DatabaseController::dbDataPair> imageQuerey;
+					imageQuerey.push_back(make_pair("fileName", imgeFilePath));
+					imageQuerey.push_back(make_pair("galleryID", to_string(galleryID)));
+					dbCtrlr.doDBQuerey("Images", imageQuerey, output);
+
+					if (!output.empty())
+					{
+						if (output.find("error") != string::npos)
+						{
+							string errString = ("image querey error: " + output + "\n");
+							cout << errString;
+							addEntryToInvalidPathFile(errString);
+						}
+						continue;//its already been hashed
+					}
+
 
 					string hashingCommand = "\"\"" + filePathBase + "\\CreateImageHash.exe\"  -hash \"";
 					hashingCommand += imgeFilePath;

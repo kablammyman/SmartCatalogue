@@ -126,7 +126,7 @@ bool DatabaseController::doDBQuerey(string table, vector<dbDataPair> data, strin
 
 	//count how many specific items to querey
 	//ex select * from table where name ="bla" and age = "bla"; \\2 whereArgs here
-	int numWhereArgs = 0;
+	int numWhereArgs = 1;
 
 	for (size_t i = 0; i < data.size(); i++)
 	{

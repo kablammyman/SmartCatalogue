@@ -93,9 +93,28 @@ void printTimeStamp(double milis)
 int insertWebsiteInfoIntoDB(GalleryData &galleryData)
 {
 	string output;
-	vector<DatabaseController::dbDataPair> dbWebInfo;
-
 	string path = (ignorePattern + galleryData.category + "\\" + galleryData.websiteName);
+	//check to see if we have this website in the DB already, if so, the ID
+	vector<DatabaseController::dbDataPair> websiteQuerey;
+	websiteQuerey.push_back(make_pair("ID", ""));
+	websiteQuerey.push_back(make_pair("name", galleryData.websiteName));
+	websiteQuerey.push_back(make_pair("path", path));
+	dbCtrlr.doDBQuerey("Website", websiteQuerey, output);
+
+	//empty output means there name wasnt found
+	if (!output.empty())
+	{
+		if (output.find("error") != string::npos)
+		{
+			cout << "website querey error: " << output << endl;
+			return -1;
+		}
+		vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 2);
+		return atoi(modelsInDB[0][0].c_str());
+	}
+
+	vector<DatabaseController::dbDataPair> dbWebInfo;
+	
 	dbWebInfo.push_back(make_pair("path", path));
 	dbWebInfo.push_back(make_pair("name", galleryData.websiteName));
 	dbCtrlr.insertNewDataEntry("Website", dbWebInfo, output);
@@ -109,13 +128,37 @@ int insertWebsiteInfoIntoDB(GalleryData &galleryData)
 
 int insertSubWebsiteInfoIntoDB(GalleryData &galleryData, int websiteID)
 {
-	string output;
-	vector<DatabaseController::dbDataPair> dbSubWebInfo;
+	if (galleryData.subWebsiteName.empty())
+		return 0;
 
+	string output;
 	string path = (ignorePattern + galleryData.category + "\\" + galleryData.websiteName + "\\" + galleryData.subWebsiteName);
+
+	//check to see if we have this website in the DB already, if so, the ID
+	vector<DatabaseController::dbDataPair> subWebsiteQuerey;
+	subWebsiteQuerey.push_back(make_pair("ID", ""));
+	subWebsiteQuerey.push_back(make_pair("name", galleryData.subWebsiteName));
+	subWebsiteQuerey.push_back(make_pair("path", path));
+	subWebsiteQuerey.push_back(make_pair("ParentID", to_string(websiteID)));
+	dbCtrlr.doDBQuerey("SubWebsite", subWebsiteQuerey, output);
+
+	if (!output.empty())
+	{
+		if (output.find("error") != string::npos)
+		{
+			cout << "SubWebsite querey error: " << output << endl;
+			return -1;
+		}
+		vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 2);
+		return atoi(modelsInDB[0][0].c_str());
+	}
+
+	vector<DatabaseController::dbDataPair> dbSubWebInfo;
 	dbSubWebInfo.push_back(make_pair("path", path));
 	dbSubWebInfo.push_back(make_pair("name", galleryData.subWebsiteName));
 	dbSubWebInfo.push_back(make_pair("ParentID", to_string(websiteID)));
+	dbCtrlr.insertNewDataEntry("SubWebsite", dbSubWebInfo, output);
+
 	if (!output.empty())
 	{
 		cout << "subWebsite input error: " << output << endl;
@@ -127,6 +170,24 @@ int insertSubWebsiteInfoIntoDB(GalleryData &galleryData, int websiteID)
 int insertGalleryInfoIntoDB(GalleryData &galleryData, int websiteID, int subWebsiteID)
 {
 	string output;
+	
+	vector<DatabaseController::dbDataPair> galleryeQuerey;
+	galleryeQuerey.push_back(make_pair("ID", ""));
+	galleryeQuerey.push_back(make_pair("galleryName", galleryData.galleryName));
+	galleryeQuerey.push_back(make_pair("path", galleryData.path));
+	dbCtrlr.doDBQuerey("Gallery", galleryeQuerey, output);
+
+	if (!output.empty())
+	{
+		if (output.find("error") != string::npos)
+		{
+			cout << "gallery querey error: " << output << endl;
+			return -1;
+		}
+		vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 2);
+		return atoi(modelsInDB[0][0].c_str());
+	}
+
 	vector<DatabaseController::dbDataPair> dbGalleryInfo;
 	dbGalleryInfo.push_back(make_pair("path", galleryData.path));
 	dbGalleryInfo.push_back(make_pair("galleryName", galleryData.galleryName));
@@ -145,6 +206,28 @@ int insertGalleryInfoIntoDB(GalleryData &galleryData, int websiteID, int subWebs
 bool insertModelInfoIntoDB(GalleryModel &model)
 {
 	string output;
+	//check to see if we have this model in the DB already, if so, use her ID
+	vector<DatabaseController::dbDataPair> modelQuerey;
+	modelQuerey.push_back(make_pair("ID", ""));
+	modelQuerey.push_back(make_pair("firstName", model.name.firstName));
+	modelQuerey.push_back(make_pair("middleName", model.name.middleName));
+	modelQuerey.push_back(make_pair("lastName", model.name.lastName));
+	dbCtrlr.doDBQuerey("Models", modelQuerey, output);
+
+	//empty output means there name wasnt found
+	if (!output.empty())
+	{
+		if (output.find("error") != string::npos)
+		{
+			cout << "model querey error: " << output << endl;
+			return -1;
+		}
+		vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 3);
+		model.name.dbID = atoi(modelsInDB[0][0].c_str());
+		return true;
+	}
+
+	//insert the new model
 	vector<DatabaseController::dbDataPair> dbModelInfo;
 	dbModelInfo.push_back(make_pair("firstName", model.name.firstName));
 	dbModelInfo.push_back(make_pair("middleName", model.name.middleName));
