@@ -39,18 +39,19 @@ vector<string> DatabaseDataParser::tokenize(string path, string delims)
 	return returnVec;
 }
 
-void DatabaseDataParser::fillPartOfSpeechTable(string pofTableName)
+bool DatabaseDataParser::fillPartOfSpeechTable(string pofTableName)
 {
 	int numCol = 2;
 	string result = dbCtrl->getTable(pofTableName);
 
 	if (result == "")
-		return;
+		return false;
 
 	vector<vector<string>> table = parseDBOutput(result, numCol);
 
 	if (table.size() < (size_t)numCol)
-		return;
+		return false;
+
 	for (size_t i = 0; i < table[1].size(); i++)
 	{
 		string tableName = table[0][i];
@@ -67,21 +68,21 @@ void DatabaseDataParser::fillPartOfSpeechTable(string pofTableName)
 			tableNamePartOfSpeech[tableName] = UNKNOWN;
 		
 	}
-	
+	return true;
 }
 //we have quite a few tables that act like drop down..we will need theri values for parsing data
-void DatabaseDataParser::getDBTableValues(string tableName)
+bool DatabaseDataParser::getDBTableValues(string tableName)
 {
 	int numCol = 2;
 	string result = dbCtrl->getTable(tableName);
 
 	if (result == "")
-		return;
+		return false;
 
 	vector<vector<string>> table = parseDBOutput(result, numCol);
 	
 	if (table.size() < (size_t)numCol)
-		return;
+		return false;
 	
 	toProperNoun(tableName);
 	if (!DBTables[tableName])
@@ -98,6 +99,7 @@ void DatabaseDataParser::getDBTableValues(string tableName)
 		}
 		DBTables[tableName] = newData;
 	}
+	return true;
 }
 
 //----------------------------------------------------------------------

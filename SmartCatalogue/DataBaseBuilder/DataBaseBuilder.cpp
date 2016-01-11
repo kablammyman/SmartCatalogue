@@ -1,9 +1,22 @@
 // DataBaseBuilder.cpp : Defines the entry point for the console application.
 //
+/*// old and inefficnet way
+//becasue i do 1 treversal to create the tree, then another to process the data i need
+vector<string> imageDirs;
+//get all the paths and put the info in memory
+if (pathToProcess != "")
+dbDataParser.getAllPaths(pathToProcess, imageDirs);
+for (size_t i = 0; i < imageDirs.size(); i++)
+dbDataParser.calcGalleryData(imageDirs[i], ignorePattern, galleryData);
+etc etc etc
+*/
 
 #include "stdafx.h"
 #include "DataBaseBuilder.h"
 #include <algorithm>
+
+//check execution time
+#include <ctime>
 
 //#define TEST_DATABASE_PARSER 0
 //#define TEST_DATABASE_CONTROLLER 1
@@ -11,44 +24,43 @@
 
 int main(int argc, char *argv[])
 {
-	string temp = argv[0];
+	char full[MAX_PATH];
+	string temp = _fullpath(full, argv[0], MAX_PATH);
 	size_t found = temp.find_last_of("/\\");
-
+	bool verboseOutput = false;
+	int goodDir = 0, badDir = 0, totalDir = 0;
 	filePathBase = temp.substr(0, found);
 	cfgPath = filePathBase + "\\imageViewCfg.txt";
-	int i = 0;
-	doImageHash = true;
-	//read from cfg if theres no commandline args
-	if (argc < 4)
+	
+	doImageHash = false;
+
+	//read from cfg by default
+	if (!CFG::CFGReaderDLL::readCfgFile(cfgPath, '|'))
 	{
-		if (!CFG::CFGReaderDLL::readCfgFile(cfgPath, '|'))
-		{
-			string errorMsg = "Error opening :";
-			errorMsg += cfgPath;
-			cout << errorMsg << "\nno cfg text file and...\n";
-			invalidParmMessageAndExit();
-		}
-
-		dbPath = CFG::CFGReaderDLL::getCfgStringValue("DBPath");
-		pathToProcess = CFG::CFGReaderDLL::getCfgStringValue("mainWorkingPath");
-		ignorePattern = CFG::CFGReaderDLL::getCfgStringValue("ignorePattern");
-		dbCtrlr.openDatabase(dbPath);
-		dbDataParser.setDBController(&dbCtrlr);
-
-		
-
-		dbDataParser.fillPartOfSpeechTable("TableNamesPartOfSceech");
-		vector<string> dbTableValues = CFG::CFGReaderDLL::getCfgListValue("tableNames");
-		//if we cant find the table names in the cfg, thejust get out of here
-		if (dbTableValues.size() == 1 && dbTableValues[0].find("could not find") != string::npos)
-			return -1;
-		//else, fill er' up!
-		for (size_t i = 0; i < dbTableValues.size(); i++)
-			dbDataParser.getDBTableValues(dbTableValues[i]);
-
-		vector<string> meta = CFG::CFGReaderDLL::getCfgListValue("metaWords");
+		string errorMsg = "Error opening :";
+		errorMsg += cfgPath;
+		cout << errorMsg << "\nno cfg text file and...\n";
+		invalidParmMessageAndExit();
 	}
-	else
+
+	dbPath = CFG::CFGReaderDLL::getCfgStringValue("DBPath");
+	pathToProcess = CFG::CFGReaderDLL::getCfgStringValue("mainWorkingPath");
+	ignorePattern = CFG::CFGReaderDLL::getCfgStringValue("ignorePattern");
+		
+	vector<string> dbTableValues = CFG::CFGReaderDLL::getCfgListValue("tableNames");
+	//if we cant find the table names in the cfg, thejust get out of here
+	if (dbTableValues.size() == 1 && dbTableValues[0].find("could not find") != string::npos)
+	{
+		cout << "couldnt find the list of table names in your cfg...\n";
+		exit(-1);
+	}
+
+	//vector<string> meta = CFG::CFGReaderDLL::getCfgListValue("metaWords");
+	doImageHash = true;
+
+
+	//command line args can add extra options
+	int i = 0;
 	while (i < argc)
 	{
 		if (strcmp(argv[i], "-dbPath") == 0)
@@ -67,7 +79,6 @@ int main(int argc, char *argv[])
 			pathToProcess = argv[i + 1];
 			ignorePattern = pathToProcess;
 		}
-		//optional param
 		else if (strcmp(argv[i], "-ignoreBase") == 0)
 		{
 			i++;
@@ -75,16 +86,24 @@ int main(int argc, char *argv[])
 				invalidParmMessageAndExit();
 			ignorePattern = argv[i + 1];
 		}
-
 		else if (strcmp(argv[i], "-imgHash") == 0)
-		{
 			doImageHash = true;
-		}
+		
+		else if (strcmp(argv[i], "-verbose") == 0)
+			verboseOutput = true;
+
 		i++;
+
 	}
 
 	if (dbPath == "" || pathToProcess == "")
 		invalidParmMessageAndExit();
+
+	if (!MyFileDirDll::doesPathExist(pathToProcess))
+	{
+		cout << pathToProcess << "is not valid\n";
+		exit(-1);
+	}
 
 #ifdef TEST_DATABASE_PARSER
 	//testNamelogic();
@@ -97,19 +116,26 @@ int main(int argc, char *argv[])
 	dbCtrlr.testDBQuerey();
 #endif	
 
-	/*// old and inefficnet way
-	//becasue i do 1 treversal to create the tree, then another to process the data i need
-	vector<string> imageDirs;
-	//get all the paths and put the info in memory
-	if (pathToProcess != "")
-		dbDataParser.getAllPaths(pathToProcess, imageDirs);
-	for (size_t i = 0; i < imageDirs.size(); i++)
-		dbDataParser.calcGalleryData(imageDirs[i], ignorePattern, galleryData);
-		etc etc etc
-	*/
+	dbCtrlr.openDatabase(dbPath);
+	dbDataParser.setDBController(&dbCtrlr);
+	
+	if (!dbDataParser.fillPartOfSpeechTable("TableNamesPartOfSceech"))
+	{
+		cout << "the partsOfSpeechTable is not present in the DB or is not valid\n";
+		exit(-1);
+	}
 
+	for (size_t i = 0; i < dbTableValues.size(); i++)
+		if (!dbDataParser.getDBTableValues(dbTableValues[i]))
+		{
+			cout << dbTableValues[i] << " is not a valid table in your DB\n";
+			exit(-1);
+		}
+
+	int start_s = clock();
 	//this time, I'm gonna get the data AS i build the dir tree
 	MyFileDirDll::startDirTreeStep(pathToProcess);
+	
 
 	while(!MyFileDirDll::isFinished())
 	{
@@ -120,40 +146,46 @@ int main(int argc, char *argv[])
 		if (MyFileDirDll::getCurNodeNumFolders() > 0)
 			continue;
 
+		
+		if (verboseOutput)
+			cout << curDir;
+
 		GalleryData galleryData;
-		//printf("%s: ", curDir.c_str());
 		bool ret = dbDataParser.calcGalleryData(curDir, ignorePattern, galleryData);
 		if (ret)
 		{
+			if (verboseOutput)
+				cout << endl;
+
 			string output;
-			vector<DatabaseController::dbDataPair> dbGalleryInfo;
+			
+			if (verboseOutput)
+			{
+				cout << "catogory:       " << galleryData.category << endl;
+				cout << "websiteName:    " << galleryData.websiteName << endl;
+				cout << "subWebsiteName: " << galleryData.subWebsiteName << endl;
+				cout << "galleryName:    " << galleryData.galleryName << endl;
+				cout << "named   models: " << galleryData.models.size() << endl;
+			}
 
-			printf("path:       %s\n", galleryData.path.c_str());
-			dbGalleryInfo.push_back(make_pair("path", galleryData.category));
+			
+			int websiteID = insertWebsiteInfoIntoDB(galleryData);
+			if (websiteID == -1)
+				goto DB_INPUT_ERROR;
+			int subWebsiteID = insertSubWebsiteInfoIntoDB(galleryData, websiteID);
+			if (subWebsiteID == -1)
+				goto DB_INPUT_ERROR;
 
-			printf("websiteName:    %s\n", galleryData.websiteName.c_str());
-			dbGalleryInfo.push_back(make_pair("websiteName", galleryData.websiteName));
-
-			printf("subWebsiteName: %s\n", galleryData.subWebsiteName.c_str());
-			dbGalleryInfo.push_back(make_pair("subWebsiteName", galleryData.subWebsiteName));
-
-			printf("galleryName:    %s\n", galleryData.galleryName.c_str());
-			dbGalleryInfo.push_back(make_pair("galleryName", galleryData.galleryName));
-
-			printf("num named models:    %d\n", galleryData.models.size());
-			dbGalleryInfo.push_back(make_pair("numModels", to_string(galleryData.models.size())));
-
-			//insert gallery info into DB
-			dbCtrlr.insertNewDataEntry("Gallery", dbGalleryInfo, output);
-
-			int galleryID = getLatestID();
+			int galleryID = insertGalleryInfoIntoDB(galleryData, websiteID, subWebsiteID);
+			if (galleryID == -1)
+				goto DB_INPUT_ERROR;
 				
 			for (size_t k = 0; k < galleryData.models.size(); k++)
 			{
-				//printf("model %d name:", k + 1);
-				//printf("%s %s %s\n", galleryData.models[k].name.firstName.c_str(), galleryData.models[k].name.middleName.c_str(), galleryData.models[k].name.lastName.c_str());
-				//chyeck to see if we have this model in the DB already, if so, use her ID
+				if (verboseOutput)
+					cout << "model " << k + 1 << " name: " << galleryData.models[k].name.firstName << " "<< galleryData.models[k].name.middleName << " " << galleryData.models[k].name.lastName << endl;
 
+				//check to see if we have this model in the DB already, if so, use her ID
 				vector<DatabaseController::dbDataPair> data;
 				data.push_back(make_pair("ID", ""));
 				data.push_back(make_pair("firstName", galleryData.models[k].name.firstName));
@@ -165,32 +197,18 @@ int main(int argc, char *argv[])
 				if (!output.empty())
 				{
 					vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 3);
-					//printf("model id in db = %s\n", modelsInDB[0][0].c_str());
 					galleryData.models[k].name.dbID = atoi(modelsInDB[0][0].c_str());
 				}
 				else
 				{
-					vector<DatabaseController::dbDataPair> dbModelInfo;
-					dbModelInfo.push_back(make_pair("firstName", galleryData.models[k].name.firstName));
-					dbModelInfo.push_back(make_pair("middleName", galleryData.models[k].name.middleName));
-					dbModelInfo.push_back(make_pair("lastName", galleryData.models[k].name.lastName));
-					dbCtrlr.insertNewDataEntry("Models", dbModelInfo, output);
-												
-					galleryData.models[k].name.dbID = getLatestID();
+					if(!insertModelInfoIntoDB(galleryData.models[k]))
+						goto DB_INPUT_ERROR;
 				}
 
 				for (size_t i = 0; i < galleryData.models[k].outfit.size(); i++)
 				{
-					//printf("%s\n", galleryData.models[k].outfit[0].type.c_str());
-					vector<DatabaseController::dbDataPair> dbOutfitInfo;
-					dbOutfitInfo.push_back(make_pair("Type", galleryData.models[k].outfit[i].type));
-					dbOutfitInfo.push_back(make_pair("ColorID", to_string(galleryData.models[k].outfit[i].ColorIndex)));
-					dbOutfitInfo.push_back(make_pair("MaterialID", to_string(galleryData.models[k].outfit[i].ClothingMaterialIndex)));
-					dbOutfitInfo.push_back(make_pair("PrintID", to_string(galleryData.models[k].outfit[i].ClothingPrintIndex)));
-					dbOutfitInfo.push_back(make_pair("ModelID", to_string(galleryData.models[k].name.dbID)));
-					dbOutfitInfo.push_back(make_pair("GalleryID", to_string(galleryID)));
-					dbCtrlr.insertNewDataEntry("Outfit", dbOutfitInfo, output);
-
+					if(!insertModelOutfitInfoIntoDB(galleryData.models[k], i, galleryID))
+						goto DB_INPUT_ERROR;
 				}
 					
 			}
@@ -209,20 +227,38 @@ int main(int argc, char *argv[])
 
 					string hash = exec(hashingCommand.c_str());
 
-					vector<DatabaseController::dbDataPair> dbImgInfo;
-					dbImgInfo.push_back(make_pair("path", imgeFilePath));
-					dbImgInfo.push_back(make_pair("hash", hash));
-					dbImgInfo.push_back(make_pair("galleryID", to_string(galleryID)));
-					dbCtrlr.insertNewDataEntry("Images", dbImgInfo, output);
+					size_t found = hashingCommand.find("-hash");
+					hashingCommand.insert(found + 1, "p");
+					string phash = exec(hashingCommand.c_str());
+
+					
+					if (!insertImageHashInfoIntoDB(imgeFilePath, hash, phash, galleryID))
+					{
+						string errString = ("couldnt hash or store: " + imgeFilePath + "\n");
+						addEntryToInvalidPathFile(errString);
+						if (verboseOutput)
+							cout << errString;
+					}
+						
 				}
 			}
-
-			
-			//printf("\n");
+			goodDir++;
 		}
-		//else
-		//	printf("its bad!\n");
+		else
+		{
+			DB_INPUT_ERROR:
+			badDir++;
+			string errString = ("invalid dir: " + curDir + "\n");
+			if (verboseOutput)
+				cout << errString << endl;
+			addEntryToInvalidPathFile(errString);
+		}
+		totalDir++;
 	}
+	int stop_s = clock();
+	double milis = (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000;
+	cout << "done in ";
+	printTimeStamp(milis);
 	return 0;
 }
 

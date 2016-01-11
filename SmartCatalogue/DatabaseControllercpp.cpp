@@ -16,7 +16,7 @@ DatabaseController::~DatabaseController()
 	}
 }
 
-void DatabaseController::openDatabase(string path)
+bool DatabaseController::openDatabase(string path)
 {
 	//prob should parse the path and seperate that from the name at some point
 	//right nopw, path should only eb the name of the db file
@@ -30,10 +30,10 @@ void DatabaseController::openDatabase(string path)
 		printf("couldnt open %s, %s", path.c_str(), output.c_str());
 		dbName = "";
 		db->closeDataBase(output);
-		return;
+		return false;
 	}
-	//curDBWindowData = db->viewData();
-	//sendDataToEditWindow(getDBViewHandle(), curDBWindowData);
+
+	return true;
 }
 
 string DatabaseController::getDBName()

@@ -6,7 +6,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-dbDataPath \\SERVER\documents\buildPornoDB -dbPath C:\Users\Victor\Desktop\newPornoDB.db</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-dbDataPath \\SERVER\documents\buildPornoDB -dbFilePath C:\Users\Victor\Desktop\newPornoDB.db</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

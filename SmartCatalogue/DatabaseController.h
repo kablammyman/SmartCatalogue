@@ -16,7 +16,7 @@ public:
 	DatabaseController();
 	~DatabaseController();
 
-	void openDatabase(string path);
+	bool openDatabase(string path);
 	bool isDBOpen();
 	bool createNewDataBase(string newDBName, string createCommand="");
 	bool executeSQL(string command, string &output);

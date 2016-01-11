@@ -59,10 +59,11 @@ class DatabaseDataParser
 	//int getNameMarkerIndexInTokens(vector<string> & tokens);
 	//int isNameMarkerInTokens(vector<string> & tokens);
 public:
-	void getDBTableValues(string tableName);
-	vector <vector<string>>parseDBOutput(string &inputData, int numFields);
-	void fillPartOfSpeechTable(string pofTableName);
 	DatabaseDataParser();
+
+	bool getDBTableValues(string tableName);
+	vector <vector<string>>parseDBOutput(string &inputData, int numFields);
+	bool  fillPartOfSpeechTable(string pofTableName);
 	void setDBController(DatabaseController *dbc);
 	void getAllPaths(string path, vector<string> &dirsWithImages);
 	bool calcGalleryData(string input, string ignorePattern, GalleryData &gallery);

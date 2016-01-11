@@ -10,27 +10,28 @@
 #include "myFileDirDll.h"
 #include "DatabaseController.h"
 
+#include <Windows.h>
+
 using namespace std;
 
 void invalidParmMessageAndExit()
 {
 	cout << "invlaid parameters. Here are the options:\n";
-	cout << "-dbData <path of db static data>\n";
-	cout << "-dbPath <path of where new db will be placed>\n";
+	cout << "-dbDataPath <path of db static data>\n";
+	cout << "-dbLocation <path of where new db will be placed>\n";
 
 	exit(1);
 }
 
 int main(int argc, const char *argv[])
 {
-
 	if (argc < 3)
 		invalidParmMessageAndExit();
 
 	int i = 0;
 
 	string dbDataDir;
-	string dbPath;
+	string dbFilePath;
 	DatabaseController dbCtrlr;
 
 	while (i < argc)
@@ -43,21 +44,44 @@ int main(int argc, const char *argv[])
 
 			dbDataDir = argv[i];
 		}
-		else if (strcmp(argv[i], "-dbPath") == 0)
+		else if (strcmp(argv[i], "-dbFilePath") == 0)
 		{
 			i++;
 			if (i >= argc)
 				invalidParmMessageAndExit();
-			dbPath = argv[i];
+			dbFilePath = argv[i];
 		}
 		
 		i++;
 	}
 
-	vector<string> allDBTextFiles = MyFileDirDll::getAllFileNamesInDir(dbDataDir);
-	//create the new db
-	dbCtrlr.createNewDataBase(dbPath);
+	if (dbFilePath.empty() || dbDataDir.empty())
+		invalidParmMessageAndExit();
 
+	if (!MyFileDirDll::doesPathExist(dbDataDir))
+	{
+		cout << dbDataDir << "is not valid\n";
+		exit(-1);
+	}
+
+	string dbDir = MyFileDirDll::getPathFromFullyQualifiedPathString(dbFilePath);
+	if (!MyFileDirDll::doesPathExist(dbDir))
+	{
+		cout << dbDir << " is not a valid place to put your db\n";
+		exit(-1);
+	}
+
+	vector<string> allDBTextFiles = MyFileDirDll::getAllFileNamesInDir(dbDataDir);
+	if (allDBTextFiles.size() == 0)
+	{
+		cout << dbDataDir << ": the DB creation data dir is empty!\n";
+		exit(-1);
+	}
+
+	//create the new db
+	dbCtrlr.createNewDataBase(dbFilePath);
+
+	
 	for (size_t i = 0; i < allDBTextFiles.size(); i++)
 	{
 		string curFile = allDBTextFiles[i];
