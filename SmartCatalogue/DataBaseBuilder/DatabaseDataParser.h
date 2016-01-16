@@ -16,6 +16,11 @@ using namespace std;
 #define ADJ  2
 #define VERB 3
 
+#define CATEGORY 0
+#define WEBSITE 1
+#define SUBWEBSITE 2
+#define GALLERY 3
+#define MODEL 4
 class DatabaseDataParser
 {
 	//dictionary is used to for spellchecking. I use a trie instead of a normal vector for fast lookup times
@@ -66,7 +71,7 @@ public:
 	bool  fillPartOfSpeechTable(string pofTableName);
 	void setDBController(DatabaseController *dbc);
 	void getAllPaths(string path, vector<string> &dirsWithImages);
-	bool calcGalleryData(string input, string ignorePattern, GalleryData &gallery);
+	bool calcGalleryData(string input, string ignorePattern, GalleryData &gallery, string &error);
 	void transformClothingNameAlias(string &phrase);
 	void transformSexToyAlias(string &phrase);
 	void fillTreeWords(vector<string> &meta, Trie *trieType);

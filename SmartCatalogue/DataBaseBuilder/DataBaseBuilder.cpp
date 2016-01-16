@@ -149,7 +149,8 @@ int main(int argc, char *argv[])
 			cout << curDir;
 
 		GalleryData galleryData;
-		bool ret = dbDataParser.calcGalleryData(curDir, ignorePattern, galleryData);
+		string galleryCalcError;
+		bool ret = dbDataParser.calcGalleryData(curDir, ignorePattern, galleryData, galleryCalcError);
 		if (ret)
 		{
 			if (verboseOutput)
@@ -166,19 +167,22 @@ int main(int argc, char *argv[])
 				cout << "named   models: " << galleryData.models.size() << endl;
 			}
 
-			
-			int websiteID = insertWebsiteInfoIntoDB(galleryData);
+			int categoryID = inserCategoryInfoIntoDB(galleryData);
+			if (categoryID == -1)
+				continue;
+
+			int websiteID = insertWebsiteInfoIntoDB(galleryData, categoryID);
 			if (websiteID == -1)
-				goto DB_INPUT_ERROR;
+				continue;
 
 			//a zero for subwebsite means there is no subwesite
 			int subWebsiteID = insertSubWebsiteInfoIntoDB(galleryData, websiteID);
 			if (subWebsiteID == -1)
-				goto DB_INPUT_ERROR;
+				continue;
 
 			int galleryID = insertGalleryInfoIntoDB(galleryData, websiteID, subWebsiteID);
 			if (galleryID == -1)
-				goto DB_INPUT_ERROR;
+				continue;
 				
 			for (size_t k = 0; k < galleryData.models.size(); k++)
 			{
@@ -186,13 +190,15 @@ int main(int argc, char *argv[])
 					cout << "model " << k + 1 << " name: " << galleryData.models[k].name.firstName << " "<< galleryData.models[k].name.middleName << " " << galleryData.models[k].name.lastName << endl;
 
 				if(!insertModelInfoIntoDB(galleryData.models[k]))
-					goto DB_INPUT_ERROR;
+					continue;
 				
+				if(!insertModelsInGalleryInfoIntoDB(galleryData.models[k].name.dbID, galleryID))
+					continue;
 
 				for (size_t i = 0; i < galleryData.models[k].outfit.size(); i++)
 				{
 					if(!insertModelOutfitInfoIntoDB(galleryData.models[k], i, galleryID))
-						goto DB_INPUT_ERROR;
+						continue;
 				}		
 			}
 
@@ -247,19 +253,19 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			DB_INPUT_ERROR:
 			badDir++;
-			string errString = ("invalid dir: " + curDir + "\n");
-			if (verboseOutput)
-				cout << errString << endl;
-			addEntryToInvalidPathFile(errString);
+			reportError("invalid directory", curDir, galleryCalcError, true);
 		}
 		totalDir++;
 	}
+
 	int stop_s = clock();
 	double milis = (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000;
 	cout << "done in ";
 	printTimeStamp(milis);
+	cout << "processed " << totalDir << " galleries\n";
+	cout << "\nGalleries added to DB: " << goodDir << endl;
+	cout << "\nGalleries that dont conform to schema: " << badDir << endl;
 	return 0;
 }
 

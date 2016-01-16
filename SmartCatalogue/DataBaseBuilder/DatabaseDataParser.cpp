@@ -197,7 +197,7 @@ vector<ModelName> DatabaseDataParser::doNameLogic(string allNames)
 	return nameVec;
 }
 
-bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, GalleryData &gallery)
+bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, GalleryData &gallery, string &error)
 {
 	/*
 	use a state machine to figure thigns out.
@@ -215,8 +215,10 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, Gal
 
 	//minimun is catogory/website/gallery
 	if (tokens.size() < 3)
+	{
+		error = "path is illegeal, not enough descriptors aka, its too short!";
 		return false;
-
+	}
 	int curState = 0;
 	vector<ModelName> names;
 
@@ -231,19 +233,19 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, Gal
 		//ex: porn stars\sunny leone\models\Aria Giovanni\poolside play (porn stars and models indicate names)
 		if (tokens[i] == "models" || tokens[i] == "porn stars" || tokens[i] == "amatuer models")
 		{
-			curState = 4;
+			curState = MODEL;
 			continue;
 		}
 
 
 		switch (curState)
 		{
-		case 0:
+		case CATEGORY:
 			catogory = tokens[i];
 			if (i < tokens.size() && tokens[i + 1] != "models")
 				curState = 1;
 			break;
-		case 1:
+		case WEBSITE:
 			toProperNoun(tokens[i]);
 			website = tokens[i];
 			//if we have more than 1 token left, and ther next one isnt models
@@ -253,19 +255,22 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, Gal
 				curState = 3;
 
 			break;
-		case 2:
+		case SUBWEBSITE:
 			toProperNoun(tokens[i]);
 			subwebsite = tokens[i];
 			if (i < tokens.size() && tokens[i + 1] != "models")
 				curState = 3;
 			break;
-		case 3:
+		case GALLERY:
 			toProperNoun(tokens[i]);
 			galleryName = tokens[i];
 			if (i < (tokens.size() - 1))
+			{
+				error = "path is illegeal, gallery is at wrong level";
 				return false;
+			}
 			break;
-		case 4:
+		case MODEL:
 			//the acutal model's name is after the model index
 			vector<ModelName> temp = doNameLogic(tokens[i]);
 			//sometimes we get more names in a porn star dir..ie, shes witha  friend
@@ -277,8 +282,10 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, Gal
 	}
 
 	if (galleryName.empty())
+	{
+		error = "path is illegeal, there is no gallery name";
 		return false;
-
+	}
 	
 	
 	gallery.path = path;
@@ -603,7 +610,8 @@ void DatabaseDataParser::testGalleryCalc()
 	{
 		GalleryData galleryData;
 		printf("%s: ", testPaths[i].c_str());
-		bool ret = calcGalleryData(testPaths[i], "\\\\OPTIPLEX-745\\photos\\porno pics", galleryData);
+		string error;
+		bool ret = calcGalleryData(testPaths[i], "\\\\OPTIPLEX-745\\photos\\porno pics", galleryData,error);
 		if (ret)
 		{
 			printf("\n");

@@ -65,14 +65,14 @@ string exec(const char* cmd)
 	return result;
 }
 
-int addEntryToInvalidPathFile(string file)
+int addEntryToInvalidPathFile(string message)
 {
 	FILE * pFile;
 	pFile = fopen("invalidPaths.txt", "a");
 	if (pFile == NULL)
 		return -1;
 
-	fputs(file.c_str(), pFile);
+	fputs(message.c_str(), pFile);
 	fclose(pFile);
 	
 	return 0;
@@ -87,10 +87,66 @@ void printTimeStamp(double milis)
 	minutes %= 60;
 	int days = hours / 24;
 	hours %= 24;
-	cout << days << " days " << hours << " hours " << minutes << " minutes " << seconds << " seconds\n";
+	string output;
+
+	if (days > 0)
+		output += (days + " days ");
+	if (hours > 0)
+		output += (hours + " hours ");  
+	if (minutes > 0)
+		output += (minutes + " minutes "); 
+	if(seconds > 0)
+		output += (seconds + " seconds");
+
+	cout << output << endl;
 }
 
-int insertWebsiteInfoIntoDB(GalleryData &galleryData)
+void reportError(string erreorType, string errorMessage, string extraInfo, bool outputToLog)
+{
+	string msg = (erreorType +": " + errorMessage);
+	
+	if (!extraInfo.empty())
+		msg += ("\n" + extraInfo);
+
+	msg += "\n";
+	if (outputToLog)
+		addEntryToInvalidPathFile(msg);
+
+	cout << msg;
+}
+int inserCategoryInfoIntoDB(GalleryData &galleryData)
+{
+	//add the model to gallery info
+	string output;
+	vector<DatabaseController::dbDataPair> categoryQuerey;
+	categoryQuerey.push_back(make_pair("ID", ""));
+	categoryQuerey.push_back(make_pair("name", galleryData.category));
+	dbCtrlr.doDBQuerey("Category", categoryQuerey, output);
+	//empty output means there name wasnt found
+	if (!output.empty())
+	{
+		if (output.find("error") != string::npos)
+		{
+			reportError("category querey error", output, ("category = " + galleryData.category), false);
+			return -1;
+		}
+		vector <vector<string>> categoryInfo = dbDataParser.parseDBOutput(output, 2);
+		return atoi(categoryInfo[0][0].c_str());
+	}
+
+	vector<DatabaseController::dbDataPair> categoryInfo;
+	categoryInfo.push_back(make_pair("name", galleryData.category));
+	dbCtrlr.insertNewDataEntry("Category", categoryInfo, output);
+
+	if (!output.empty())
+	{
+		reportError("category input error", output, ("category = " + galleryData.category), false);
+		return -1;
+	}
+	return getLatestID();
+}
+
+int insertWebsiteInfoIntoDB(GalleryData &galleryData, int categoryID)
 {
 	string output;
 	string path = (ignorePattern + galleryData.category + "\\" + galleryData.websiteName);
@@ -106,21 +162,22 @@ int insertWebsiteInfoIntoDB(GalleryData &galleryData)
 	{
 		if (output.find("error") != string::npos)
 		{
-			cout << "website querey error: " << output << endl;
+			reportError("website querey error", output, ("website = " + galleryData.websiteName), false);
 			return -1;
 		}
-		vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 2);
-		return atoi(modelsInDB[0][0].c_str());
+		vector <vector<string>> websiteInfo = dbDataParser.parseDBOutput(output, 2);
+		return atoi(websiteInfo[0][0].c_str());
 	}
 
 	vector<DatabaseController::dbDataPair> dbWebInfo;
 	
 	dbWebInfo.push_back(make_pair("path", path));
 	dbWebInfo.push_back(make_pair("name", galleryData.websiteName));
+	dbWebInfo.push_back(make_pair("categoryID", to_string(categoryID)));
 	dbCtrlr.insertNewDataEntry("Website", dbWebInfo, output);
 	if (!output.empty())
 	{
-		cout << "website input error: " << output << endl;
+		reportError("website input error", output, ("website = " + galleryData.websiteName), false);
 		return -1;
 	}
 	return getLatestID();
@@ -146,7 +203,7 @@ int insertSubWebsiteInfoIntoDB(GalleryData &galleryData, int websiteID)
 	{
 		if (output.find("error") != string::npos)
 		{
-			cout << "SubWebsite querey error: " << output << endl;
+			reportError("subWebsite querey error", output, ("website = " + galleryData.subWebsiteName), false);
 			return -1;
 		}
 		vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 2);
@@ -161,7 +218,7 @@ int insertSubWebsiteInfoIntoDB(GalleryData &galleryData, int websiteID)
 
 	if (!output.empty())
 	{
-		cout << "subWebsite input error: " << output << endl;
+		reportError("subWebsite input error", output, ("website = " + galleryData.subWebsiteName), false);
 		return -1;
 	}
 	return getLatestID();
@@ -181,7 +238,7 @@ int insertGalleryInfoIntoDB(GalleryData &galleryData, int websiteID, int subWebs
 	{
 		if (output.find("error") != string::npos)
 		{
-			cout << "gallery querey error: " << output << endl;
+			reportError("gallery querey error", output, ("gallery = " + galleryData.galleryName), false);
 			return -1;
 		}
 		vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 2);
@@ -197,7 +254,7 @@ int insertGalleryInfoIntoDB(GalleryData &galleryData, int websiteID, int subWebs
 	dbCtrlr.insertNewDataEntry("Gallery", dbGalleryInfo, output);
 	if (!output.empty())
 	{
-		cout << "gallery input error: " << output << endl;
+		reportError("gallery input error", output, ("gallery = " + galleryData.galleryName), false);
 		return -1;
 	}
 	return getLatestID();
@@ -219,7 +276,7 @@ bool insertModelInfoIntoDB(GalleryModel &model)
 	{
 		if (output.find("error") != string::npos)
 		{
-			cout << "model querey error: " << output << endl;
+			reportError("model querey error", output, ("model = " + model.name.firstName + " " + model.name.middleName + " " + model.name.lastName), false);
 			return -1;
 		}
 		vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 3);
@@ -236,7 +293,7 @@ bool insertModelInfoIntoDB(GalleryModel &model)
 
 	if (!output.empty())
 	{
-		cout << "model input error: " << output << endl;
+		reportError("model input error", output, ("model = " + model.name.firstName + " " + model.name.middleName + " " + model.name.lastName), false);
 		return false;
 	}
 
@@ -258,7 +315,7 @@ bool insertModelOutfitInfoIntoDB(GalleryModel &model, int clothingIndex, int gal
 	dbCtrlr.insertNewDataEntry("Outfit", dbOutfitInfo, output);
 	if (!output.empty())
 	{
-		cout << "model outfit input error: " << output << endl;
+		reportError("model outfit input error", output, ("model = " + model.name.firstName + " " + model.name.middleName + " " + model.name.lastName), false);
 		return false;
 	}
 	return true;
@@ -280,9 +337,23 @@ bool insertImageHashInfoIntoDB(string imgeFilePath, string hash, string phash, i
 		//then its not an error
 		if (output.find("UNIQUE constraint failed") == string::npos)
 		{
-			cout << "image hash input error: " << output << endl;
+			reportError("image hash input error", output, "imgPath = " + imgeFilePath, false);
 			return false;
 		}
 	}
+	return true;
+}
+
+bool insertModelsInGalleryInfoIntoDB(int modelID, int galleryID)
+{
+	//add the model to gallery info
+	string output;
+	vector<DatabaseController::dbDataPair> modelsInGalleryInfo;
+	modelsInGalleryInfo.push_back(make_pair("modelID", to_string(modelID)));
+	modelsInGalleryInfo.push_back(make_pair("galleryID", to_string(galleryID)));
+	dbCtrlr.insertNewDataEntry("ModelsInGallery", modelsInGalleryInfo, output);
+
+	if (!output.empty())
+			return false;
 	return true;
 }

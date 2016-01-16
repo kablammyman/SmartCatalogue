@@ -1,12 +1,6 @@
 // dupeImageFinder.cpp : Defines the entry point for the application.
 //
 
-
-/*
-
-i cant make 64 bit builds until i update myLibs to be 64 bit as well
-
-*/
 #include "stdafx.h"
 
 #include "dupeImageFinder.h"
@@ -296,7 +290,7 @@ BOOL InitTreeViewItems(HWND hwndTV)
 
 	//string path = "C:\\Users\\Victor\\Desktop\\onlyTeaseNameless\\";
 	//string path = "\\\\OPTIPLEX-745\\photos\\porno pics\\mega sites\\only all sites\\only secretaries\\";
-	string path = "\\\\SERVER\\porn\\porno pics\\";
+	string path = "\\\\SERVER\\porn\\porno pics\\mega sites\\only all sites\\only secretaries\\";
 	vector<string> imgDirs;
 
 	img.loadCalculatedHashes();
