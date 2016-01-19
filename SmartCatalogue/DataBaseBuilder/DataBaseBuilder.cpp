@@ -210,9 +210,11 @@ int main(int argc, char *argv[])
 				{
 					//when the path has spaces,we need DOUBLE quotes aka ""C:\some dir\run.exe"" 
 					string imgeFilePath = (curDir+ *it);
+
+					string md5Hash = createMD5Hash(imgeFilePath);
 					//we have this querey seperated from the method, so we dont do un nesc hashing!
 					vector<DatabaseController::dbDataPair> imageQuerey;
-					imageQuerey.push_back(make_pair("fileName", imgeFilePath));
+					imageQuerey.push_back(make_pair("MD5", md5Hash));
 					imageQuerey.push_back(make_pair("galleryID", to_string(galleryID)));
 					dbCtrlr.doDBQuerey("Images", imageQuerey, output);
 
@@ -239,7 +241,7 @@ int main(int argc, char *argv[])
 					string phash = exec(hashingCommand.c_str());
 
 					
-					if (!insertImageHashInfoIntoDB(imgeFilePath, hash, phash, galleryID))
+					if (!insertImageHashInfoIntoDB(*it, hash, phash, md5Hash, galleryID))
 					{
 						string errString = ("couldnt hash or store: " + imgeFilePath + "\n");
 						addEntryToInvalidPathFile(errString);

@@ -8,6 +8,8 @@
 #include "CFGReaderDll.h"
 #include "myFileDirDll.h"
 
+#include "MD5.h"
+
 using namespace std;
 
 string filePathBase;
@@ -114,6 +116,33 @@ void reportError(string erreorType, string errorMessage, string extraInfo, bool 
 
 	cout << msg;
 }
+
+
+//http://stackoverflow.com/questions/1220046/how-to-get-the-md5-hash-of-a-file-in-c
+string createMD5Hash(string fileName)
+{
+	//Start opening your file
+	ifstream inputFile;
+	inputFile.open(fileName, std::ios::binary | std::ios::in);
+
+	//Find length of file
+	inputFile.seekg(0, std::ios::end);
+	long len = inputFile.tellg();
+	inputFile.seekg(0, std::ios::beg);
+
+	//read in the data from your file
+	char * InFileData = new char[len];
+	inputFile.read(InFileData, len);
+
+	//Calculate MD5 hash
+	string returnString = md5(InFileData, len);
+
+	//Clean up
+	delete[] InFileData;
+
+	return returnString;
+}
+
 int inserCategoryInfoIntoDB(GalleryData &galleryData)
 {
 	//add the model to gallery info
@@ -321,13 +350,14 @@ bool insertModelOutfitInfoIntoDB(GalleryModel &model, int clothingIndex, int gal
 	return true;
 }
 
-bool insertImageHashInfoIntoDB(string imgeFilePath, string hash, string phash, int galleryID)
+bool insertImageHashInfoIntoDB(string imgeFileName, string hash, string phash,string md5, int galleryID)
 {
 	string output;
 	vector<DatabaseController::dbDataPair> dbImgInfo;
-	dbImgInfo.push_back(make_pair("fileName", imgeFilePath));
+	dbImgInfo.push_back(make_pair("fileName", imgeFileName));
 	dbImgInfo.push_back(make_pair("hash", hash));
 	dbImgInfo.push_back(make_pair("phash", phash));
+	dbImgInfo.push_back(make_pair("MD5", md5));
 	dbImgInfo.push_back(make_pair("galleryID", to_string(galleryID)));
 	dbCtrlr.insertNewDataEntry("Images", dbImgInfo, output);
 
@@ -337,7 +367,7 @@ bool insertImageHashInfoIntoDB(string imgeFilePath, string hash, string phash, i
 		//then its not an error
 		if (output.find("UNIQUE constraint failed") == string::npos)
 		{
-			reportError("image hash input error", output, "imgPath = " + imgeFilePath, false);
+			reportError("image hash input error", output, "filename = " + imgeFileName, false);
 			return false;
 		}
 	}
