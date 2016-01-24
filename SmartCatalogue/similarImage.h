@@ -52,6 +52,9 @@ public:
 	void calcImageHasesForDir(string imgDir);
 	void dumpImageDataToTTextFile(string filename);
 	int test(string imgPath1, string imgPath2, bool viewImg = false);
+	int hashDistFrom2Images(string imgPath1, string imgPath2);
+	int phashDistFrom2Images(string imgPath1, string imgPath2);
+
 	void loadCalculatedHashes();
 	void getAllImagePaths(string path, vector<string> & imgDirs);
 	long long getIntValueOfHash(string bits);

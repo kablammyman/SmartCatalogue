@@ -293,11 +293,12 @@ BOOL InitTreeViewItems(HWND hwndTV)
 	string path = "\\\\SERVER\\porn\\porno pics\\mega sites\\only all sites\\only secretaries\\";
 	vector<string> imgDirs;
 
+	//old code from test and inital coding
+	/*
 	img.loadCalculatedHashes();
-
 	img.getAllImagePaths(path, imgDirs);
 	img.findDupes(imgDirs, dupeList);
-
+	*/
 	wstring rootNodeOutput(path.begin(), path.end());
 	AddItemToTree(hwndTV, (LPTSTR)rootNodeOutput.c_str(), 1); 
 

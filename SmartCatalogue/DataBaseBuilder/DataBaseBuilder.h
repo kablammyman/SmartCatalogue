@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <iostream>
+#include <vector>
 
 #include "DatabaseDataParser.h"
 #include "DatabaseController.h"
@@ -22,7 +23,7 @@ DatabaseController dbCtrlr;
 string dbPath;
 string pathToProcess;
 string ignorePattern;//we dont need the base path for all processing, since it wont change
-
+vector<string> meta;
 
 void invalidParmMessageAndExit()
 {

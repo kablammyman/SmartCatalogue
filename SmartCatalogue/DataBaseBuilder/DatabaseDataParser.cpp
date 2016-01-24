@@ -7,14 +7,10 @@ DatabaseDataParser::DatabaseDataParser()
 	we use that list to know what values are allowed...we dont want miss-spellings
 	*/
 	dictionary = new Trie();
+	keywords = new Trie();
 
 	nameMarker = "models";//when we see this in a path, we know that the next token is a name for sure
 	fileWalker = new FileWalker();
-
-	
-
-	//if (!meta.empty())
-	//	fileWalker->fillMetaWords(meta);
 }
 //----------------------------------------------------------------------
 void DatabaseDataParser::setDBController(DatabaseController *dbc)
@@ -310,15 +306,16 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, Gal
 			
 		index++;
 	} 
-	// what should we do with this...is this still needed?
-	//	addMetaWordsToData(path, (*galleryData));
+
+	addMetaWordsToData(gallery);
+	
 	return true;
 }
 //----------------------------------------------------------------------
-void DatabaseDataParser::fillTreeWords(vector<string> &meta, Trie *trieType)
+void DatabaseDataParser::fillTreeWords(vector<string> &meta)
 {
 	for (size_t i = 0; i < meta.size(); i++)
-		trieType->addWord(meta[i]);
+		keywords->addWord(meta[i]);
 }
 //----------------------------------------------------------------------
 string DatabaseDataParser::seaerchForGalleryDescriptor(vector<string> &tokens, Trie *treeType)
@@ -330,17 +327,17 @@ string DatabaseDataParser::seaerchForGalleryDescriptor(vector<string> &tokens, T
 }
 //----------------------------------------------------------------------
 //find all the intersting words this path has. Later, add a random img file name and see if the filename has some meta keywords
-void DatabaseDataParser::addMetaWordsToData(string path, GalleryData &data)
+void DatabaseDataParser::addMetaWordsToData(GalleryData &data)
 {
 	string metaWords = "";
-	vector<string> tokens = tokenize(path, "- \\");
+	vector<string> tokens = tokenize(data.path, "- \\");
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
-		//need a smart way to do this. i have to get the adjs for each nouun
-		//ex:
-		//purple skirt blue room. the purple is for the clothing item, blue describes location
+		if (keywords->searchWord(tokens[i]))
+			data.keywords += (tokens[i] + ",");
 	}
-
+	//remove the last comma since its not needed
+	data.keywords.resize(data.keywords.length()-1); 
 }
 int DatabaseDataParser::getPartfOfSpeech(string word)
 {
@@ -373,6 +370,7 @@ bool DatabaseDataParser::isConjunction(string word)
 	return false;
 }
 //since this will be used after things are capitolized, all the checks will reflect that
+//how to get this out of the code...put in cfg?
 void DatabaseDataParser::transformClothingNameAlias(string &phrase)
 {
 	size_t found = phrase.find("School Girl");

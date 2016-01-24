@@ -26,7 +26,7 @@ class DatabaseDataParser
 	//dictionary is used to for spellchecking. I use a trie instead of a normal vector for fast lookup times
 	//since the dictionary will be bigger than 10 words, lol
 	Trie *dictionary;
-
+	Trie *keywords;
 	//descriptiveWords is for reverse lookups, so i can see what DB to find a word in, without having to search them all
 	//first is the actual word, the second is the catogory
 	//ex: descriptiveWords["green"] -> color
@@ -54,7 +54,7 @@ class DatabaseDataParser
 	vector<string> tokenize(string path, string delims);
 	vector<string> splitModelName(string input);
 	vector<ModelName> doNameLogic(string allNames);
-	void addMetaWordsToData(string path, GalleryData &data);
+	void addMetaWordsToData(GalleryData &data);
 	void toProperNoun(string &input);
 	vector <ClothingItem> getOutfitFromGalleryName(string galleryName);
 	//grab wordss that are in a DB table. if the word is misspelled, it wont be found
@@ -74,7 +74,7 @@ public:
 	bool calcGalleryData(string input, string ignorePattern, GalleryData &gallery, string &error);
 	void transformClothingNameAlias(string &phrase);
 	void transformSexToyAlias(string &phrase);
-	void fillTreeWords(vector<string> &meta, Trie *trieType);
+	void fillTreeWords(vector<string> &meta);
 	
 	/*
 	bool addToField(string type) {

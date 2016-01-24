@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 		exit(-1);
 	}
 
-	//vector<string> meta = CFG::CFGReaderDLL::getCfgListValue("metaWords");
+	meta = CFG::CFGReaderDLL::getCfgListValue("metaWords");
 
 	//command line args can add extra options
 	int i = 0;
@@ -116,7 +116,9 @@ int main(int argc, char *argv[])
 
 	dbCtrlr.openDatabase(dbPath);
 	dbDataParser.setDBController(&dbCtrlr);
-	
+	if(meta.size() > 0)
+		dbDataParser.fillTreeWords(meta);
+
 	if (!dbDataParser.fillPartOfSpeechTable("TableNamesPartOfSceech"))
 	{
 		cout << "the partsOfSpeechTable is not present in the DB or is not valid\n";
@@ -183,7 +185,8 @@ int main(int argc, char *argv[])
 			int galleryID = insertGalleryInfoIntoDB(galleryData, websiteID, subWebsiteID);
 			if (galleryID == -1)
 				continue;
-				
+			
+			//gotta fill in meta/keywords...even if they descrivbe models outfit
 			for (size_t k = 0; k < galleryData.models.size(); k++)
 			{
 				if (verboseOutput)

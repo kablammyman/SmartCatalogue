@@ -165,6 +165,40 @@ int SimilarImage::test(string imgPath1, string imgPath2, bool viewImg)
 	return 0;
 }
 
+int SimilarImage::hashDistFrom2Images(string imgPath1, string imgPath2)
+{
+	Mat img = cv::imread(imgPath1.c_str(), cv::IMREAD_COLOR);
+	Mat img2 = cv::imread(imgPath2.c_str(), cv::IMREAD_COLOR);
+
+	if (img.empty() || img2.empty())
+	{
+		cout << "invlaid image or path(s)\n";
+		return -1;
+	}
+
+	string hash = HashValue(img);
+	string hash2 = HashValue(img2);
+
+	return HanmingDistance(hash, hash2);
+}
+
+int SimilarImage::phashDistFrom2Images(string imgPath1, string imgPath2)
+{
+	Mat img = cv::imread(imgPath1.c_str(), cv::IMREAD_COLOR);
+	Mat img2 = cv::imread(imgPath2.c_str(), cv::IMREAD_COLOR);
+
+	if (img.empty() || img2.empty())
+	{
+		cout << "invlaid image or path(s)\n";
+		return -1;
+	}
+
+	string hash = pHashValue(img);
+	string hash2 = pHashValue(img2);
+
+	return HanmingDistance(hash, hash2);
+}
+
 void SimilarImage::getAllImagePaths(string path, vector<string> & imgDirs)
 {
 	if (MyFileDirDll::doesPathExist(path) == false)

@@ -75,6 +75,7 @@ struct GalleryData
 	string subWebsiteName;
 	string galleryName;
 	string category;
+	string keywords;
 	int dbID; //used when collecting\inserting data
 };
 

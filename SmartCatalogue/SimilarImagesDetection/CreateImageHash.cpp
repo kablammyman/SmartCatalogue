@@ -7,8 +7,6 @@ void invalidParmMessageAndExit()
 {
 	cout << "invlaid parameters. Here are the options:\n";
 	cout << "-compare <imgpath1> <imgpath2> -> compare 2 images\n";
-	cout << "-addToDB <imgPath> <dbPath> -> add either a single image to a DB\n";
-	cout << "-addToDB <imgDir> <dbPath> -> add a direcotry of images to a DB\n";
 	cout << "-compToDB <imgPath> <dbPath> -> compare an image to a a DB of image hashes\n";
 	cout << "-compToDir <imgPath> <imgDir> -> compare an image to a directory of images\n";
 	cout << "-hash <imgpath> create and return the hash of an image\n";
@@ -70,6 +68,29 @@ int main(int argc, const char *argv[])
 
 			return 0;
 		}
+		else if (strcmp(argv[i], "-compare") == 0)// <imgpath1> <imgpath2> -> compare 2 images\n";
+		{
+			SimilarImage simImage;
+			i++;
+			if (i >= argc)
+				invalidParmMessageAndExit();
+			string img1 = argv[i];
+
+			i++;
+			if (i >= argc)
+				invalidParmMessageAndExit();
+			string img2 = argv[i];
+
+			cout << simImage.hashDistFrom2Images(img1,img2);
+		}
+
+		else if (strcmp(argv[i], "-compToDB") == 0)// <imgPath> <dbPath> -> compare an image to a a DB of image hashes\n";
+		{
+		}
+		else if (strcmp(argv[i], "-compToDir") == 0)//  <imgPath> <imgDir> -> compare an image to a directory of images\n";
+		{
+		}
+
 		i++;
 	}
 
