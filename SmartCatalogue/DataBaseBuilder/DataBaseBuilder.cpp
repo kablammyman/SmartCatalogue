@@ -266,8 +266,8 @@ int main(int argc, char *argv[])
 	cout << "done in ";
 	printTimeStamp(milis);
 	cout << "processed " << totalDir << " galleries\n";
-	cout << "\nGalleries added to DB: " << goodDir << endl;
-	cout << "\nGalleries that dont conform to schema: " << badDir << endl;
+	cout << "\nGalleries added to DB: " << goodDir << " (" <<(goodDir/totalDir)*100<<"%)" <<endl;
+	cout << "\nGalleries that dont conform to schema: " << badDir << " (" << (badDir / totalDir) * 100 << "%)" << endl;
 	return 0;
 }
 

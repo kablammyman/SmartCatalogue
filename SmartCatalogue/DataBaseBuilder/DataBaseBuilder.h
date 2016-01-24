@@ -92,13 +92,13 @@ void printTimeStamp(double milis)
 	string output;
 
 	if (days > 0)
-		output += (days + " days ");
+		output += (to_string(days) + " days ");
 	if (hours > 0)
-		output += (hours + " hours ");  
+		output += (to_string(hours) + " hours ");
 	if (minutes > 0)
-		output += (minutes + " minutes "); 
+		output += (to_string(minutes) + " minutes ");
 	if(seconds > 0)
-		output += (seconds + " seconds");
+		output += (to_string(seconds) + " seconds");
 
 	cout << output << endl;
 }
