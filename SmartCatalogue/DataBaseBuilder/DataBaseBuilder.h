@@ -156,7 +156,7 @@ int inserCategoryInfoIntoDB(GalleryData &galleryData)
 	{
 		if (output.find("error") != string::npos)
 		{
-			reportError("category querey error", output, ("category = " + galleryData.category), false);
+			reportError("category querey error", output, ("category = " + galleryData.category +"\npath = " + galleryData.path), false);
 			return -1;
 		}
 		vector <vector<string>> categoryInfo = dbDataParser.parseDBOutput(output, 2);
@@ -169,7 +169,7 @@ int inserCategoryInfoIntoDB(GalleryData &galleryData)
 
 	if (!output.empty())
 	{
-		reportError("category input error", output, ("category = " + galleryData.category), false);
+		reportError("category input error", output, ("category = " + galleryData.category + "\npath = " + galleryData.path), false);
 		return -1;
 	}
 	return getLatestID();
@@ -191,7 +191,7 @@ int insertWebsiteInfoIntoDB(GalleryData &galleryData, int categoryID)
 	{
 		if (output.find("error") != string::npos)
 		{
-			reportError("website querey error", output, ("website = " + galleryData.websiteName), false);
+			reportError("website querey error", output, ("website = " + galleryData.websiteName + "\npath = " + galleryData.path), false);
 			return -1;
 		}
 		vector <vector<string>> websiteInfo = dbDataParser.parseDBOutput(output, 2);
@@ -206,7 +206,7 @@ int insertWebsiteInfoIntoDB(GalleryData &galleryData, int categoryID)
 	dbCtrlr.insertNewDataEntry("Website", dbWebInfo, output);
 	if (!output.empty())
 	{
-		reportError("website input error", output, ("website = " + galleryData.websiteName), false);
+		reportError("website input error", output, ("website = " + galleryData.websiteName + "\npath = " + galleryData.path), false);
 		return -1;
 	}
 	return getLatestID();
@@ -232,7 +232,7 @@ int insertSubWebsiteInfoIntoDB(GalleryData &galleryData, int websiteID)
 	{
 		if (output.find("error") != string::npos)
 		{
-			reportError("subWebsite querey error", output, ("website = " + galleryData.subWebsiteName), false);
+			reportError("subWebsite querey error", output, ("website = " + galleryData.subWebsiteName + "\npath = " + galleryData.path), false);
 			return -1;
 		}
 		vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 2);
@@ -247,7 +247,7 @@ int insertSubWebsiteInfoIntoDB(GalleryData &galleryData, int websiteID)
 
 	if (!output.empty())
 	{
-		reportError("subWebsite input error", output, ("website = " + galleryData.subWebsiteName), false);
+		reportError("subWebsite input error", output, ("website = " + galleryData.subWebsiteName + "\npath = " + galleryData.path), false);
 		return -1;
 	}
 	return getLatestID();
@@ -267,7 +267,7 @@ int insertGalleryInfoIntoDB(GalleryData &galleryData, int websiteID, int subWebs
 	{
 		if (output.find("error") != string::npos)
 		{
-			reportError("gallery querey error", output, ("gallery = " + galleryData.galleryName), false);
+			reportError("gallery querey error", output, ("gallery = " + galleryData.galleryName + "\npath = " + galleryData.path), false);
 			return -1;
 		}
 		vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 2);
@@ -283,7 +283,7 @@ int insertGalleryInfoIntoDB(GalleryData &galleryData, int websiteID, int subWebs
 	dbCtrlr.insertNewDataEntry("Gallery", dbGalleryInfo, output);
 	if (!output.empty())
 	{
-		reportError("gallery input error", output, ("gallery = " + galleryData.galleryName), false);
+		reportError("gallery input error", output, ("gallery = " + galleryData.galleryName + "\npath = " + galleryData.path), false);
 		return -1;
 	}
 	return getLatestID();
@@ -344,7 +344,7 @@ bool insertModelOutfitInfoIntoDB(GalleryModel &model, int clothingIndex, int gal
 	dbCtrlr.insertNewDataEntry("Outfit", dbOutfitInfo, output);
 	if (!output.empty())
 	{
-		reportError("model outfit input error", output, ("model = " + model.name.firstName + " " + model.name.middleName + " " + model.name.lastName), false);
+		reportError("model outfit input error", output, ("model = " + model.name.firstName + " " + model.name.middleName + " " + model.name.lastName + "\ngalleryID = " + to_string(galleryID)), false);
 		return false;
 	}
 	return true;
@@ -367,7 +367,7 @@ bool insertImageHashInfoIntoDB(string imgeFileName, string hash, string phash,st
 		//then its not an error
 		if (output.find("UNIQUE constraint failed") == string::npos)
 		{
-			reportError("image hash input error", output, "filename = " + imgeFileName, false);
+			reportError("image hash input error", output, "filename = " + imgeFileName + "\ngalleryID = " + to_string(galleryID), false);
 			return false;
 		}
 	}
