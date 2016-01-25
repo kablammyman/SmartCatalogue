@@ -307,6 +307,14 @@ string SimilarImage::getImageHash(string imgPath)
 	return HashValue(img);
 }
 
+string SimilarImage::getImageHash(Mat imgData)
+{
+	if (imgData.data == NULL)
+		return "";
+
+	return HashValue(imgData);
+}
+
 string SimilarImage::getImagePHash(string imgPath)
 {
 	Mat img = cv::imread(imgPath, cv::IMREAD_COLOR);
@@ -316,6 +324,16 @@ string SimilarImage::getImagePHash(string imgPath)
 	return pHashValue(img);
 
 }
+
+string SimilarImage::getImagePHash(Mat imgData)
+{
+	if (imgData.data == NULL)
+		return "";
+
+	return pHashValue(imgData);
+
+}
+
 void SimilarImage::calcImageHasesForDir(string imgDir)
 {
 	vector<string> Allfiles = MyFileDirDll::getAllFileNamesInDir(imgDir);

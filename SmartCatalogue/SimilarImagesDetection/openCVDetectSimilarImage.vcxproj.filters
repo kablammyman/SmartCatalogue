@@ -7,9 +7,6 @@
     <ClCompile Include="..\DatabaseControllercpp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="readFromClipboard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\similarImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

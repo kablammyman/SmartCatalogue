@@ -64,5 +64,7 @@ public:
 	void findDupes(vector<string> & imgDirs, map<int, vector<int>> &dupeList);
 
 	string getImageHash(string imgPath);
+	string getImageHash(Mat imgData);
 	string getImagePHash(string imgPath);
+	string getImagePHash(Mat imgData);
 };

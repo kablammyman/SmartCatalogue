@@ -67,22 +67,21 @@ int main(int argc, char *argv[])
 			if (i >= argc)
 				invalidParmMessageAndExit();
 
-			dbPath = argv[i + 1];
+			dbPath = argv[i];
 		}
 		else if (strcmp(argv[i], "-dataPath") == 0)
 		{
 			i++;
 			if (i >= argc)
 				invalidParmMessageAndExit();
-			pathToProcess = argv[i + 1];
-			ignorePattern = pathToProcess;
+			pathToProcess = argv[i];
 		}
 		else if (strcmp(argv[i], "-ignoreBase") == 0)
 		{
 			i++;
 			if (i >= argc)
 				invalidParmMessageAndExit();
-			ignorePattern = argv[i + 1];
+			ignorePattern = argv[i];
 		}
 		else if (strcmp(argv[i], "-NoimgHash") == 0)
 			doImageHash = false;
@@ -269,8 +268,12 @@ int main(int argc, char *argv[])
 	cout << "done in ";
 	printTimeStamp(milis);
 	cout << "processed " << totalDir << " galleries\n";
-	cout << "\nGalleries added to DB: " << goodDir << " (" <<(goodDir/totalDir)*100<<"%)" <<endl;
-	cout << "\nGalleries that dont conform to schema: " << badDir << " (" << (badDir / totalDir) * 100 << "%)" << endl;
+	float goodPercent = (goodDir / totalDir);
+	goodPercent *= 100;
+	cout << "\nGalleries added to DB: " << goodDir << " (" << goodPercent <<"%)" <<endl;
+	float badPercent = (badDir / totalDir);
+	badPercent *= 100;
+	cout << "\nGalleries that dont conform to schema: " << badDir << " (" << badPercent << "%)" << endl;
 	return 0;
 }
 

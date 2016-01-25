@@ -337,8 +337,8 @@ void DatabaseDataParser::addMetaWordsToData(GalleryData &data)
 		if (keywords->searchWord(tokens[i]))
 			data.keywords += (tokens[i] + ",");
 	}
-	//remove the last comma since its not needed
-	data.keywords.resize(data.keywords.length()-1); 
+	if(!metaWords.empty())//remove the last comma since its not needed
+		data.keywords.resize(data.keywords.length()-1); 
 }
 int DatabaseDataParser::getPartfOfSpeech(string word)
 {

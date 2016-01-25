@@ -8,6 +8,78 @@
 using namespace std;
 string DataBase::returnData;
 bool DataBase::gettingData;
+
+static void testFunc(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+	// check that we have four arguments (lat1, lon1, lat2, lon2)
+/*	if (argc != 4)
+		return;*/
+	// check that all four arguments are non-null
+	if (sqlite3_value_type(argv[0]) == SQLITE_NULL || sqlite3_value_type(argv[1]) == SQLITE_NULL /*|| sqlite3_value_type(argv[2]) == SQLITE_NULL || sqlite3_value_type(argv[3]) == SQLITE_NULL*/) {
+		sqlite3_result_null(context);
+		return;
+	}
+	// get the four argument values
+	/*double lat1 = sqlite3_value_double(argv[0]);
+	double lon1 = sqlite3_value_double(argv[1]);
+	double lat2 = sqlite3_value_double(argv[2]);
+	double lon2 = sqlite3_value_double(argv[3]);*/
+	char *string1 = (char *)sqlite3_value_text(argv[0]);
+	char *string2 = (char *)sqlite3_value_text(argv[1]);
+	string ret = string1;
+	ret += "~~~";
+	ret += string2;
+	//cout <<"mine: " << ret << endl;
+	char *buffer = new char[ret.size()];
+	strcpy(buffer, ret.c_str());
+	sqlite3_result_text(context, buffer, strlen(buffer),NULL);
+}
+static void testFunc2(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+	char *string1 = (char *)sqlite3_value_text(argv[0]);
+	char *string2 = (char *)sqlite3_value_text(argv[1]);
+	string ret = string1;
+	ret += "~~~";
+	ret += string2;
+
+	char *buffer = new char[ret.size()];
+	strcpy(buffer, ret.c_str());
+	//trying to see what i can do to limit what i return, so i picked to only return "small strings"
+	if(ret.size() < 9)
+		sqlite3_result_text(context, buffer, strlen(buffer), NULL);
+
+	//it doesnt matter if this is here or not for this method
+	//else
+	//	sqlite3_result_null(context);
+
+	//success!!
+	//dbCtrlr.executeSQL("SELECT testFunc(id,name) FROM BodyPart where id = 1;", output);
+	//success!! it will only return the data that has less than 9 chars...looks like: testFunc2(id,name) | 1~~~Head
+	//dbCtrlr.executeSQL("SELECT testFunc2(id,name) FROM BodyPart where testFunc2(id,name) NOT NULL;", output);
+	//can i only reutnr special cols now? YES
+	//dbCtrlr.executeSQL("SELECT name FROM Gallery where testFunc2(id,name) NOT NULL;", output);
+	//what happens with a large table? seems super fast!
+	//dbCtrlr.executeSQL("SELECT galleryName FROM Gallery where testFunc2(id,galleryName) NOT NULL;", output);
+
+	//lets add in our own data instead of using query data for params
+	//dbCtrlr.executeSQL("SELECT galleryName FROM Gallery where testFunc2('yup',id) NOT NULL;", output);
+}
+
+static void hammingDistance(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+	char *string1 = (char *)sqlite3_value_text(argv[0]);
+	char *string2 = (char *)sqlite3_value_text(argv[1]);
+
+	int difference = 0;
+	for (int i = 0; i<64; i++)
+	{
+		if (string1[i] != string2[i])
+			difference++;
+	}
+	
+	sqlite3_result_int(context, difference);
+}
+
 DataBase::DataBase()
 {
 	returnCode = 0;
@@ -44,6 +116,11 @@ DataBase::~DataBase()
 		name +=".db";
 
 	returnCode = sqlite3_open(name.c_str(), &db);
+	//a custom sqlite method test..needs to go right after i open the db
+	int numParams = 2;//this var is more for remnding me what things are for
+	//sqlite3_create_function(db, "testFunc", numParams, SQLITE_UTF8, NULL, &testFunc, NULL, NULL);
+	//sqlite3_create_function(db, "testFunc2", numParams, SQLITE_UTF8, NULL, &testFunc2, NULL, NULL);
+	sqlite3_create_function(db, "hammingDistance", 2, SQLITE_UTF8, NULL, &hammingDistance, NULL, NULL);
    //returnCode = sqlite3_open("MyDb.db", &db);
    if (returnCode)
    {

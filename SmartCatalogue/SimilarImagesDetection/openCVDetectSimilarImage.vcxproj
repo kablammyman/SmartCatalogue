@@ -23,7 +23,6 @@
     <ClCompile Include="..\DatabaseControllercpp.cpp" />
     <ClCompile Include="..\similarImage.cpp" />
     <ClCompile Include="CreateImageHash.cpp" />
-    <ClCompile Include="readFromClipboard.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\database.h" />
