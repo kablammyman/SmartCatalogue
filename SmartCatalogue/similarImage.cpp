@@ -16,7 +16,7 @@ using namespace std;
 //Hash  
 string SimilarImage::HashValue(Mat &src)
 {
-	string rst(64, '\0');
+	string rst(maxNumBits, '\0');
 	Mat img;
 	if (src.channels() == 3)
 		cvtColor(src, img, CV_BGR2GRAY);
@@ -63,8 +63,8 @@ string SimilarImage::HashValue(Mat &src)
 string SimilarImage::pHashValue(Mat &src)
 {
 	Mat img, dst;
-	string rst(64, '\0');
-	double dIdex[64];
+	string rst(maxNumBits, '\0');
+	double *dIdex = new double[maxNumBits];
 	double mean = 0.0;
 	int k = 0;
 	if (src.channels() == 3)
@@ -88,13 +88,13 @@ string SimilarImage::pHashValue(Mat &src)
 		for (int j = 0; j < 8; ++j)
 		{
 			dIdex[k] = dst.at<double>(i, j);
-			mean += dst.at<double>(i, j) / 64;
+			mean += dst.at<double>(i, j) / maxNumBits;
 			++k;
 		}
 	}
 
 	/* ??*/
-	for (int i = 0; i<64; ++i)
+	for (int i = 0; i<maxNumBits; ++i)
 	{
 		if (dIdex[i] >= mean)
 		{
@@ -111,10 +111,10 @@ string SimilarImage::pHashValue(Mat &src)
 //  
 int SimilarImage::HanmingDistance(string &str1, string &str2)
 {
-	if ((str1.size() != 64) || (str2.size() != 64))
+	if ((str1.size() != maxNumBits) || (str2.size() != maxNumBits))
 		return -1;
 	int difference = 0;
-	for (int i = 0; i<64; i++)
+	for (int i = 0; i<maxNumBits; i++)
 	{
 		if (str1[i] != str2[i])
 			difference++;
@@ -122,6 +122,13 @@ int SimilarImage::HanmingDistance(string &str1, string &str2)
 	return difference;
 }
 
+float SimilarImage::getPercentDiff(int diff)
+{
+	float percent = (maxNumBits - diff);
+	percent /= maxNumBits;
+	percent *= 100;
+	return percent;
+}
 
 int SimilarImage::test(string imgPath1, string imgPath2, bool viewImg)
 {
@@ -170,9 +177,15 @@ int SimilarImage::hashDistFrom2Images(string imgPath1, string imgPath2)
 	Mat img = cv::imread(imgPath1.c_str(), cv::IMREAD_COLOR);
 	Mat img2 = cv::imread(imgPath2.c_str(), cv::IMREAD_COLOR);
 
-	if (img.empty() || img2.empty())
+	if (img.empty())
 	{
-		cout << "invlaid image or path(s)\n";
+		cout << "invlaid image or path: " << imgPath1;
+		return -1;
+	}
+		
+	if(img2.empty())
+	{
+		cout << "invlaid image or path: " << imgPath2;
 		return -1;
 	}
 
@@ -187,9 +200,15 @@ int SimilarImage::phashDistFrom2Images(string imgPath1, string imgPath2)
 	Mat img = cv::imread(imgPath1.c_str(), cv::IMREAD_COLOR);
 	Mat img2 = cv::imread(imgPath2.c_str(), cv::IMREAD_COLOR);
 
-	if (img.empty() || img2.empty())
+	if (img.empty())
 	{
-		cout << "invlaid image or path(s)\n";
+		cout << "invlaid image or path: " << imgPath1;
+		return -1;
+	}
+
+	if (img2.empty())
+	{
+		cout << "invlaid image or path: " << imgPath2;
 		return -1;
 	}
 

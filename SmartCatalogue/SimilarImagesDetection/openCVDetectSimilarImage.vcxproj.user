@@ -3,11 +3,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerCommand>$(TargetPath) </LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-hash "\\SERVER\porn\porno pics\amatuer sites\atk gallery\exotics\models\Monique Symone\198\m01.jpg"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-isInDir "\\SERVER\porn\porno pics\magazines\penthouse\models\Adrienne Manning and Dani Daniels\christamas sex in red undies\07.jpg" "\\SERVER\porn\porno pics\magazines\penthouse\models\Adrienne Manning and Dani Daniels\christamas sex in red undies"</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommand>$(TargetPath) </LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-hash "\\SERVER\porn\porno pics\amatuer sites\atk gallery\exotics\models\Monique Symone\198\m01.jpg"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-isInDir "\\SERVER\porn\porno pics\magazines\penthouse\models\Adrienne Manning and Dani Daniels\christamas sex in red undies\07.jpg" "\\SERVER\porn\porno pics\magazines\penthouse\models\Adrienne Manning and Dani Daniels\christamas sex in red undies"</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

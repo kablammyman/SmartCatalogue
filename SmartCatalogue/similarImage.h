@@ -31,12 +31,14 @@ class SimilarImage
 {
 	DatabaseController dbCtrlr;
 	int minHammingDist;
+	int maxNumBits;
 	
 public:
 	vector<ImageFiles> allImages; //maybe this should be private, but we need to see this list so we can display it
 	SimilarImage()
 	{
 		minHammingDist = 2;
+		maxNumBits = 64;
 	}
 
 	//Hash  
@@ -45,7 +47,8 @@ public:
 	//pHash  
 	string pHashValue(Mat &src);
 
-	//  
+	int getMinHammingDist() { return minHammingDist; }
+	float getPercentDiff(int diff);
 	int HanmingDistance(string &str1, string &str2);
 
 	void calcImageHash(string imgPath);

@@ -227,7 +227,8 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, Gal
 
 		// sometiomes we have more than 1 model folder, so find them all
 		//ex: porn stars\sunny leone\models\Aria Giovanni\poolside play (porn stars and models indicate names)
-		if (tokens[i] == "models" || tokens[i] == "porn stars" || tokens[i] == "amatuer models")
+		//note: we got rid of amatuer models and porn stars since they can be placed in model folders of actaul catogories
+		if (tokens[i] == "models")
 		{
 			curState = MODEL;
 			continue;
