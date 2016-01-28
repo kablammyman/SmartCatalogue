@@ -226,6 +226,13 @@ string MainApp::DoBrowseFolder(HWND hwnd)
 }
 
 
+void MainApp::callCreateNewDatabase()
+{
+	//this will tell the createNewDB.exe to run and also provide where it should 
+	//place teh db
+}
+
+
 void MainApp::sendDataToEditWindow(HWND hwnd, string data)
 {
 	HWND hEdit = GetDlgItem(hwnd, IDC_CHILD_EDIT);

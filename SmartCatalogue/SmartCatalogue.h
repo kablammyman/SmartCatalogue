@@ -14,6 +14,7 @@ INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    AddRecordBox(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    SQLQuereyBox(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	selectOrDeleteQuereyBox(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK QuickFind(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK DlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 HWND CreateNewMDIChild(HWND hMDIClient);
 BOOL SetUpMDIChildWindowClass(HINSTANCE hInstance);

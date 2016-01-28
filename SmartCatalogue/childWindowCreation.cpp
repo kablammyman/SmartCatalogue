@@ -7,7 +7,7 @@
 HWND CreateNewMDIChild(HWND hMDIClient)
 {
 	MDICREATESTRUCT mcs;
-	HWND hChild;
+	HWND hChild = NULL;
 
 	mcs.szTitle = "[Untitled]";
 	mcs.szClass = "some child window";

@@ -89,7 +89,7 @@ public:
 	std::string DoBrowseFolder(HWND hwnd);
 
 		
-	
+	void callCreateNewDatabase();
 	void sendDataToEditWindow(HWND hwnd, string data);
 	void sendDataToEditWindow(HWND hwnd, vector<string> &data);
 	vector<string> getDataFromEditWindow(HWND hwnd);

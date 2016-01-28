@@ -21,6 +21,7 @@ void invalidParmMessageAndExit()
 	cout << "-isInDir <imgPath> <imgDir> -> compare an image to a directory of images\n";
 	cout << "-hash <imgpath> create and return the hash of an image\n";
 	cout << "-phash <imgpath> create and return the phash of an image\n";
+	cout << std::flush;
 	exit(1);
 }
 
@@ -118,10 +119,17 @@ int main(int argc, const char *argv[])
 	
 	string dbPath;
 	string pathToProcess;
-
+	string output = "";
+	bool err = false;
+	string cmdArgUpper;
 	while (i < argc)
 	{
-		if (strcmp(argv[i], "-dbPath") == 0)
+		cmdArgUpper = argv[i];
+		for (size_t j = 0; j < cmdArgUpper.size(); j++)
+			cmdArgUpper[j] = toupper(cmdArgUpper[j]);
+			
+
+		if (cmdArgUpper == "-DBPATH")
 		{
 			i++;
 			if (i >= argc)
@@ -129,40 +137,34 @@ int main(int argc, const char *argv[])
 
 			dbPath = argv[i];
 		}
-		else if (strcmp(argv[i], "-imgPath") == 0)
+		else if (cmdArgUpper == "-IMGPATH")
 		{
 			i++;
 			if (i >= argc)
 				invalidParmMessageAndExit();
 			pathToProcess = argv[i];
 		}
-		else if (strcmp(argv[i], "-hash") == 0)
+		else if (cmdArgUpper == "-HASH")
 		{
 			i++;
 			if (i >= argc)
 				invalidParmMessageAndExit();
 
 			SimilarImage simImage;
-			string returnVal = simImage.getImageHash(argv[i]);
-			cout << returnVal;
-			//cout << endl; //when other programs read from this programs stdout, we dont want the new line with the actual data
-			
-			return 0;
+			output = simImage.getImageHash(argv[i]);
+			break;
 		}
-		else if (strcmp(argv[i], "-phash") == 0)
+		else if (cmdArgUpper == "-PHASH")
 		{
 			i++;
 			if (i >= argc)
 				invalidParmMessageAndExit();
 
 			SimilarImage simImage;
-			string returnVal = simImage.getImagePHash(argv[i]);
-			cout << returnVal; 
-		//	cout << endl;
-
-			return 0;
+			output = simImage.getImagePHash(argv[i]);
+			break;
 		}
-		else if (strcmp(argv[i], "-compare") == 0)// <imgpath1> <imgpath2> -> compare 2 images\n";
+		else if (cmdArgUpper == "-COMPARE")// <imgpath1> <imgpath2> -> compare 2 images\n";
 		{
 			SimilarImage simImage;
 			i++;
@@ -178,10 +180,10 @@ int main(int argc, const char *argv[])
 			int diff = simImage.hashDistFrom2Images(img1,img2);
 			if (diff == -1)
 				exit(-1);
-			cout << simImage.getPercentDiff(diff) << "% simularity";
-				
+			output = (to_string(simImage.getPercentDiff(diff)) +  "% simularity");
+			break;
 		}
-		else if (strcmp(argv[i], "-isInDir") == 0)//  <imgPath> <imgDir> -> compare an image to a directory of images\n";
+		else if (cmdArgUpper == "-ISINDIR")//  <imgPath> <imgDir> -> compare an image to a directory of images\n";
 		{
 			SimilarImage simImage;
 			i++;
@@ -191,28 +193,28 @@ int main(int argc, const char *argv[])
 			string img1Hash = simImage.getImageHash(argv[i]);
 			if (img1Hash.empty())
 			{
-				cout << "invalid file: " << argv[i];
-				exit(-1);
+				output = "invalid file: "; 
+				output += argv[i];
+				err = true;
 			}
 			i++;
 			if (i >= argc)
 				invalidParmMessageAndExit();
 
 			vector<string> files = MyFileDirDll::getAllFileNamesInDir(argv[i]);
-			string matches = "possible matches:\n";
+			output = "possible matches:\n";
 			for (size_t j = 0; j < files.size(); j++)
 			{
 				string hash = simImage.getImageHash(files[j]);
 				if (simImage.HanmingDistance(img1Hash, hash) < simImage.getMinHammingDist())
-					matches += (files[j] + "\n");
+					output += (files[j] + "\n");
 			}
 			//remove the last comma since its not needed
-			matches.resize(matches.length() - 1);
-
-			cout << matches;
+			output.resize(output.length() - 1);
+			break;
 		}
 
-		else if (strcmp(argv[i], "-isInDB") == 0)// <imgPath> <dbPath> -> compare an image to a a DB of image hashes\n";
+		else if (cmdArgUpper == "-ISINDB")// <imgPath> <dbPath> -> compare an image to a a DB of image hashes\n";
 		{
 			DatabaseController dbCtrlr;
 			SimilarImage simImage;
@@ -231,8 +233,8 @@ int main(int argc, const char *argv[])
 				img1Hash = simImage.getImageHash(getClipboardImage());
 				if (img1Hash.empty())
 				{
-					cout << "no image data in clipboard or in command line params";
-					exit(-1);
+					output = "no image data in clipboard or in command line params";
+					err = true;
 				}
 			}
 			else
@@ -240,7 +242,7 @@ int main(int argc, const char *argv[])
 				img1Hash = simImage.getImageHash(argv[i]);
 				if (img1Hash.empty())
 				{
-					cout << "invalid file: " << argv[i];
+					cout << "invalid file: " << argv[i] << std::flush;
 					exit(-1);
 				}
 				i++;
@@ -249,9 +251,8 @@ int main(int argc, const char *argv[])
 				dbPath = argv[i];
 				
 			}
-
 			dbCtrlr.openDatabase(dbPath);
-			string output;
+			
 			string querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID where hammingDistance('";
 			querey += img1Hash;
 			querey += "',hash) < ";
@@ -260,12 +261,18 @@ int main(int argc, const char *argv[])
 			dbCtrlr.executeSQL(querey, output);
 			if (output.empty())
 				output = "no matches found";
-			cout << output;
+			break;
 		}
 		
 
 		i++;
 	}
-
-	return 0;
+	if (output.empty())
+		output = "didnt recognize any params...";
+	
+	cout << output << std::flush;
+	//cout << endl; //when other programs read from this programs stdout, we dont want the new line with the actual data
+	if(!err)
+		return 0;
+	return -1;
 }

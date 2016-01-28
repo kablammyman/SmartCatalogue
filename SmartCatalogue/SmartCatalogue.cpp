@@ -267,16 +267,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				MainApp::Instance()->dbCtrlr.insertNewDataEntry("someTableName", make_pair("some field", "some value"), output);
 			}
 		}
-		else if(LOWORD(wParam) == BTN_DELETE_FROM_FILE_PATH_LIST)
-		{
-			/*if(!MainApp::Instance()->showDeleteButton())
-				 MessageBox(hWnd, "This isnt a deleteable list","save the pornz!", MB_OKCANCEL);
-			else
-			{
-				//we need to figure out how to make sure MainApp::Instance()->dir exists
-				MainApp::Instance()->deleteFromFilePathList();
-			}*/
-		}
+	
 		wmId    = LOWORD(wParam);
 		wmEvent = HIWORD(wParam);
 		// Parse the menu selections:
@@ -286,18 +277,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				std::string fileName;
 				MainApp::Instance()->DoFileOpen(hWnd,fileName);
-				//HWND hEdit = GetDlgItem(hwnd, IDC_MAIN_EDIT);
 				if(!fileName.empty())
 				{
 					MainApp::Instance()->dbCtrlr.openDatabase(fileName);
 				}
-				RedrawWindow( hWnd, 0, 0, RDW_INVALIDATE | RDW_NOCHILDREN );
-				/*else 
-				{	
-					MessageBoxA(hWnd, "Could not load team data, make it yourself!", "Error", MB_OK | MB_ICONEXCLAMATION);
-					stats.homeTeam.clear(); //remove any junk data thats was in the list from bad file
-				}*/
-	
+				RedrawWindow( hWnd, 0, 0, RDW_INVALIDATE | RDW_NOCHILDREN );	
 			}
 			break;
 		case ID_TEST_BUTTON:
@@ -309,16 +293,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		case ID_FILE_DB_NEW:
 			{
-				//MainApp::Instance()->createNewDataBase();	
-				CreateNewMDIChild(g_hMDIClient);
+				MainApp::Instance()->callCreateNewDatabase();
+				//CreateNewMDIChild(g_hMDIClient);
 			}
 			break;
 		case ID_FILE_CONFIG_SAVE:
 			{
 				std::string fileName;
 				MainApp::Instance()->DoFileSave(hWnd,fileName); 
-				//if(!stats.saveHomeTeamToFile(fileName))
-				//	MessageBoxA(hWnd, "Could not save team!", "Error", MB_OK | MB_ICONEXCLAMATION);
 			}
 			break;
 		case IDM_DATABASE_ADD_ENTRIES:
