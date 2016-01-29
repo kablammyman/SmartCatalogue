@@ -162,8 +162,10 @@
   <ItemGroup>
     <ClInclude Include="..\database.h" />
     <ClInclude Include="..\MD5.h" />
+    <ClInclude Include="..\Utils.h" />
     <ClInclude Include="DataBaseBuilder.h" />
     <ClInclude Include="DatabaseDataParser.h" />
+    <ClInclude Include="DatabaseManager.h" />
     <ClInclude Include="DataBaseTableStructs.h" />
     <ClInclude Include="fileWalker.h" />
     <ClInclude Include="SpellChecker.h" />
@@ -175,7 +177,8 @@
     <ClCompile Include="..\database.cpp" />
     <ClCompile Include="..\DatabaseControllercpp.cpp" />
     <ClCompile Include="..\MD5.cpp" />
-    <ClCompile Include="DataBaseBuilder.cpp" />
+    <ClCompile Include="DatabaseBuilder.cpp" />
+    <ClCompile Include="DataBaseManager.cpp" />
     <ClCompile Include="DatabaseDataParser.cpp" />
     <ClCompile Include="fileWalker.cpp" />
     <ClCompile Include="SpellChecker.cpp" />

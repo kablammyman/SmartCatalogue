@@ -287,10 +287,11 @@ BOOL InitTreeViewItems(HWND hwndTV)
 
 	map<int, vector<int>> dupeList;
 	SimilarImage img;
+	DatabaseController dbCtrlr;
 
 	//string path = "C:\\Users\\Victor\\Desktop\\onlyTeaseNameless\\";
 	//string path = "\\\\OPTIPLEX-745\\photos\\porno pics\\mega sites\\only all sites\\only secretaries\\";
-	string path = "\\\\SERVER\\porn\\porno pics\\mega sites\\only all sites\\only secretaries\\";
+	string path = "\\\\SERVER\\porn\\porno pics\\";
 	vector<string> imgDirs;
 
 	//old code from test and inital coding
@@ -299,6 +300,18 @@ BOOL InitTreeViewItems(HWND hwndTV)
 	img.getAllImagePaths(path, imgDirs);
 	img.findDupes(imgDirs, dupeList);
 	*/
+	dbCtrlr.openDatabase("\\SERVER\documents\pornoDB.db");
+
+	string querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID where hammingDistance('";
+	querey += img1Hash;
+	querey += "',hash) < ";
+	querey += to_string(simImage.getMinHammingDist() + 2);
+	querey += ";";
+	dbCtrlr.executeSQL(querey, output);
+	if (output.empty())
+		output = "no matches found";
+
+
 	wstring rootNodeOutput(path.begin(), path.end());
 	AddItemToTree(hwndTV, (LPTSTR)rootNodeOutput.c_str(), 1); 
 

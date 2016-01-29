@@ -11,6 +11,7 @@
 #include "myFileDirDll.h"
 #include "similarImage.h"
 #include "DatabaseController.h"
+#include "CFGReaderDll.h"
 
 
 void invalidParmMessageAndExit()
