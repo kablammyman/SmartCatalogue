@@ -2,16 +2,16 @@
 //
 
 #include "stdafx.h"
-
-#include "dupeImageFinder.h"
-#include "similarImage.h"
 #include <map>
-
+#include <thread>
 #include "Shellapi.h" //shellExecute
 
-#include "myFileDirDll.h"
+#include "dupeImageFinder.h"
 
-#include <thread>
+#include "similarImage.h"
+#include "myFileDirDll.h"
+#include "Utils.h"
+
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -21,7 +21,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	// TODO: Place code here.
+	Utils::filePathBase = Utils::getExePath();
+	Utils::loadCFGFile();
 
 	// Initialize global strings
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -98,6 +99,8 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	hInst = hInstance; // Store instance handle in our global variable
+
+	
 
 	mainWindowHandle = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
@@ -286,40 +289,39 @@ BOOL InitTreeViewItems(HWND hwndTV)
 	HTREEITEM hti;
 
 	map<int, vector<int>> dupeList;
-	SimilarImage img;
+	SimilarImage simImg;
 	DatabaseController dbCtrlr;
 
-	//string path = "C:\\Users\\Victor\\Desktop\\onlyTeaseNameless\\";
-	//string path = "\\\\OPTIPLEX-745\\photos\\porno pics\\mega sites\\only all sites\\only secretaries\\";
-	string path = "\\\\SERVER\\porn\\porno pics\\";
-	vector<string> imgDirs;
+	dbCtrlr.openDatabase(Utils::dbPath);
+	string output;
+	string command = "SELECT hash, MD5 FROM Images;";
+	dbCtrlr.executeSQL(command, output);
+	
+	vector<DatabaseController::dbDataPair> hashes;
+	dbCtrlr.removeTableNameFromOutput(output,2,1,2,hashes);
+	
+	//vector<vector<string>> allImages; 	
+	//dbCtrlr.parseDBOutput(output, 2, allImages);
+	
+	simImg.findDupes(hashes, dupeList);
 
-	//old code from test and inital coding
-	/*
-	img.loadCalculatedHashes();
-	img.getAllImagePaths(path, imgDirs);
-	img.findDupes(imgDirs, dupeList);
-	*/
-	dbCtrlr.openDatabase("\\SERVER\documents\pornoDB.db");
-
-	string querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID where hammingDistance('";
-	querey += img1Hash;
-	querey += "',hash) < ";
-	querey += to_string(simImage.getMinHammingDist() + 2);
-	querey += ";";
-	dbCtrlr.executeSQL(querey, output);
-	if (output.empty())
-		output = "no matches found";
-
-
-	wstring rootNodeOutput(path.begin(), path.end());
+	wstring rootNodeOutput(Utils::dbPath.begin(), Utils::dbPath.end());
 	AddItemToTree(hwndTV, (LPTSTR)rootNodeOutput.c_str(), 1); 
 
 	// show content:
 	for (map<int, vector<int>>::iterator it = dupeList.begin(); it != dupeList.end(); ++it)
 	{
 		int index = it->first;
-		string curDir = img.allImages[index].path;
+		
+		string output;
+		string md5Index = hashes[index].second;
+		string command = ("SELECT fileName, galleryID FROM Images WHERE MD5 = '" + md5Index+"';");
+		dbCtrlr.executeSQL(command, output);
+		
+		vector<string> imgInfo;
+		dbCtrlr.removeTableNameFromOutput(output, 2, 1, imgInfo);
+		string curDir = imgInfo[0];
+
 		wstring temp(curDir.begin(), curDir.end());
 		hti = AddItemToTree(hwndTV, (LPTSTR)temp.c_str(), 2);
 
@@ -327,7 +329,7 @@ BOOL InitTreeViewItems(HWND hwndTV)
 
 		for (size_t i = 0; i < listOfDupes.size(); i++)
 		{
-			string curDir = img.allImages[listOfDupes[i]].path;
+			string curDir = simImg.allImages[listOfDupes[i]].path;
 			wstring temp(curDir.begin(), curDir.end());
 
 			hti = AddItemToTree(hwndTV, (LPTSTR)temp.c_str(), 3);

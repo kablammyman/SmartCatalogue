@@ -1,37 +1,22 @@
 #pragma once
 
 #include <string>
-#include <Windows.h>
-#include "CFGReaderDll.h"
+#include <vector>
 
 using namespace std;
 
-string filePathBase;
-string dbPath;
-string pathToProcess;
-string ignorePattern;
-
-string getProgramPath(char *argv)
+class Utils
 {
-	char full[MAX_PATH];
-	string temp = _fullpath(full, argv, MAX_PATH);
-	size_t found = temp.find_last_of("/\\");
-	return temp.substr(0, found);
-}
+public:
+	static string filePathBase;
+	static string dbPath;
+	static string pathToProcess;
+	static string ignorePattern;
+	static vector<string> meta;
 
-void loadCFGFile(string programBasePath)
-{
-	string cfgPath = filePathBase + "\\imageViewCfg.txt";
-
-	if (!CFG::CFGReaderDLL::readCfgFile(cfgPath, '|'))
-	{
-		string errorMsg = "Error opening :";
-		errorMsg += cfgPath;
-		cout << errorMsg << "\nno cfg text file and...\n";
-		invalidParmMessageAndExit();
-	}
-
-	dbPath = CFG::CFGReaderDLL::getCfgStringValue("DBPath");
-	pathToProcess = CFG::CFGReaderDLL::getCfgStringValue("mainWorkingPath");
-	ignorePattern = CFG::CFGReaderDLL::getCfgStringValue("ignorePattern");
-}
+	static string getExePath();
+	static void setProgramPath(string argv);
+	static void loadCFGFile(string programBasePath = "");
+	static vector<string> tokenize(string path, string delims);
+	static void toProperNoun(string &input);
+};

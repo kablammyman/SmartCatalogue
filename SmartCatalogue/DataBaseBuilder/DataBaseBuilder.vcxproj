@@ -177,6 +177,7 @@
     <ClCompile Include="..\database.cpp" />
     <ClCompile Include="..\DatabaseControllercpp.cpp" />
     <ClCompile Include="..\MD5.cpp" />
+    <ClCompile Include="..\Utils.cpp" />
     <ClCompile Include="DatabaseBuilder.cpp" />
     <ClCompile Include="DataBaseManager.cpp" />
     <ClCompile Include="DatabaseDataParser.cpp" />

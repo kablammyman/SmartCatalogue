@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "DatabaseDataParser.h"
+#include "Utils.h"
 
 DatabaseDataParser::DatabaseDataParser()
 {
@@ -21,19 +22,6 @@ void DatabaseDataParser::setDBController(DatabaseController *dbc)
 	else
 		dbCtrl = dbc;
 }
-//----------------------------------------------------------------------
-vector<string> DatabaseDataParser::tokenize(string path, string delims)
-{
-	vector<string> returnVec;
-	char *p = strtok(const_cast<char *>(path.c_str()), delims.c_str());
-	while (p)
-	{
-		//printf ("Token: %s\n", p);
-		returnVec.push_back(p);
-		p = strtok(NULL, delims.c_str());
-	}
-	return returnVec;
-}
 
 bool DatabaseDataParser::fillPartOfSpeechTable(string pofTableName)
 {
@@ -52,8 +40,8 @@ bool DatabaseDataParser::fillPartOfSpeechTable(string pofTableName)
 	{
 		string tableName = table[0][i];
 		string pos = table[1][i];
-		toProperNoun(tableName);
-		toProperNoun(pos);
+		Utils::toProperNoun(tableName);
+		Utils::toProperNoun(pos);
 		if (pos == "Noun")
 			tableNamePartOfSpeech[tableName] = NOUN;
 		else if (pos == "Adj")
@@ -80,7 +68,7 @@ bool DatabaseDataParser::getDBTableValues(string tableName)
 	if (table.size() < (size_t)numCol)
 		return false;
 	
-	toProperNoun(tableName);
+	Utils::toProperNoun(tableName);
 	if (!DBTables[tableName])
 	{
 		vector<string> *newData = new vector<string>();
@@ -98,28 +86,6 @@ bool DatabaseDataParser::getDBTableValues(string tableName)
 	return true;
 }
 
-//----------------------------------------------------------------------
-//turns words or sentences into all proper nouns
-void DatabaseDataParser::toProperNoun(string &input)
-{
-	bool caps = true;
-	for (size_t i = 0; i < input.size(); i++)
-	{
-
-		if (input[i] == ' ' || input[i] == '-' || input[i] == '_')
-		{
-			caps = true;
-			continue;
-		}
-		if (caps)
-		{
-			input[i] = toupper(input[i]);
-			caps = false;
-		}
-		else
-			input[i] = tolower(input[i]);
-	}
-}
 //----------------------------------------------------------------------
 //after we trhow away opltiplex//porno pics//some folder//
 //we should be left with: porn stars//name or glam sites//website//name
@@ -143,7 +109,7 @@ vector<string> DatabaseDataParser::splitModelName(string input)
 	if (foundSymbol != string::npos)
 		input.replace(foundSymbol, 5, ",");
 
-	names = tokenize(input, ",");
+	names = Utils::tokenize(input, ",");
 
 
 	if (names.size() == 0)//we onyl have 1 name
@@ -162,10 +128,10 @@ vector<ModelName> DatabaseDataParser::doNameLogic(string allNames)
 	for (size_t i = 0; i < modelNames.size(); i++)
 	{
 		ModelName model;
-		vector<string> names = tokenize(modelNames[i], " ");
+		vector<string> names = Utils::tokenize(modelNames[i], " ");
 		if (!names.empty())
 		{
-			toProperNoun(names[0]);
+			Utils::toProperNoun(names[0]);
 			//names[0][0] = toupper(names[0][0]);//capatolize the first letter of each name
 			model.firstName = names[0];
 		}
@@ -174,7 +140,7 @@ vector<ModelName> DatabaseDataParser::doNameLogic(string allNames)
 			bool useMiddleName = names.size() > 2 ? true : false;
 			for (size_t j = 1; j < names.size(); j++)
 			{
-				toProperNoun(names[j]);
+				Utils::toProperNoun(names[j]);
 				//names[j][0] = toupper(names[j][0]);//capatolize the first letter of each name
 				if (useMiddleName && j == 1)
 					model.middleName = names[j];
@@ -207,7 +173,7 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, Gal
 	input = input.substr(pos + ignorePattern.size());
 
 	vector<string> otherModels; //when we have a gallery with more than 1 model in the porn star or amature model catogory
-	vector<string> tokens = tokenize(input, "\\");
+	vector<string> tokens = Utils::tokenize(input, "\\");
 
 	//minimun is catogory/website/gallery
 	if (tokens.size() < 3)
@@ -243,7 +209,7 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, Gal
 				curState = 1;
 			break;
 		case WEBSITE:
-			toProperNoun(tokens[i]);
+			Utils::toProperNoun(tokens[i]);
 			website = tokens[i];
 			//if we have more than 1 token left, and ther next one isnt models
 			if (((tokens.size() - 1) - i) > 1 && tokens[i + 1] != "models")
@@ -253,13 +219,13 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, Gal
 
 			break;
 		case SUBWEBSITE:
-			toProperNoun(tokens[i]);
+			Utils::toProperNoun(tokens[i]);
 			subwebsite = tokens[i];
 			if (i < tokens.size() && tokens[i + 1] != "models")
 				curState = 3;
 			break;
 		case GALLERY:
-			toProperNoun(tokens[i]);
+			Utils::toProperNoun(tokens[i]);
 			galleryName = tokens[i];
 			if (i < (tokens.size() - 1))
 			{
@@ -331,7 +297,7 @@ string DatabaseDataParser::seaerchForGalleryDescriptor(vector<string> &tokens, T
 void DatabaseDataParser::addMetaWordsToData(GalleryData &data)
 {
 	string metaWords = "";
-	vector<string> tokens = tokenize(data.path, "- \\");
+	vector<string> tokens = Utils::tokenize(data.path, "- \\");
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
 		if (keywords->searchWord(tokens[i]))
@@ -457,7 +423,7 @@ vector <ClothingItem> DatabaseDataParser::getOutfitFromGalleryName(string galler
 {
 	transformClothingNameAlias(galleryName);
 	vector <ClothingItem> clothes;
-	vector<string> tokens = tokenize(galleryName, "- _");
+	vector<string> tokens = Utils::tokenize(galleryName, "- _");
 	ClothingItem curItem;
 	
 
@@ -506,7 +472,7 @@ vector <ClothingItem> DatabaseDataParser::getOutfitFromGalleryName(string galler
 }
 string DatabaseDataParser::getVerfiedWordFromGalleryName(string galleryName, string dbTableName)
 {
-	vector<string> tokens = tokenize(galleryName, "- _");
+	vector<string> tokens = Utils::tokenize(galleryName, "- _");
 
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
@@ -530,25 +496,7 @@ void DatabaseDataParser::getAllPaths(string path, vector<string> &dirsWithImages
 	fileWalker->getAllDirsWithImgs(dirsWithImages);
 }
 
-//----------------------------------------------------------------------
-vector<vector<string>> DatabaseDataParser::parseDBOutput(string &inputData,int numFields)
-{
-	vector <vector<string>> returnData(numFields, vector<string>(0));//initialise tahe num vectors we need with 1 elements each
-	int curField = 0;
-	vector<string> tokens = tokenize(inputData, "|\n");
-	//the first is the field name, the second is the value we want
-	for (size_t i = 1; i < tokens.size(); i+=2)
-	{
-		returnData[curField].push_back(tokens[i]);
-		if (curField == numFields-1)
-			curField = 0;
-		else
-			curField++;
-			
-	}
 
-	return returnData;
-}
 
 
 /////////////////////////////are these still needed or useful?////////////////////////////////

@@ -108,7 +108,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\myLibs\libs\debug\x64;C:\opencv\lib\Debug\x64;C:\SQLite3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>comctl32.lib;sqlite3.lib;myFileDirDll.lib;opencv_core300d.lib;opencv_imgproc300d.lib;opencv_highgui300d.lib;opencv_ml300d.lib;opencv_features2d300d.lib;opencv_calib3d300d.lib;opencv_objdetect300d.lib;opencv_flann300d.lib;opencv_imgcodecs300d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CFGReaderDll.lib;myFileDirDll.lib;comctl32.lib;sqlite3.lib;opencv_core300d.lib;opencv_imgproc300d.lib;opencv_highgui300d.lib;opencv_ml300d.lib;opencv_features2d300d.lib;opencv_calib3d300d.lib;opencv_objdetect300d.lib;opencv_flann300d.lib;opencv_imgcodecs300d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -145,7 +145,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>comctl32.lib;sqlite3.lib;myFileDirDll.lib;opencv_core300.lib;opencv_imgproc300.lib;opencv_highgui300.lib;opencv_ml300.lib;opencv_features2d300.lib;opencv_calib3d300.lib;opencv_objdetect300.lib;opencv_flann300.lib;opencv_imgcodecs300.lib;opencv_face300.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CFGReaderDll.lib;myFileDirDll.lib;comctl32.lib;sqlite3.lib;opencv_core300.lib;opencv_imgproc300.lib;opencv_highgui300.lib;opencv_ml300.lib;opencv_features2d300.lib;opencv_calib3d300.lib;opencv_objdetect300.lib;opencv_flann300.lib;opencv_imgcodecs300.lib;opencv_face300.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\myLibs\Libs\Release\x64;C:\opencv\lib\Release\x64;C:\SQLite3\lib\x64</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -156,6 +156,7 @@
     <ClInclude Include="..\database.h" />
     <ClInclude Include="..\DatabaseController.h" />
     <ClInclude Include="..\similarImage.h" />
+    <ClInclude Include="..\Utils.h" />
     <ClInclude Include="dupeImageFinder.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -165,6 +166,7 @@
     <ClCompile Include="..\database.cpp" />
     <ClCompile Include="..\DatabaseControllercpp.cpp" />
     <ClCompile Include="..\similarImage.cpp" />
+    <ClCompile Include="..\Utils.cpp" />
     <ClCompile Include="dupeImageFinder.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

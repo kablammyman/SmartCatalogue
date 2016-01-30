@@ -89,7 +89,8 @@ int DatabaseBuilder::inserCategoryInfoIntoDB(GalleryData &galleryData)
 			reportError("category querey error", output, ("category = " + galleryData.category + "\npath = " + galleryData.path), false);
 			return -1;
 		}
-		vector <vector<string>> categoryInfo = dbDataParser.parseDBOutput(output, 2);
+		vector <vector<string>> categoryInfo; 
+		dbDataParser.parseDBOutput(output, 2, categoryInfo);
 		return atoi(categoryInfo[0][0].c_str());
 	}
 
@@ -126,7 +127,8 @@ int DatabaseBuilder::insertWebsiteInfoIntoDB(GalleryData &galleryData, int categ
 			reportError("website querey error", output, ("website = " + galleryData.websiteName + "\npath = " + galleryData.path), false);
 			return -1;
 		}
-		vector <vector<string>> websiteInfo = dbDataParser.parseDBOutput(output, 2);
+		vector <vector<string>> websiteInfo;
+		dbDataParser.parseDBOutput(output, 2, websiteInfo);
 		return atoi(websiteInfo[0][0].c_str());
 	}
 
@@ -169,7 +171,8 @@ int DatabaseBuilder::insertSubWebsiteInfoIntoDB(GalleryData &galleryData, int we
 			reportError("subWebsite querey error", output, ("website = " + galleryData.subWebsiteName + "\npath = " + galleryData.path), false);
 			return -1;
 		}
-		vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 2);
+		vector <vector<string>> modelsInDB; 
+		dbDataParser.parseDBOutput(output, 2, modelsInDB);
 		return atoi(modelsInDB[0][0].c_str());
 	}
 
@@ -204,7 +207,8 @@ int DatabaseBuilder::insertGalleryInfoIntoDB(GalleryData &galleryData, int websi
 			reportError("gallery querey error", output, ("gallery = " + galleryData.galleryName + "\npath = " + galleryData.path), false);
 			return -1;
 		}
-		vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 2);
+		vector <vector<string>> modelsInDB; 
+		dbDataParser.parseDBOutput(output, 2, modelsInDB);
 		return atoi(modelsInDB[0][0].c_str());
 	}
 
@@ -242,7 +246,8 @@ bool DatabaseBuilder::insertModelInfoIntoDB(GalleryModel &model)
 			reportError("model querey error", output, ("model = " + model.name.firstName + " " + model.name.middleName + " " + model.name.lastName), false);
 			return false;
 		}
-		vector <vector<string>> modelsInDB = dbDataParser.parseDBOutput(output, 3);
+		vector <vector<string>> modelsInDB; 
+		dbDataParser.parseDBOutput(output, 3, modelsInDB);
 		model.name.dbID = atoi(modelsInDB[0][0].c_str());
 		return true;
 	}

@@ -50,12 +50,11 @@ class DatabaseDataParser
 	bool isConjunction(string word);
 
 	bool hasDataFromTable(string data, map<int,string> dbValues);
-	string getModelName(string path);
-	vector<string> tokenize(string path, string delims);
+	//string getModelName(string path);
 	vector<string> splitModelName(string input);
 	vector<ModelName> doNameLogic(string allNames);
 	void addMetaWordsToData(GalleryData &data);
-	void toProperNoun(string &input);
+	
 	vector <ClothingItem> getOutfitFromGalleryName(string galleryName);
 	//grab wordss that are in a DB table. if the word is misspelled, it wont be found
 	//maybe we can add spell check to this?
@@ -67,7 +66,6 @@ public:
 	DatabaseDataParser();
 
 	bool getDBTableValues(string tableName);
-	vector <vector<string>>parseDBOutput(string &inputData, int numFields);
 	bool  fillPartOfSpeechTable(string pofTableName);
 	void setDBController(DatabaseController *dbc);
 	void getAllPaths(string path, vector<string> &dirsWithImages);

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "DatabaseController.h"
+#include "Utils.h"
 
 DatabaseController::DatabaseController()
 {
@@ -183,6 +184,87 @@ bool DatabaseController::insertNewDataEntry(string table, vector<dbDataPair> dat
 	return db->executeSQL(querey + values, output);
 
 }
+
+void DatabaseController::parseDBOutput(string &inputData, int numFields, vector<vector<string>> &returnData)
+{
+	returnData.clear();
+	returnData.resize(numFields, vector<string>(0));//initialise tahe num vectors we need with 1 elements each
+	int curField = 0;
+	vector<string> tokens = Utils::tokenize(inputData, "|\n");
+	//the first is the field name, the second is the value we want
+	for (size_t i = 1; i < tokens.size(); i += 2)
+	{
+		returnData[curField].push_back(tokens[i]);
+		if (curField == numFields - 1)
+			curField = 0;
+		else
+			curField++;
+
+	}
+}
+void DatabaseController::removeTableNameFromOutput(string &inputData, int numCols, int colToUse1, int colToUse2, vector<dbDataPair> &returnData)
+{
+	//vector<string> tokens = Utils::tokenize(inputData, "|\n");
+	string delims = "|\n";
+	int counter = 1;
+
+	if (colToUse1 > numCols || colToUse1 < 1)
+		return;
+
+	if (colToUse2 > numCols || colToUse2 < 1)
+		return;
+
+	colToUse1 *= 2;
+	colToUse2 *= 2;
+	
+	char *p = strtok(const_cast<char *>(inputData.c_str()), delims.c_str());
+	string data1;
+
+	while (p)
+	{
+		if (counter == colToUse1)
+			data1 = p;
+
+		else if (counter == colToUse2)//we got our data, move on. i wish i could jump past the wasted loop iterations somehow...
+			returnData.push_back(make_pair(data1,p));
+		
+		
+		//x2 becasue it goes colName|data, we only want the data, not the col name
+		if (counter < (numCols * 2))
+			counter++;
+		else
+			counter = 1;
+		p = strtok(NULL, delims.c_str());
+	}
+}
+//blah! the code is differnt enough that i cant reuse it woulth more loops... >=(
+void DatabaseController::removeTableNameFromOutput(string &inputData, int numCols, int colToUse, vector<string> &returnData)
+{
+	string delims = "|\n";
+	int counter = 1;
+
+	if (colToUse > numCols || colToUse < 1)
+		return;
+
+	char *p = strtok(const_cast<char *>(inputData.c_str()), delims.c_str());
+	string data1;
+
+	while (p)
+	{
+		if (counter == colToUse + 1)
+			data1 = p;
+		//x2 becasue it goes colName|data, we only want the data, not the col name
+		if (counter < (numCols * 2))
+			counter++;
+		else
+			counter = 1;
+		p = strtok(NULL, delims.c_str());
+	}
+
+}
+
+
+
 ///////////////////////////////////////////////////////////test methods
 void DatabaseController::createTable(string tableName, string fields)
 {
@@ -224,8 +306,8 @@ void DatabaseController::testDBQuerey()
 	 
 	doDBQuerey("Category", "name", output);
 
-	//DatabaseDataParser temp;
-	//vector <vector<string>> returnData1  = temp.parseDBOutput(output, 2);
+	vector <vector<string>> returnData1; 
+	parseDBOutput(output, 2, returnData1);
 
 	vector<string> test2;
 	test2.push_back("WebsiteID");

@@ -5,6 +5,7 @@
 #include <iostream>
 #include "DataBaseManager.h"
 #include "DataBaseBuilder.h"
+#include "CFGReaderDll.h"
 #include <algorithm>
 #include "Utils.h"
 #include <ctime>//check execution time
@@ -19,8 +20,8 @@ int main(int argc, char *argv[])
 	int goodDir = 0, badDir = 0, totalDir = 0;
 	doImageHash = true;
 
-	filePathBase = getProgramPath(argv[0]);
-	loadCFGFile(filePathBase);
+	Utils::setProgramPath(argv[0]);
+	Utils::loadCFGFile();
 		
 	vector<string> dbTableValues = CFG::CFGReaderDLL::getCfgListValue("tableNames");
 	//if we cant find the table names in the cfg, thejust get out of here
@@ -29,8 +30,6 @@ int main(int argc, char *argv[])
 		cout << "couldnt find the list of table names in your cfg...\n";
 		exit(-1);
 	}
-
-	meta = CFG::CFGReaderDLL::getCfgListValue("metaWords");
 
 	//command line args can add extra options
 	int i = 0;
@@ -42,21 +41,21 @@ int main(int argc, char *argv[])
 			if (i >= argc)
 				invalidParmMessageAndExit();
 
-			dbPath = argv[i];
+			Utils::dbPath = argv[i];
 		}
 		else if (strcmp(argv[i], "-dataPath") == 0)
 		{
 			i++;
 			if (i >= argc)
 				invalidParmMessageAndExit();
-			pathToProcess = argv[i];
+			Utils::pathToProcess = argv[i];
 		}
 		else if (strcmp(argv[i], "-ignoreBase") == 0)
 		{
 			i++;
 			if (i >= argc)
 				invalidParmMessageAndExit();
-			ignorePattern = argv[i];
+			Utils::ignorePattern = argv[i];
 		}
 		else if (strcmp(argv[i], "-NoimgHash") == 0)
 			doImageHash = false;
@@ -68,12 +67,12 @@ int main(int argc, char *argv[])
 
 	}
 
-	if (dbPath == "" || pathToProcess == "")
+	if (Utils::dbPath == "" || Utils::pathToProcess == "")
 		invalidParmMessageAndExit();
 
-	if (!MyFileDirDll::doesPathExist(pathToProcess))
+	if (!MyFileDirDll::doesPathExist(Utils::pathToProcess))
 	{
-		cout << pathToProcess << "is not valid\n";
+		cout << Utils::pathToProcess << "is not valid\n";
 		exit(-1);
 	}
 
@@ -91,9 +90,9 @@ int main(int argc, char *argv[])
 	int start_s = clock();
 	
 	//get the data AS i build the dir tree
-	MyFileDirDll::startDirTreeStep(pathToProcess);
-	DatabaseBuilder dbBuilder(dbPath,ignorePattern);
-	dbBuilder.fillMetaWords(meta);
+	MyFileDirDll::startDirTreeStep(Utils::pathToProcess);
+	DatabaseBuilder dbBuilder(Utils::dbPath, Utils::ignorePattern);
+	dbBuilder.fillMetaWords(Utils::meta);
 	dbBuilder.fillPartsOfSpeechTable(dbTableValues);
 
 	while(!MyFileDirDll::isFinished())
@@ -178,7 +177,7 @@ int main(int argc, char *argv[])
 						continue;
 
 
-					string hashingCommand = "\"\"" + filePathBase + "\\CreateImageHash.exe\"  -hash \"";
+					string hashingCommand = "\"\"" + Utils::filePathBase + "\\CreateImageHash.exe\"  -hash \"";
 					hashingCommand += imgeFilePath;
 					hashingCommand += "\"\"";
 

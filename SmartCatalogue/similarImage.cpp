@@ -341,7 +341,41 @@ void SimilarImage::calcImageHasesForDir(string imgDir)
 		calcImageHash(Allfiles[i]);
 }
 
-void SimilarImage::findDupes(vector<string> & imgDirs, map<int, vector<int>> &dupeList)
+//supply the hashes in a vector...either the phash or normal hash
+void SimilarImage::findDupes(vector<hashPathPair> & allHashes, map<int, vector<int>> &dupeList)
+{
+	map<int, bool> alreadyIncludedMap;
+	for (int i = 0; i < allHashes.size(); i++)
+	{
+		for (int j = i; j < allHashes.size(); j++)
+		{
+			if (i == j)
+				continue;
+			//if we found these 2 to be a match alraedy, dont add it to the list again!
+			if (alreadyIncludedMap[i] && alreadyIncludedMap[j])
+				continue;
+
+			if (HanmingDistance(allHashes[i].first, allHashes[j].first) < minHammingDist)
+			{			
+				//if we found these 2 to be a match alraedy, dont add it to the list again!
+				/*if (alreadyIncludedMap[i] && alreadyIncludedMap[j])
+					continue;*/
+
+				vector<int> temp;
+				if (dupeList.count(i) > 0)
+					temp = dupeList[i];
+				
+				temp.push_back(j);
+				dupeList[i] = temp;
+	
+				alreadyIncludedMap[i] = true;
+				alreadyIncludedMap[j] = true;
+			}
+		}
+	}
+}
+
+void SimilarImage::findDupesFromMem(map<int, vector<int>> &dupeList)
 {
 	map<int, bool> alreadyIncludedMap;
 	for (int i = 0; i < allImages.size(); i++)
@@ -355,18 +389,18 @@ void SimilarImage::findDupes(vector<string> & imgDirs, map<int, vector<int>> &du
 				continue;
 
 			if (HanmingDistance(allImages[i].phash, allImages[j].phash) < minHammingDist)
-			{			
+			{
 				//if we found these 2 to be a match alraedy, dont add it to the list again!
 				/*if (alreadyIncludedMap[i] && alreadyIncludedMap[j])
-					continue;*/
+				continue;*/
 
 				vector<int> temp;
 				if (dupeList.count(i) > 0)
 					temp = dupeList[i];
-				
+
 				temp.push_back(j);
 				dupeList[i] = temp;
-	
+
 				alreadyIncludedMap[i] = true;
 				alreadyIncludedMap[j] = true;
 			}

@@ -9,7 +9,7 @@ using namespace std;
 
 bool doImageHash;
 
-vector<string> meta;
+
 
 void invalidParmMessageAndExit()
 {

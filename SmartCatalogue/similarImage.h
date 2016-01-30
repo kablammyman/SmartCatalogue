@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <stdio.h>
-
+#include <utility>      // std::pair
 #include <vector>
 #include <map>
 #include "opencv2/core.hpp"
@@ -35,6 +35,8 @@ class SimilarImage
 	
 public:
 	vector<ImageFiles> allImages; //maybe this should be private, but we need to see this list so we can display it
+	//simple pair for when we are finding dupes not in our struct form
+	typedef pair <string, string> hashPathPair;
 	SimilarImage()
 	{
 		minHammingDist = 2;
@@ -61,7 +63,11 @@ public:
 	void loadCalculatedHashes();
 	void getAllImagePaths(string path, vector<string> & imgDirs);
 	long long getIntValueOfHash(string bits);
-	void findDupes(vector<string> & imgDirs, map<int, vector<int>> &dupeList);
+
+	//supply the hashes in a vector...either the phash or normal hash
+	void findDupes(vector<hashPathPair> & allHashes, map<int, vector<int>> &dupeList);
+	//find the dupes in all the files we just hashed and are still in mem
+	void findDupesFromMem(map<int, vector<int>> &dupeList);
 
 	string getImageHash(string imgPath);
 	string getImageHash(Mat imgData);
