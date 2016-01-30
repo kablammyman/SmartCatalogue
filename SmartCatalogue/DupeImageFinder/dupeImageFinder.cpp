@@ -320,19 +320,23 @@ BOOL InitTreeViewItems(HWND hwndTV)
 		
 		vector<string> imgInfo;
 		dbCtrlr.removeTableNameFromOutput(output, 2, 1, imgInfo);
-		string curDir = imgInfo[0];
 
-		wstring temp(curDir.begin(), curDir.end());
+		wstring temp(imgInfo[0].begin(), imgInfo[0].end());
 		hti = AddItemToTree(hwndTV, (LPTSTR)temp.c_str(), 2);
 
-		vector<int> listOfDupes = it->second;
+		vector<int> curListOfDupes = it->second;
 
-		for (size_t i = 0; i < listOfDupes.size(); i++)
+		for (size_t i = 0; i < curListOfDupes.size(); i++)
 		{
-			string curDir = simImg.allImages[listOfDupes[i]].path;
-			wstring temp(curDir.begin(), curDir.end());
+			//string curDir = simImg.allImages[listOfDupes[i]].path;
+			md5Index = hashes[curListOfDupes[i]].second;
+			command = ("SELECT fileName, galleryID FROM Images WHERE MD5 = '" + md5Index + "';");
+			dbCtrlr.executeSQL(command, output);
 
-			hti = AddItemToTree(hwndTV, (LPTSTR)temp.c_str(), 3);
+			dbCtrlr.removeTableNameFromOutput(output, 2, 1, imgInfo);
+
+			wstring subTemp(imgInfo[0].begin(), imgInfo[0].end());
+			hti = AddItemToTree(hwndTV, (LPTSTR)subTemp.c_str(), 3);
 		}
 	}
 
