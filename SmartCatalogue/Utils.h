@@ -19,4 +19,5 @@ public:
 	static void loadCFGFile(string programBasePath = "");
 	static vector<string> tokenize(string path, string delims);
 	static void toProperNoun(string &input);
+	static string getTimeStamp(double milis);
 };

@@ -90,7 +90,7 @@ int DatabaseBuilder::inserCategoryInfoIntoDB(GalleryData &galleryData)
 			return -1;
 		}
 		vector <vector<string>> categoryInfo; 
-		dbDataParser.parseDBOutput(output, 2, categoryInfo);
+		dbCtrlr.parseDBOutput(output, 2, categoryInfo);
 		return atoi(categoryInfo[0][0].c_str());
 	}
 
@@ -128,7 +128,7 @@ int DatabaseBuilder::insertWebsiteInfoIntoDB(GalleryData &galleryData, int categ
 			return -1;
 		}
 		vector <vector<string>> websiteInfo;
-		dbDataParser.parseDBOutput(output, 2, websiteInfo);
+		dbCtrlr.parseDBOutput(output, 2, websiteInfo);
 		return atoi(websiteInfo[0][0].c_str());
 	}
 
@@ -172,7 +172,7 @@ int DatabaseBuilder::insertSubWebsiteInfoIntoDB(GalleryData &galleryData, int we
 			return -1;
 		}
 		vector <vector<string>> modelsInDB; 
-		dbDataParser.parseDBOutput(output, 2, modelsInDB);
+		dbCtrlr.parseDBOutput(output, 2, modelsInDB);
 		return atoi(modelsInDB[0][0].c_str());
 	}
 
@@ -208,7 +208,7 @@ int DatabaseBuilder::insertGalleryInfoIntoDB(GalleryData &galleryData, int websi
 			return -1;
 		}
 		vector <vector<string>> modelsInDB; 
-		dbDataParser.parseDBOutput(output, 2, modelsInDB);
+		dbCtrlr.parseDBOutput(output, 2, modelsInDB);
 		return atoi(modelsInDB[0][0].c_str());
 	}
 
@@ -247,7 +247,7 @@ bool DatabaseBuilder::insertModelInfoIntoDB(GalleryModel &model)
 			return false;
 		}
 		vector <vector<string>> modelsInDB; 
-		dbDataParser.parseDBOutput(output, 3, modelsInDB);
+		dbCtrlr.parseDBOutput(output, 3, modelsInDB);
 		model.name.dbID = atoi(modelsInDB[0][0].c_str());
 		return true;
 	}

@@ -14,8 +14,7 @@ private:
 	int y; 
 	int size;
 	unsigned int range;
-	float newProgress = 0;
-	float percentDone = 0;
+	long long  percentDone = 0;
 
 public:
 	ProgressBar(HWND hwndParent, int _x, int _y, int s, unsigned int r);

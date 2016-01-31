@@ -5,9 +5,10 @@
 #include <map>
 #include <thread>
 #include "Shellapi.h" //shellExecute
+#include <fstream>
 
 #include "dupeImageFinder.h"
-
+#include "ProgressBar.h"
 #include "similarImage.h"
 #include "myFileDirDll.h"
 #include "Utils.h"
@@ -288,72 +289,78 @@ BOOL InitTreeViewItems(HWND hwndTV)
 	DatabaseController dbCtrlr;
 
 	dbCtrlr.openDatabase(Utils::dbPath);
+	
+	int start_s = clock();
+
 	string output;
 	//get a list of all images
 	string querey = "SELECT hash, MD5 FROM Images;";
 	dbCtrlr.executeSQL(querey, output);
 	
+	
 	vector<DatabaseController::dbDataPair> hashes;
 	dbCtrlr.removeTableNameFromOutput(output,2,1,2,hashes);
 	
+	wstring rootNodeOutput(Utils::dbPath.begin(), Utils::dbPath.end());
+	AddItemToTree(hwndTV, (LPTSTR)rootNodeOutput.c_str(), 1);
+
+	ProgressBar progress(hwndTV, 10, 10, 500, hashes.size());
 	//now compare each image in the list to the db, making sure not to include it self
 	for (size_t i = 0; i < hashes.size(); i++)
 	{
-
-		querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 != ";
+		progress.updateProgressBar(i);
+		querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 != '";
 		querey += hashes[i].second;
-		querey += " AND hammingDistance('";
+		querey += "' AND hammingDistance('";
 		querey += hashes[i].first;
 		querey += "',hash) < ";
-		querey += to_string(simImage.getMinHammingDist() + 2);
+		querey += to_string(/*simImage.getMinHammingDist() + 2*/ 4);
 		querey += ";";
 		dbCtrlr.executeSQL(querey, output);
 		//we have a match
 		if (output.find("path|") != string::npos)
 		{
+			//put all dupes for this image in a list
+			vector<DatabaseController::dbDataPair> dupeList;
+			dbCtrlr.removeTableNameFromOutput(output, 2, 1, 2, dupeList);
 
+			//get the path and filename for current image
+			querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 = '";
+			querey += hashes[i].second;
+			querey += "';";
+			dbCtrlr.executeSQL(querey, output);
+
+			//make this "branch" from the current image file name and path
+			vector<DatabaseController::dbDataPair> branchName;
+			dbCtrlr.removeTableNameFromOutput(output, 2, 1, 2, branchName);
+			string imagePath = (branchName[0].second + branchName[0].first);
+			wstring temp(imagePath.begin(), imagePath.end());
+			hti = AddItemToTree(hwndTV, (LPTSTR)temp.c_str(), 2);
+			
+			//all the children of this branch will be the list of dupes
+			for (size_t j = 0; j < dupeList.size(); j++)
+			{
+				string fullPath = (dupeList[j].second + dupeList[j].first);
+				wstring subTemp(fullPath.begin(), fullPath.end());
+				hti = AddItemToTree(hwndTV, (LPTSTR)subTemp.c_str(), 3);
+			}
+			
 		}
 	}
 	
-	
 
-	wstring rootNodeOutput(Utils::dbPath.begin(), Utils::dbPath.end());
-	AddItemToTree(hwndTV, (LPTSTR)rootNodeOutput.c_str(), 1); 
+	//if (hti == NULL)
+	//	return FALSE;
+	int stop_s = clock();
+	double milis = (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000;
+	string timeTaken = Utils::getTimeStamp(milis);
 
-	// show content:
-	for (map<int, vector<int>>::iterator it = dupeList.begin(); it != dupeList.end(); ++it)
-	{
-		int index = it->first;
-		
-		string output;
-		string md5Index = hashes[index].second;
-		string command = ("SELECT fileName, galleryID FROM Images WHERE MD5 = '" + md5Index+"';");
-		dbCtrlr.executeSQL(command, output);
-		
-		vector<string> imgInfo;
-		dbCtrlr.removeTableNameFromOutput(output, 2, 1, imgInfo);
+	ofstream myfile;
+	myfile.open("dupeImageFinder.txt");
+	myfile << "parsed " << Utils::dbPath <<endl;
+	myfile << timeTaken << endl;
+	myfile.close();
 
-		wstring temp(imgInfo[0].begin(), imgInfo[0].end());
-		hti = AddItemToTree(hwndTV, (LPTSTR)temp.c_str(), 2);
-
-		vector<int> curListOfDupes = it->second;
-
-		for (size_t i = 0; i < curListOfDupes.size(); i++)
-		{
-			//string curDir = simImg.allImages[listOfDupes[i]].path;
-			md5Index = hashes[curListOfDupes[i]].second;
-			command = ("SELECT fileName, galleryID FROM Images WHERE MD5 = '" + md5Index + "';");
-			dbCtrlr.executeSQL(command, output);
-
-			dbCtrlr.removeTableNameFromOutput(output, 2, 1, imgInfo);
-
-			wstring subTemp(imgInfo[0].begin(), imgInfo[0].end());
-			hti = AddItemToTree(hwndTV, (LPTSTR)subTemp.c_str(), 3);
-		}
-	}
-
-	/*if (hti == NULL)
-		return FALSE;*/
 	return TRUE;
 }
 //get the main window handle, x and y cords of mouse

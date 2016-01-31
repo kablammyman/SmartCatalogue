@@ -31,7 +31,8 @@ bool DatabaseDataParser::fillPartOfSpeechTable(string pofTableName)
 	if (result == "")
 		return false;
 
-	vector<vector<string>> table = parseDBOutput(result, numCol);
+	vector<vector<string>> table; 
+	dbCtrl->parseDBOutput(result, numCol, table);
 
 	if (table.size() < (size_t)numCol)
 		return false;
@@ -63,7 +64,8 @@ bool DatabaseDataParser::getDBTableValues(string tableName)
 	if (result == "")
 		return false;
 
-	vector<vector<string>> table = parseDBOutput(result, numCol);
+	vector<vector<string>> table;  
+	dbCtrl->parseDBOutput(result, numCol,table);
 	
 	if (table.size() < (size_t)numCol)
 		return false;

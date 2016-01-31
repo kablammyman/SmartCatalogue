@@ -34,7 +34,9 @@ ProgressBar::ProgressBar(HWND hwndParent, int _x, int _y, int s, unsigned int r)
 	SendMessage(hwndPB, PBM_SETRANGE, 0, MAKELPARAM(0, size));
 	SendMessage(hwndPB, PBM_SETSTEP, (WPARAM)1, 0);
 
-	newProgress = 0;
+	//SendMessage(hwndPB, PBM_SETSTEP, (WPARAM)(size / 100), 0);
+
+
 	percentDone = 0;
 }
 
@@ -45,12 +47,8 @@ ProgressBar::~ProgressBar()
 
 void ProgressBar::updateProgressBar(int curAmt)
 {
-	percentDone = (float)curAmt;
-	percentDone /= range;
-
-	newProgress = percentDone * range;
-	//percentDone *= 100;
-	//Sleep(50);
-
-	SendMessage(hwndPB, PBM_SETPOS, (int)newProgress, 0);
+	percentDone = (curAmt * 100) / range;
+	
+	percentDone *= (size / 100);
+	SendMessage(hwndPB, PBM_SETPOS, percentDone, 0);
 }

@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="..\database.h" />
     <ClInclude Include="..\DatabaseController.h" />
+    <ClInclude Include="..\ProgressBar.h" />
     <ClInclude Include="..\similarImage.h" />
     <ClInclude Include="..\Utils.h" />
     <ClInclude Include="dupeImageFinder.h" />
@@ -165,6 +166,7 @@
   <ItemGroup>
     <ClCompile Include="..\database.cpp" />
     <ClCompile Include="..\DatabaseControllercpp.cpp" />
+    <ClCompile Include="..\ProgressBar.cpp" />
     <ClCompile Include="..\similarImage.cpp" />
     <ClCompile Include="..\Utils.cpp" />
     <ClCompile Include="dupeImageFinder.cpp" />

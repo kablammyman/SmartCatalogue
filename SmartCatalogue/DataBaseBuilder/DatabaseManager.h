@@ -41,28 +41,7 @@ string exec(const char* cmd)
 	return result;
 }
 
-void printTimeStamp(double milis)
-{
-	int seconds = milis / 1000;
-	int minutes = seconds / 60;
-	seconds %= 60;
-	int hours = minutes / 60;
-	minutes %= 60;
-	int days = hours / 24;
-	hours %= 24;
-	string output;
 
-	if (days > 0)
-		output += (to_string(days) + " days ");
-	if (hours > 0)
-		output += (to_string(hours) + " hours ");
-	if (minutes > 0)
-		output += (to_string(minutes) + " minutes ");
-	if (seconds > 0)
-		output += (to_string(seconds) + " seconds");
-
-	cout << output << endl;
-}
 
 //http://stackoverflow.com/questions/1220046/how-to-get-the-md5-hash-of-a-file-in-c
 string createMD5Hash(string fileName)

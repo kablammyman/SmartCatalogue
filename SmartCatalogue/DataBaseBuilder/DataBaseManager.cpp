@@ -210,8 +210,7 @@ int main(int argc, char *argv[])
 
 	int stop_s = clock();
 	double milis = (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000;
-	cout << "done in ";
-	printTimeStamp(milis);
+	cout << "done in "<< Utils::getTimeStamp(milis) << endl;
 	cout << "processed " << totalDir << " galleries\n";
 	float goodPercent = (goodDir / totalDir);
 	goodPercent *= 100;
