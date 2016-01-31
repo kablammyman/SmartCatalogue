@@ -31,10 +31,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	InitCommonControls();
 
-	/*thread t1(InitTreeViewItems, hwndTree);
-	//Join the thread with the main thread
-	t1.join();*/
-
 	// Perform application initialization:
 	if (!InitInstance(hInstance, nCmdShow))
 	{
@@ -125,7 +121,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		
 		
 		
-
+	/*thread t1(InitTreeViewItems, hwndTree);
+	//Join the thread with the main thread
+	t1.join();*/
 	InitTreeViewItems(hwndTree);
 
 	return TRUE;
@@ -287,23 +285,37 @@ HTREEITEM AddItemToTree(HWND hwndTV, wchar_t* lpszItem, int nLevel)
 BOOL InitTreeViewItems(HWND hwndTV)
 {
 	HTREEITEM hti;
-
-	map<int, vector<int>> dupeList;
-	SimilarImage simImg;
 	DatabaseController dbCtrlr;
 
 	dbCtrlr.openDatabase(Utils::dbPath);
 	string output;
-	string command = "SELECT hash, MD5 FROM Images;";
-	dbCtrlr.executeSQL(command, output);
+	//get a list of all images
+	string querey = "SELECT hash, MD5 FROM Images;";
+	dbCtrlr.executeSQL(querey, output);
 	
 	vector<DatabaseController::dbDataPair> hashes;
 	dbCtrlr.removeTableNameFromOutput(output,2,1,2,hashes);
 	
-	//vector<vector<string>> allImages; 	
-	//dbCtrlr.parseDBOutput(output, 2, allImages);
+	//now compare each image in the list to the db, making sure not to include it self
+	for (size_t i = 0; i < hashes.size(); i++)
+	{
+
+		querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 != ";
+		querey += hashes[i].second;
+		querey += " AND hammingDistance('";
+		querey += hashes[i].first;
+		querey += "',hash) < ";
+		querey += to_string(simImage.getMinHammingDist() + 2);
+		querey += ";";
+		dbCtrlr.executeSQL(querey, output);
+		//we have a match
+		if (output.find("path|") != string::npos)
+		{
+
+		}
+	}
 	
-	simImg.findDupes(hashes, dupeList);
+	
 
 	wstring rootNodeOutput(Utils::dbPath.begin(), Utils::dbPath.end());
 	AddItemToTree(hwndTV, (LPTSTR)rootNodeOutput.c_str(), 1); 
@@ -422,3 +434,67 @@ void lilMenu(HWND handle, int x, int y)
 
 	
 }
+
+/*
+
+BOOL InitTreeViewItems(HWND hwndTV)
+{
+HTREEITEM hti;
+
+map<int, vector<int>> dupeList;
+SimilarImage simImg;
+DatabaseController dbCtrlr;
+
+dbCtrlr.openDatabase(Utils::dbPath);
+string output;
+string command = "SELECT hash, MD5 FROM Images;";
+dbCtrlr.executeSQL(command, output);
+
+vector<DatabaseController::dbDataPair> hashes;
+dbCtrlr.removeTableNameFromOutput(output,2,1,2,hashes);
+
+//vector<vector<string>> allImages;
+//dbCtrlr.parseDBOutput(output, 2, allImages);
+
+simImg.findDupes(hashes, dupeList);
+
+wstring rootNodeOutput(Utils::dbPath.begin(), Utils::dbPath.end());
+AddItemToTree(hwndTV, (LPTSTR)rootNodeOutput.c_str(), 1);
+
+// show content:
+for (map<int, vector<int>>::iterator it = dupeList.begin(); it != dupeList.end(); ++it)
+{
+int index = it->first;
+
+string output;
+string md5Index = hashes[index].second;
+string command = ("SELECT fileName, galleryID FROM Images WHERE MD5 = '" + md5Index+"';");
+dbCtrlr.executeSQL(command, output);
+
+vector<string> imgInfo;
+dbCtrlr.removeTableNameFromOutput(output, 2, 1, imgInfo);
+
+wstring temp(imgInfo[0].begin(), imgInfo[0].end());
+hti = AddItemToTree(hwndTV, (LPTSTR)temp.c_str(), 2);
+
+vector<int> curListOfDupes = it->second;
+
+for (size_t i = 0; i < curListOfDupes.size(); i++)
+{
+//string curDir = simImg.allImages[listOfDupes[i]].path;
+md5Index = hashes[curListOfDupes[i]].second;
+command = ("SELECT fileName, galleryID FROM Images WHERE MD5 = '" + md5Index + "';");
+dbCtrlr.executeSQL(command, output);
+
+dbCtrlr.removeTableNameFromOutput(output, 2, 1, imgInfo);
+
+wstring subTemp(imgInfo[0].begin(), imgInfo[0].end());
+hti = AddItemToTree(hwndTV, (LPTSTR)subTemp.c_str(), 3);
+}
+}
+
+//if (hti == NULL)
+//return FALSE;
+return TRUE;
+}
+*/
