@@ -20,6 +20,7 @@
 #define ID_TREEVIEW_VIEW_ITEM             40002
 #define ID_TREEVIEW_OPEN_DIR          40003
 #define ID_TREEVIEW_DELETE_ITEM              40004
+#define ID_REMOVE_FROM_TREE			40005
 
 #define IDC_TREE1                       1059
 #define IDR_MENU_TREEVIEW               119

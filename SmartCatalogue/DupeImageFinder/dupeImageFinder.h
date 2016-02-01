@@ -9,7 +9,12 @@
 #define MAX_LOADSTRING 100
 
 DatabaseController dbCtrlr;
-
+struct treeEntry
+{
+	string path;
+	string md5;
+	//str
+};
 // Global Variables:
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
@@ -31,6 +36,8 @@ void lilMenu(HWND handle, int x, int y);
 void findAllTheDupes(HWND hwndTV);
 void addNewItemToTree(HWND hwndTV, string curMD5, string quereyOutput);
 void init();
+void deleteImage(wstring imaage);
+void deleteGallery(wstring gallery);
 void mainLogic();
 void finish();
 //usewd to time how long it takes to find the dupes

@@ -339,15 +339,8 @@ void lilMenu(HWND handle, int x, int y)
 	}
 	else if (command == ID_TREEVIEW_DELETE_ITEM)
 	{
-		// delete if it is not root
-		//if (item != treeView.getRoot())
-		//	treeView.deleteItem(item);
-		if (selectedText.size() > 3)// I guess the min length is 4... C:\a can be a legit file
-		{
-			string fileName(selectedText.begin(), selectedText.end());
-			MyFileDirDll::deleteFile(fileName);
-		}
-		
+		deleteImage(selectedText);
+		TreeView_DeleteItem(handle, hItem);
 	}
 	else if (command == ID_TREEVIEW_OPEN_DIR)
 	{
@@ -359,8 +352,12 @@ void lilMenu(HWND handle, int x, int y)
 		//std::cout << " file: " << str.substr(found + 1) << '\n';
 		wstring path = selectedText.substr(0, found);
 		ShellExecute(NULL, L"explore", path.c_str(), NULL, NULL, SW_SHOWNORMAL);
+		
 	}
-
+	else if (command == ID_REMOVE_FROM_TREE)
+	{
+		TreeView_DeleteItem(handle, hItem);
+	}
 	
 }
 
@@ -423,6 +420,48 @@ void init()
 	dupeSearch.detach();
 }
 
+void deleteImage(wstring image)
+{
+	// delete if it is not root
+	//if (item != treeView.getRoot())
+	//	treeView.deleteItem(item);
+	if (image.size() < 3)// I guess the min length is 4... C:\a can be a legit file
+		return;
+
+	string fileName(image.begin(), image.end());
+	/*if (!MyFileDirDll::deleteFile(fileName))
+	{
+		wstring err = (L"Error deleting " + image);
+		MessageBox(NULL, err.c_str() , NULL, NULL);
+		return;
+	}*/
+	string output, querey;
+	querey = "DELETE FROM Images WHERE  Images.fileName = '";
+	querey += MyFileDirDll::getFileNameFromPathString(fileName);  
+	querey += "' AND galleryID IS (SELECT galleryID FROM Gallery WHERE path = '";
+	querey += MyFileDirDll::getPathFromFullyQualifiedPathString(fileName);
+	querey += "\\');"; //the DB has the back slashes in the path, so i need to include them here
+	
+	dbCtrlr.executeSQL(querey, output);
+	cout << output << endl;
+}
+
+void deleteGallery(wstring path)
+{
+	string output, querey;
+	string fileName(path.begin(), path.end());
+	querey = "DELETE FROM Images  WHERE galleryID is (select id from Gallery where path = '";
+	querey += MyFileDirDll::getPathFromFullyQualifiedPathString(fileName);
+	querey += "\\');";
+
+	dbCtrlr.executeSQL(querey, output);
+
+	querey = "delete FROM Gallery where path = '";
+	querey += MyFileDirDll::getPathFromFullyQualifiedPathString(fileName);
+	querey += "\\';";
+
+	dbCtrlr.executeSQL(querey, output);
+}
 void mainLogic()
 {
 	SetWindowTextA(statusText, "searching for dupe images...");
@@ -436,7 +475,7 @@ void mainLogic()
 		querey += "' AND hammingDistance('";
 		querey += hashes[i].first;
 		querey += "',hash) < ";
-		querey += to_string(/*simImage.getMinHammingDist() + 2*/ 3);
+		querey += to_string(/*simImage.getMinHammingDist() + 2*/ 7);
 		querey += ";";
 		dbCtrlr.executeSQL(querey, output);
 		//we have a match
