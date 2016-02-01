@@ -3,8 +3,11 @@
 #include "resource.h"
 #include <windows.h>
 #include "CommCtrl.h"
+#include "DatabaseController.h"
 
 #define MAX_LOADSTRING 100
+
+DatabaseController dbCtrlr;
 
 // Global Variables:
 HINSTANCE hInst;                                // current instance
@@ -23,3 +26,5 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 BOOL InitTreeViewItems(HWND hwndTV);
 HTREEITEM AddItemToTree(HWND hwndTV, wchar_t* lpszItem, int nLevel);
 void lilMenu(HWND handle, int x, int y);
+void findAllTheDupes(HWND hwndTV);
+void addNewItemToTree(HWND hwndTV, string curMD5, string quereyOutput);

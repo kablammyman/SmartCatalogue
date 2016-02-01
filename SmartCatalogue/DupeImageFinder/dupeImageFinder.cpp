@@ -97,11 +97,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	hInst = hInstance; // Store instance handle in our global variable
 
-	
-
 	mainWindowHandle = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
-
-
 
 	if (!mainWindowHandle)
 	{
@@ -118,15 +114,25 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		WS_CHILD | WS_VISIBLE | WS_BORDER | WS_HSCROLL | WS_VSCROLL | TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS,
 		0, 30, rc.right/2, rc.bottom,
 		mainWindowHandle, NULL, hInstance, NULL);
-
-		
-		
-		
-	/*thread t1(InitTreeViewItems, hwndTree);
-	//Join the thread with the main thread
-	t1.join();*/
+	
 	InitTreeViewItems(hwndTree);
 
+	thread t1(findAllTheDupes, hwndTree);
+	t1.detach();
+
+	//or i can put all the threads in a vector to join later
+	/*
+	std::vector<std::thread> allThreads;
+	for (int i = 0; i < 10; ++i) {
+	allThreads.emplace_back(myfunction, i, param2, param3);
+	}
+
+	// Do something else...
+
+	for (auto& t : allThreads) {
+	t1.join();
+	}
+	*/
 	return TRUE;
 }
 
@@ -193,26 +199,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 	return 0;
-}
-
-// Message handler for about box.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(lParam);
-	switch (message)
-	{
-	case WM_INITDIALOG:
-		return (INT_PTR)TRUE;
-
-	case WM_COMMAND:
-		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-		{
-			EndDialog(hDlg, LOWORD(wParam));
-			return (INT_PTR)TRUE;
-		}
-		break;
-	}
-	return (INT_PTR)FALSE;
 }
 
 HTREEITEM AddItemToTree(HWND hwndTV, wchar_t* lpszItem, int nLevel)
@@ -284,85 +270,15 @@ HTREEITEM AddItemToTree(HWND hwndTV, wchar_t* lpszItem, int nLevel)
 // hwndTV - handle to the tree-view control. 
 
 BOOL InitTreeViewItems(HWND hwndTV)
-{
-	HTREEITEM hti;
-	DatabaseController dbCtrlr;
-
+{	
 	dbCtrlr.openDatabase(Utils::dbPath);
-	
-	int start_s = clock();
-
-	string output;
-	//get a list of all images
-	string querey = "SELECT hash, MD5 FROM Images;";
-	dbCtrlr.executeSQL(querey, output);
-	
-	
-	vector<DatabaseController::dbDataPair> hashes;
-	dbCtrlr.removeTableNameFromOutput(output,2,1,2,hashes);
 	
 	wstring rootNodeOutput(Utils::dbPath.begin(), Utils::dbPath.end());
 	AddItemToTree(hwndTV, (LPTSTR)rootNodeOutput.c_str(), 1);
 
-	ProgressBar progress(hwndTV, 10, 10, 500, hashes.size());
-	//now compare each image in the list to the db, making sure not to include it self
-	for (size_t i = 0; i < hashes.size(); i++)
-	{
-		progress.updateProgressBar(i);
-		querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 != '";
-		querey += hashes[i].second;
-		querey += "' AND hammingDistance('";
-		querey += hashes[i].first;
-		querey += "',hash) < ";
-		querey += to_string(/*simImage.getMinHammingDist() + 2*/ 4);
-		querey += ";";
-		dbCtrlr.executeSQL(querey, output);
-		//we have a match
-		if (output.find("path|") != string::npos)
-		{
-			//put all dupes for this image in a list
-			vector<DatabaseController::dbDataPair> dupeList;
-			dbCtrlr.removeTableNameFromOutput(output, 2, 1, 2, dupeList);
-
-			//get the path and filename for current image
-			querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 = '";
-			querey += hashes[i].second;
-			querey += "';";
-			dbCtrlr.executeSQL(querey, output);
-
-			//make this "branch" from the current image file name and path
-			vector<DatabaseController::dbDataPair> branchName;
-			dbCtrlr.removeTableNameFromOutput(output, 2, 1, 2, branchName);
-			string imagePath = (branchName[0].second + branchName[0].first);
-			wstring temp(imagePath.begin(), imagePath.end());
-			hti = AddItemToTree(hwndTV, (LPTSTR)temp.c_str(), 2);
-			
-			//all the children of this branch will be the list of dupes
-			for (size_t j = 0; j < dupeList.size(); j++)
-			{
-				string fullPath = (dupeList[j].second + dupeList[j].first);
-				wstring subTemp(fullPath.begin(), fullPath.end());
-				hti = AddItemToTree(hwndTV, (LPTSTR)subTemp.c_str(), 3);
-			}
-			
-		}
-	}
-	
-
-	//if (hti == NULL)
-	//	return FALSE;
-	int stop_s = clock();
-	double milis = (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000;
-	string timeTaken = Utils::getTimeStamp(milis);
-
-	ofstream myfile;
-	myfile.open("dupeImageFinder.txt");
-	myfile << "parsed " << Utils::dbPath <<endl;
-	myfile << timeTaken << endl;
-	myfile.close();
-
 	return TRUE;
 }
+
 //get the main window handle, x and y cords of mouse
 void lilMenu(HWND handle, int x, int y)
 {
@@ -442,8 +358,105 @@ void lilMenu(HWND handle, int x, int y)
 	
 }
 
-/*
+void addNewItemToTree(HWND hwndTV, string curMD5,  string quereyOutput)
+{
+	HTREEITEM hti;
+	//put all dupes for this image in a list
+	vector<DatabaseController::dbDataPair> dupeList;
+	dbCtrlr.removeTableNameFromOutput(quereyOutput, 2, 1, 2, dupeList);
 
+	//get the path and filename for current image
+	string querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 = '";
+	querey += curMD5;
+	querey += "';";
+	string output;
+	dbCtrlr.executeSQL(querey, output);
+
+	//make this "branch" from the current image file name and path
+	vector<DatabaseController::dbDataPair> branchName;
+	dbCtrlr.removeTableNameFromOutput(output, 2, 1, 2, branchName);
+	string imagePath = (branchName[0].second + branchName[0].first);
+	wstring temp(imagePath.begin(), imagePath.end());
+	hti = AddItemToTree(hwndTV, (LPTSTR)temp.c_str(), 2);
+
+	//all the children of this branch will be the list of dupes
+	for (size_t j = 0; j < dupeList.size(); j++)
+	{
+		string fullPath = (dupeList[j].second + dupeList[j].first);
+		wstring subTemp(fullPath.begin(), fullPath.end());
+		hti = AddItemToTree(hwndTV, (LPTSTR)subTemp.c_str(), 3);
+	}
+}
+
+void findAllTheDupes(HWND hwndTV)
+{
+	int start_s = clock();
+	string output;
+	//get a list of all images
+	string querey = "SELECT hash, MD5 FROM Images;";
+	dbCtrlr.executeSQL(querey, output);
+
+
+	vector<DatabaseController::dbDataPair> hashes;
+	dbCtrlr.removeTableNameFromOutput(output, 2, 1, 2, hashes);
+
+	ProgressBar progress(hwndTV, 10, 1, 200, hashes.size());
+	//now compare each image in the list to the db, making sure not to include it self
+
+	for (size_t i = 0; i < hashes.size(); i++)
+	{
+		progress.updateProgressBar(i);
+		querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 != '";
+		querey += hashes[i].second;
+		querey += "' AND hammingDistance('";
+		querey += hashes[i].first;
+		querey += "',hash) < ";
+		querey += to_string(/*simImage.getMinHammingDist() + 2*/ 3);
+		querey += ";";
+		dbCtrlr.executeSQL(querey, output);
+		//we have a match
+		if (output.find("path|") != string::npos)
+		{
+			addNewItemToTree(hwndTV, hashes[i].second, output);
+		}
+	}
+
+
+	//if (hti == NULL)
+	//	return FALSE;
+	int stop_s = clock();
+	double milis = (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000;
+	string timeTaken = Utils::getTimeStamp(milis);
+
+	ofstream myfile;
+	myfile.open("dupeImageFinder.txt");
+	myfile << "parsed " << Utils::dbPath << endl;
+	myfile << timeTaken << endl;
+	myfile.close();
+}
+
+// Message handler for about box.
+INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return (INT_PTR)TRUE;
+
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
+}
+
+
+/*
 BOOL InitTreeViewItems(HWND hwndTV)
 {
 HTREEITEM hti;
