@@ -23,7 +23,7 @@
 
 #define IDC_TREE1                       1059
 #define IDR_MENU_TREEVIEW               119
-
+#define IDC_STATUS_TEXT                  1010
 #endif
 // Next default values for new objects
 //

@@ -8,7 +8,7 @@
 #include <fstream>
 
 #include "dupeImageFinder.h"
-#include "ProgressBar.h"
+
 #include "similarImage.h"
 #include "myFileDirDll.h"
 #include "Utils.h"
@@ -108,7 +108,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	UpdateWindow(mainWindowHandle);
 	RECT rc;
 	GetClientRect(mainWindowHandle, &rc);
-	//hTree = CreateWindowEx(0, WC_TREEVIEW, _T(""), WS_VISIBLE | WS_CHILD | WS_BORDER | WS_HSCROLL | WS_VSCROLL | TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS, 0, 45, 216, 532, mainWindowHandle, NULL, hInst, NULL);
 
 	hwndTree = CreateWindowEx(WS_EX_CLIENTEDGE,WC_TREEVIEW,0,
 		WS_CHILD | WS_VISIBLE | WS_BORDER | WS_HSCROLL | WS_VSCROLL | TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS,
@@ -116,9 +115,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		mainWindowHandle, NULL, hInstance, NULL);
 	
 	InitTreeViewItems(hwndTree);
-
-	thread t1(findAllTheDupes, hwndTree);
+	//waitingMarquee.init(mainWindowHandle, 1, 1, 100, 100,true);
+	thread t1(init);
 	t1.detach();
+
+	progress.init(mainWindowHandle, 1, 1, (rc.right / 2),100);
+	statusText = CreateWindow(TEXT("Edit"), TEXT("opening DB and loading images"), WS_CHILD | WS_VISIBLE | WS_BORDER, (rc.right / 2), 0, 1000, 30, mainWindowHandle, (HMENU)IDC_STATUS_TEXT, NULL, NULL);
 
 	//or i can put all the threads in a vector to join later
 	/*
@@ -198,6 +200,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
+
+
 	return 0;
 }
 
@@ -275,6 +279,8 @@ BOOL InitTreeViewItems(HWND hwndTV)
 	
 	wstring rootNodeOutput(Utils::dbPath.begin(), Utils::dbPath.end());
 	AddItemToTree(hwndTV, (LPTSTR)rootNodeOutput.c_str(), 1);
+
+	hwndTreeView = hwndTV;
 
 	return TRUE;
 }
@@ -358,6 +364,7 @@ void lilMenu(HWND handle, int x, int y)
 	
 }
 
+
 void addNewItemToTree(HWND hwndTV, string curMD5,  string quereyOutput)
 {
 	HTREEITEM hti;
@@ -372,10 +379,25 @@ void addNewItemToTree(HWND hwndTV, string curMD5,  string quereyOutput)
 	string output;
 	dbCtrlr.executeSQL(querey, output);
 
+	//not sure how this happens, but it does wqhen mulit thraded...
+	//oh...i see...this is why...lol
+	/*
+	Make sure you're compiling SQLite with -DTHREADSAFE=1.
+	Make sure that each thread opens the database file and keeps its own sqlite structure.
+	Make sure you handle the likely possibility that one or more threads collide when they access the db file at the same time: handle SQLITE_BUSY appropriately.
+	Make sure you enclose within transactions the commands that modify the database file, like INSERT, UPDATE, DELETE, and others.
+	*/
+	if (output.empty())
+		return;
+
 	//make this "branch" from the current image file name and path
 	vector<DatabaseController::dbDataPair> branchName;
 	dbCtrlr.removeTableNameFromOutput(output, 2, 1, 2, branchName);
 	string imagePath = (branchName[0].second + branchName[0].first);
+	
+	string text = ("lastMatch: " + imagePath);
+	SetWindowTextA(statusText, text.c_str());
+
 	wstring temp(imagePath.begin(), imagePath.end());
 	hti = AddItemToTree(hwndTV, (LPTSTR)temp.c_str(), 2);
 
@@ -388,24 +410,27 @@ void addNewItemToTree(HWND hwndTV, string curMD5,  string quereyOutput)
 	}
 }
 
-void findAllTheDupes(HWND hwndTV)
+void init()
 {
-	int start_s = clock();
+	start_s = clock();
 	string output;
 	//get a list of all images
 	string querey = "SELECT hash, MD5 FROM Images;";
 	dbCtrlr.executeSQL(querey, output);
-
-
-	vector<DatabaseController::dbDataPair> hashes;
 	dbCtrlr.removeTableNameFromOutput(output, 2, 1, 2, hashes);
+	progress.setRange(hashes.size());
+	thread dupeSearch(mainLogic);
+	dupeSearch.detach();
+}
 
-	ProgressBar progress(hwndTV, 10, 1, 200, hashes.size());
+void mainLogic()
+{
+	SetWindowTextA(statusText, "searching for dupe images...");
+	//i put this here so the app will not hourglass as it does its main calcls
 	//now compare each image in the list to the db, making sure not to include it self
-
+	string output, querey;
 	for (size_t i = 0; i < hashes.size(); i++)
 	{
-		progress.updateProgressBar(i);
 		querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 != '";
 		querey += hashes[i].second;
 		querey += "' AND hammingDistance('";
@@ -417,19 +442,26 @@ void findAllTheDupes(HWND hwndTV)
 		//we have a match
 		if (output.find("path|") != string::npos)
 		{
-			addNewItemToTree(hwndTV, hashes[i].second, output);
+			//thread newMatch(addNewItemToTree, hwndTreeView, hashes[i].second, output);
+			//newMatch.detach();
+			addNewItemToTree(hwndTreeView, hashes[i].second, output);
 		}
+		progress.updateProgressBar(i);
 	}
 
+	finish();
+}
 
-	//if (hti == NULL)
-	//	return FALSE;
-	int stop_s = clock();
+void finish()
+{
+	stop_s = clock();
 	double milis = (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000;
 	string timeTaken = Utils::getTimeStamp(milis);
 
 	ofstream myfile;
 	myfile.open("dupeImageFinder.txt");
+	if (!myfile.is_open())
+		return;
 	myfile << "parsed " << Utils::dbPath << endl;
 	myfile << timeTaken << endl;
 	myfile.close();
