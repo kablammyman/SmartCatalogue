@@ -441,18 +441,25 @@ void init(wstring path)
 {
 	start_s = clock();
 	string output, querey;
-	string websiteName(path.begin(), path.end());
-	if(path == START_STRING || path.empty())//get a list of all images
+	
+	if (path == START_STRING || path.empty())//get a list of all images
+	{
+		SetWindowTextA(statusText, "loading DB and getting ALL images...");
 		querey = "SELECT hash, MD5 FROM Images;";
+	}
 	else
 	{
-		querey = "select hash, MD5 from images where galleryid < (SELECT ID from Gallery Where WebsiteID is(select id from website where name = '";
+		///blah! i cant figure out how to do this in one go, so ill have to do 2 :(
+		//nevermind, i needed to use IN...lol
+		string websiteName(path.begin(), path.end());
+		string msg = ("loading DB and getting images from website " + websiteName);
+		SetWindowTextA(statusText, msg.c_str());
+
+		querey = "SELECT hash, MD5 FROM Images WHERE Images.GalleryID IN ( SELECT ID from Gallery Where WebsiteID is (SELECT ID from Website where name = '";
 		querey += websiteName;
-		querey += "')order by id desc limit 1) AND galleryid > (SELECT ID from Gallery Where WebsiteID is(select id from website where name = '";
-		querey += websiteName;
-		querey += "') order by id asc limit 1);";
+		querey += "'));";
 	}
-	SetWindowTextA(statusText, "loading DB and getting images...");
+	
 	dbCtrlr.executeSQL(querey, output);
 	dbCtrlr.removeTableNameFromOutput(output, 2, 1, 2, hashes);
 	progress.setRange(hashes.size());

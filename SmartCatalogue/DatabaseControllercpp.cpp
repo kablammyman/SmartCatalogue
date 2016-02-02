@@ -247,12 +247,11 @@ void DatabaseController::removeTableNameFromOutput(string &inputData, int numCol
 		return;
 
 	char *p = strtok(const_cast<char *>(inputData.c_str()), delims.c_str());
-	string data1;
 
 	while (p)
 	{
 		if (counter == colToUse + 1)
-			data1 = p;
+			returnData.push_back(p);
 		//x2 becasue it goes colName|data, we only want the data, not the col name
 		if (counter < (numCols * 2))
 			counter++;
