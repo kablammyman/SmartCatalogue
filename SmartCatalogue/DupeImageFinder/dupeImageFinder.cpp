@@ -471,7 +471,7 @@ void deleteImage(wstring image)
 	{
 		wstring err = (L"Error deleting " + image);
 		MessageBox(NULL, err.c_str() , NULL, NULL);
-		return;
+		//return;
 	}
 	string output, querey;
 	querey = "DELETE FROM Images WHERE  Images.fileName = '";
@@ -486,8 +486,17 @@ void deleteImage(wstring image)
 
 void deleteGallery(wstring path)
 {
-	string output, querey;
 	string fileName(path.begin(), path.end());
+	string result = MyFileDirDll::deleteAllFilesInDir(fileName);
+	if(!result.empty())
+	{
+		wstring err(result.begin(),result.end());
+		MessageBox(NULL, err.c_str(), NULL, NULL);
+		//return;
+	}
+
+	string output, querey;
+
 	querey = "DELETE FROM Images  WHERE galleryID is (select id from Gallery where path = '";
 	querey += MyFileDirDll::getPathFromFullyQualifiedPathString(fileName);
 	querey += "\\');";
