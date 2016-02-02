@@ -2,8 +2,7 @@
 //
 
 #include "stdafx.h"
-#include <map>
-#include <thread>
+
 #include "Shellapi.h" //shellExecute
 #include <fstream>
 
@@ -116,12 +115,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	
 	InitTreeViewItems(hwndTree);
 	//waitingMarquee.init(mainWindowHandle, 1, 1, 100, 100,true);
-	thread t1(init);
-	t1.detach();
+	
 
 	progress.init(mainWindowHandle, 1, 1, (rc.right / 2),100);
-	statusText = CreateWindow(TEXT("Edit"), TEXT("opening DB and loading images"), WS_CHILD | WS_VISIBLE | WS_BORDER, (rc.right / 2), 0, 1000, 30, mainWindowHandle, (HMENU)IDC_STATUS_TEXT, NULL, NULL);
-
+	
+	statusText = CreateWindow(TEXT("Edit"), START_STRING, WS_CHILD | WS_VISIBLE | WS_BORDER, (rc.right / 2), 1, 1000, 30, mainWindowHandle, (HMENU)IDC_STATUS_TEXT, NULL, NULL);
+	startButton = CreateWindow(TEXT("BUTTON"), TEXT("Find Dupes!"), WS_CHILD | WS_VISIBLE, (rc.right / 2), 35, 96, 30, mainWindowHandle, (HMENU)IDC_STARTBUTTON, NULL, NULL);//96 = 12*8 or strlen of "find dupes!"
+	hammingDistBox = CreateWindow(TEXT("Edit"), L"3", WS_CHILD | WS_VISIBLE | WS_BORDER, (rc.right / 2) + 100, 35, 16, 30, mainWindowHandle, (HMENU)IDC_DISTBOX, NULL, NULL);
+	
 	//or i can put all the threads in a vector to join later
 	/*
 	std::vector<std::thread> allThreads;
@@ -159,8 +160,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		int wmId = LOWORD(wParam);
 		// Parse the menu selections:
+
+
 		switch (wmId)
 		{
+		case IDC_STARTBUTTON:
+		{
+			int textCount = GetWindowTextLength(statusText) + 2;
+			wchar_t * textBuffer = new wchar_t[textCount];
+			GetWindowText(statusText, textBuffer, textCount);
+
+			textCount = GetWindowTextLength(hammingDistBox) + 2;
+			wchar_t * textBuffer2 = new wchar_t[textCount];
+			GetWindowText(hammingDistBox, textBuffer2, textCount);
+			minHammingDist = _wtoi(textBuffer2);
+
+			thread t1(init, textBuffer);
+			t1.detach();
+
+			EnableWindow(statusText, FALSE);
+			EnableWindow(startButton, FALSE);
+			EnableWindow(hammingDistBox, FALSE);
+		}
+		break;
+
 		case IDM_ABOUT:
 			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
 			break;
@@ -172,7 +195,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 	}
 	break;
-	
+
+
 	//this is a fancy way to say "right click"
 	case WM_CONTEXTMENU:
 		lilMenu((HWND)wParam, LOWORD(lParam), HIWORD(lParam));
@@ -333,27 +357,32 @@ void lilMenu(HWND handle, int x, int y)
 
 	if (command == ID_TREEVIEW_VIEW_ITEM)
 	{
-		//ShellExecute(0, 0, L"\\\\OPTIPLEX-745\\photos\\porno pics\\mega sites\\twistys\\models\\Valentina Nappi\\black flower robe blue flower undies\\8_628.jpg", 0, 0, SW_SHOW);
 		if(selectedText.size() > 3)// I guess the min length is 4... C:\a can be a legit file
 			ShellExecute(0, 0, selectedText.c_str(), 0, 0, SW_SHOW);
 	}
-	else if (command == ID_TREEVIEW_DELETE_ITEM)
-	{
-		deleteImage(selectedText);
-		TreeView_DeleteItem(handle, hItem);
-	}
+
 	else if (command == ID_TREEVIEW_OPEN_DIR)
 	{
 		if (selectedText.size() < 3)
 			return;
 
 		size_t found = selectedText.find_last_of(L"/\\");
-		//std::cout << " path: " << str.substr(0, found) << '\n';
-		//std::cout << " file: " << str.substr(found + 1) << '\n';
 		wstring path = selectedText.substr(0, found);
 		ShellExecute(NULL, L"explore", path.c_str(), NULL, NULL, SW_SHOWNORMAL);
 		
 	}
+	
+	else if (command == ID_TREEVIEW_DELETE_ITEM)
+	{
+		deleteImage(selectedText);
+		TreeView_DeleteItem(handle, hItem);
+	}
+	else if (command == ID_TREEVIEW_DELETE_GALLERY)
+	{
+		deleteGallery(selectedText);
+		TreeView_DeleteItem(handle, hItem);
+	}
+
 	else if (command == ID_REMOVE_FROM_TREE)
 	{
 		TreeView_DeleteItem(handle, hItem);
@@ -407,34 +436,43 @@ void addNewItemToTree(HWND hwndTV, string curMD5,  string quereyOutput)
 	}
 }
 
-void init()
+//right now, the path is merely the website name
+void init(wstring path)
 {
 	start_s = clock();
-	string output;
-	//get a list of all images
-	string querey = "SELECT hash, MD5 FROM Images;";
+	string output, querey;
+	string websiteName(path.begin(), path.end());
+	if(path == START_STRING || path.empty())//get a list of all images
+		querey = "SELECT hash, MD5 FROM Images;";
+	else
+	{
+		querey = "select hash, MD5 from images where galleryid < (SELECT ID from Gallery Where WebsiteID is(select id from website where name = '";
+		querey += websiteName;
+		querey += "')order by id desc limit 1) AND galleryid > (SELECT ID from Gallery Where WebsiteID is(select id from website where name = '";
+		querey += websiteName;
+		querey += "') order by id asc limit 1);";
+	}
+	SetWindowTextA(statusText, "loading DB and getting images...");
 	dbCtrlr.executeSQL(querey, output);
 	dbCtrlr.removeTableNameFromOutput(output, 2, 1, 2, hashes);
 	progress.setRange(hashes.size());
-	thread dupeSearch(mainLogic);
-	dupeSearch.detach();
+	thread d1(mainLogic);
+	dupeSearch = &d1;
+	dupeSearch->detach();
 }
 
 void deleteImage(wstring image)
 {
-	// delete if it is not root
-	//if (item != treeView.getRoot())
-	//	treeView.deleteItem(item);
 	if (image.size() < 3)// I guess the min length is 4... C:\a can be a legit file
 		return;
 
 	string fileName(image.begin(), image.end());
-	/*if (!MyFileDirDll::deleteFile(fileName))
+	if (!MyFileDirDll::deleteFile(fileName))
 	{
 		wstring err = (L"Error deleting " + image);
 		MessageBox(NULL, err.c_str() , NULL, NULL);
 		return;
-	}*/
+	}
 	string output, querey;
 	querey = "DELETE FROM Images WHERE  Images.fileName = '";
 	querey += MyFileDirDll::getFileNameFromPathString(fileName);  
@@ -475,7 +513,7 @@ void mainLogic()
 		querey += "' AND hammingDistance('";
 		querey += hashes[i].first;
 		querey += "',hash) < ";
-		querey += to_string(/*simImage.getMinHammingDist() + 2*/ 7);
+		querey += to_string(/*simImage.getMinHammingDist() + 2*/ minHammingDist);
 		querey += ";";
 		dbCtrlr.executeSQL(querey, output);
 		//we have a match
@@ -487,7 +525,7 @@ void mainLogic()
 		}
 		progress.updateProgressBar(i);
 	}
-
+	SetWindowTextA(statusText, "done!");
 	finish();
 }
 

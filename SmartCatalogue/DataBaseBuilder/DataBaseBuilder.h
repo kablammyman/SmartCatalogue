@@ -29,7 +29,7 @@ public:
 	int inserCategoryInfoIntoDB(GalleryData &galleryData);
 	int insertWebsiteInfoIntoDB(GalleryData &galleryData, int categoryID);
 	int insertSubWebsiteInfoIntoDB(GalleryData &galleryData, int websiteID);
-	int insertGalleryInfoIntoDB(GalleryData &galleryData, int websiteID, int subWebsiteID);
+	int insertGalleryInfoIntoDB(GalleryData &galleryData, int websiteID, int subWebsiteID, int categoryID);
 	bool insertModelInfoIntoDB(GalleryModel &model);
 	bool insertModelOutfitInfoIntoDB(GalleryModel &model, int clothingIndex, int galleryID);
 	bool insertImageHashInfoIntoDB(string imgeFileName, string hash, string phash, string md5, int galleryID);

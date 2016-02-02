@@ -21,10 +21,13 @@
 #define ID_TREEVIEW_OPEN_DIR          40003
 #define ID_TREEVIEW_DELETE_ITEM              40004
 #define ID_REMOVE_FROM_TREE			40005
+#define ID_TREEVIEW_DELETE_GALLERY 40006
 
 #define IDC_TREE1                       1059
 #define IDR_MENU_TREEVIEW               119
 #define IDC_STATUS_TEXT                  1010
+#define IDC_STARTBUTTON				1011
+#define IDC_DISTBOX			1012
 #endif
 // Next default values for new objects
 //

@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 			if (subWebsiteID == -1)
 				continue;
 
-			int galleryID = dbBuilder.insertGalleryInfoIntoDB(galleryData, websiteID, subWebsiteID);
+			int galleryID = dbBuilder.insertGalleryInfoIntoDB(galleryData, websiteID, subWebsiteID, categoryID);
 			if (galleryID == -1)
 				continue;
 			

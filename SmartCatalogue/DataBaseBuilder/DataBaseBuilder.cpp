@@ -190,7 +190,7 @@ int DatabaseBuilder::insertSubWebsiteInfoIntoDB(GalleryData &galleryData, int we
 	return getLatestID();
 }
 //---------------------------------------------------------------------------------------------------------
-int DatabaseBuilder::insertGalleryInfoIntoDB(GalleryData &galleryData, int websiteID, int subWebsiteID)
+int DatabaseBuilder::insertGalleryInfoIntoDB(GalleryData &galleryData, int websiteID, int subWebsiteID, int categoryID)
 {
 	string output;
 
@@ -218,6 +218,7 @@ int DatabaseBuilder::insertGalleryInfoIntoDB(GalleryData &galleryData, int websi
 	dbGalleryInfo.push_back(make_pair("numModels", to_string(galleryData.models.size())));
 	dbGalleryInfo.push_back(make_pair("WebsiteID", to_string(websiteID)));
 	dbGalleryInfo.push_back(make_pair("SubWebsiteID", to_string(subWebsiteID)));
+	dbGalleryInfo.push_back(make_pair("categoryID", to_string(categoryID)));
 	dbCtrlr.insertNewDataEntry("Gallery", dbGalleryInfo, output);
 	if (!output.empty())
 	{
