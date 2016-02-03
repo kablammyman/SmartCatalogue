@@ -5,7 +5,7 @@
 
 #include "Shellapi.h" //shellExecute
 #include <fstream>
-
+#include <map>
 #include "dupeImageFinder.h"
 
 #include "similarImage.h"
@@ -494,7 +494,10 @@ void deleteImage(wstring image)
 void deleteGallery(wstring path)
 {
 	string fileName(path.begin(), path.end());
-	string result = MyFileDirDll::deleteAllFilesInDir(fileName);
+	string gallDir = MyFileDirDll::getPathFromFullyQualifiedPathString(fileName);
+	string result = MyFileDirDll::deleteAllFilesInDir(gallDir);
+	RemoveDirectoryA(gallDir.c_str());
+
 	if(!result.empty())
 	{
 		wstring err(result.begin(),result.end());
@@ -522,8 +525,11 @@ void mainLogic()
 	//i put this here so the app will not hourglass as it does its main calcls
 	//now compare each image in the list to the db, making sure not to include it self
 	string output, querey;
+	map<string, bool> foundItems;
 	for (size_t i = 0; i < hashes.size(); i++)
 	{
+		if (foundItems[hashes[i].second])
+			continue;
 		querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 != '";
 		querey += hashes[i].second;
 		querey += "' AND hammingDistance('";
@@ -538,6 +544,7 @@ void mainLogic()
 			//thread newMatch(addNewItemToTree, hwndTreeView, hashes[i].second, output);
 			//newMatch.detach();
 			addNewItemToTree(hwndTreeView, hashes[i].second, output);
+			foundItems[hashes[i].second] = true;
 		}
 		progress.updateProgressBar(i);
 	}
