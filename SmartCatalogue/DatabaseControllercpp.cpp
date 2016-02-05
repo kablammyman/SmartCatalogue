@@ -202,55 +202,71 @@ void DatabaseController::parseDBOutput(string &inputData, int numFields, vector<
 
 	}
 }
-void DatabaseController::removeTableNameFromOutput(string &inputData, int numCols, int colToUse1, int colToUse2, vector<dbDataPair> &returnData)
+
+string DatabaseController::dataGrabber(string &word, size_t &curPos)
 {
-	//vector<string> tokens = Utils::tokenize(inputData, "|\n");
-	string delims = "|\n";
-	int counter = 1;
+	string curWord;
+	curPos = word.find('|', curPos);
+	curPos++;//move past the pipe and start to collect next word
+	while (word[curPos] != '\n')
+		curWord += word[curPos++];
 
-	if (colToUse1 > numCols || colToUse1 < 1)
-		return;
+	return curWord;
+}
 
-	if (colToUse2 > numCols || colToUse2 < 1)
-		return;
-
-	colToUse1 *= 2;
-	colToUse2 *= 2;
-	
-	char *p = strtok(const_cast<char *>(inputData.c_str()), delims.c_str());
-	string data1;
-
-	while (p)
+void DatabaseController::getAllValuesFromCol(string &inputData, string colName, vector<string> &returnData)
+{
+	bool done = false;
+	string curWord;
+	size_t c = 0;
+	while (!done)
 	{
-		if (counter == colToUse1)
-			data1 = p;
-
-		else if (counter == colToUse2)//we got our data, move on. i wish i could jump past the wasted loop iterations somehow...
-			returnData.push_back(make_pair(data1,p));
+		c = inputData.find(colName,c);
+		if (c != string::npos)
+			returnData.push_back(dataGrabber(inputData,c));
 		
-		
-		//x2 becasue it goes colName|data, we only want the data, not the col name
-		if (counter < (numCols * 2))
-			counter++;
 		else
-			counter = 1;
-		p = strtok(NULL, delims.c_str());
+			done = true;
+	}
+}
+
+
+
+void DatabaseController::getDataPairFromOutput(string &inputData, string colName1, string colName2,vector<dbDataPair> &returnData)
+{
+	bool done = false;
+	string firstWord;
+	size_t c = 0;
+	while (!done)
+	{
+		c = inputData.find(colName1,c);
+		if (c != string::npos)
+			firstWord = dataGrabber(inputData, c);
+
+		c = inputData.find(colName2,c);
+		if (c != string::npos)
+			returnData.push_back(make_pair(firstWord, dataGrabber(inputData, c)));
+		else
+			done = true;
+
 	}
 }
 //blah! the code is differnt enough that i cant reuse it woulth more loops... >=(
-void DatabaseController::removeTableNameFromOutput(string &inputData, int numCols, int colToUse, vector<string> &returnData)
+/*void DatabaseController::removeTableNameFromOutput(string &inputData, int numCols, int colToUse, vector<string> &returnData)
 {
-	string delims = "|\n";
-	int counter = 1;
-
 	if (colToUse > numCols || colToUse < 1)
 		return;
+
+	string delims = "|\n";
+	int counter = 1;
+	colToUse *= 2;
+
 
 	char *p = strtok(const_cast<char *>(inputData.c_str()), delims.c_str());
 
 	while (p)
 	{
-		if (counter == colToUse + 1)
+		if (counter == colToUse)
 			returnData.push_back(p);
 		//x2 becasue it goes colName|data, we only want the data, not the col name
 		if (counter < (numCols * 2))
@@ -261,7 +277,7 @@ void DatabaseController::removeTableNameFromOutput(string &inputData, int numCol
 	}
 
 }
-
+*/
 
 
 ///////////////////////////////////////////////////////////test methods

@@ -11,6 +11,7 @@ class DatabaseController
 {
 	DataBase *db;
 	string dbName;
+	string dataGrabber(string &word, size_t &startPos);
 
 public:
 	typedef pair <string, string> dbDataPair;
@@ -34,8 +35,8 @@ public:
 	//num cols is hopw many cols were truthned from the querey, and the colToUse is the data we want to put in the vector
 	void removeTableNameFromOutput(string &inputData, int numCols, int colToUse, vector<string> &returnData);
 	//same as before, but now we can couple data together
-	void removeTableNameFromOutput(string &inputData, int numCols, int colToUse1, int colToUse2,  vector<dbDataPair> &returnData);
-
+	void getDataPairFromOutput(string &inputData, string colName1, string colName2, vector<dbDataPair> &returnData);
+	void getAllValuesFromCol(string &inputData, string colName, vector<string> &returnData);
 	//test methods
 	void createTable(string tableName, string fields);
 	void testGetTable();

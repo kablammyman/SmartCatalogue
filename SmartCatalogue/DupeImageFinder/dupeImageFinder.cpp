@@ -357,6 +357,8 @@ void lilMenu(HWND handle, int x, int y)
 
 	if (command == ID_TREEVIEW_VIEW_ITEM)
 	{
+		if (TreeView_GetParent(handle, hItem) == NULL)
+			return;
 		if(selectedText.size() > 3)// I guess the min length is 4... C:\a can be a legit file
 			ShellExecute(0, 0, selectedText.c_str(), 0, 0, SW_SHOW);
 	}
@@ -365,7 +367,8 @@ void lilMenu(HWND handle, int x, int y)
 	{
 		if (selectedText.size() < 3)
 			return;
-
+		if (TreeView_GetParent(handle, hItem) == NULL)
+			return;
 		size_t found = selectedText.find_last_of(L"/\\");
 		wstring path = selectedText.substr(0, found);
 		ShellExecute(NULL, L"explore", path.c_str(), NULL, NULL, SW_SHOWNORMAL);
@@ -374,18 +377,24 @@ void lilMenu(HWND handle, int x, int y)
 	
 	else if (command == ID_TREEVIEW_DELETE_ITEM)
 	{
+		if (TreeView_GetParent(handle, hItem) == NULL)
+			return;
 		deleteImage(selectedText);
 		TreeView_DeleteItem(handle, hItem);
 	}
 	else if (command == ID_TREEVIEW_DELETE_GALLERY)
 	{
+		if (TreeView_GetParent(handle, hItem) == NULL)
+			return;
 		deleteGallery(selectedText);
 		TreeView_DeleteItem(handle, hItem);
 	}
 
 	else if (command == ID_REMOVE_FROM_TREE)
 	{
-		TreeView_DeleteItem(handle, hItem);
+		//dont remove the root!
+		if(TreeView_GetParent(handle, hItem) != NULL)
+			TreeView_DeleteItem(handle, hItem);
 	}
 	
 }
@@ -396,7 +405,7 @@ void addNewItemToTree(HWND hwndTV, string curMD5,  string quereyOutput)
 	HTREEITEM hti;
 	//put all dupes for this image in a list
 	vector<DatabaseController::dbDataPair> dupeList;
-	dbCtrlr.removeTableNameFromOutput(quereyOutput, 2, 1, 2, dupeList);
+	dbCtrlr.getDataPairFromOutput(quereyOutput, "fileName","path", dupeList);
 
 	//get the path and filename for current image
 	string querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 = '";
@@ -418,7 +427,7 @@ void addNewItemToTree(HWND hwndTV, string curMD5,  string quereyOutput)
 
 	//make this "branch" from the current image file name and path
 	vector<DatabaseController::dbDataPair> branchName;
-	dbCtrlr.removeTableNameFromOutput(output, 2, 1, 2, branchName);
+	dbCtrlr.getDataPairFromOutput(output,"fileName","path", branchName);
 	string imagePath = (branchName[0].second + branchName[0].first);
 	
 	string text = ("lastMatch: " + imagePath);
@@ -452,6 +461,7 @@ void init(wstring path)
 		///blah! i cant figure out how to do this in one go, so ill have to do 2 :(
 		//nevermind, i needed to use IN...lol
 		string websiteName(path.begin(), path.end());
+		Utils::toProperNoun(websiteName);
 		string msg = ("loading DB and getting images from website " + websiteName);
 		SetWindowTextA(statusText, msg.c_str());
 
@@ -461,7 +471,8 @@ void init(wstring path)
 	}
 	
 	dbCtrlr.executeSQL(querey, output);
-	dbCtrlr.removeTableNameFromOutput(output, 2, 1, 2, hashes);
+	dbCtrlr.getDataPairFromOutput(output,"hash","MD5",hashes);
+	//dbCtrlr.removeTableNameFromOutput(output, 2, 1, 2, hashes);
 	progress.setRange(hashes.size());
 	thread d1(mainLogic);
 	dupeSearch = &d1;
@@ -529,8 +540,11 @@ void mainLogic()
 	for (size_t i = 0; i < hashes.size(); i++)
 	{
 		if (foundItems[hashes[i].second])
+		{
+			progress.updateProgressBar(i);
 			continue;
-		querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 != '";
+		}
+		querey = "SELECT  Images.fileName, Gallery.path, Images.MD5 FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 != '";
 		querey += hashes[i].second;
 		querey += "' AND hammingDistance('";
 		querey += hashes[i].first;
@@ -543,8 +557,14 @@ void mainLogic()
 		{
 			//thread newMatch(addNewItemToTree, hwndTreeView, hashes[i].second, output);
 			//newMatch.detach();
+			vector<string> dataToCache;
+			//dbCtrlr.removeTableNameFromOutput(output, 3, 3, dataToCache);
+			dbCtrlr.getAllValuesFromCol(output, "MD5", dataToCache);
 			addNewItemToTree(hwndTreeView, hashes[i].second, output);
+
 			foundItems[hashes[i].second] = true;
+			for (size_t j = 0; j < dataToCache.size(); j++)
+				foundItems[dataToCache[j]] = true;
 		}
 		progress.updateProgressBar(i);
 	}
