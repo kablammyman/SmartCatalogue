@@ -4,6 +4,8 @@
 #include <windows.h>
 #include "CommCtrl.h"
 #include "DatabaseController.h"
+#include "WinToDBMiddleman.h"
+
 #include "ProgressBar.h"
 #include <thread>
 
@@ -38,13 +40,12 @@ void lilMenu(HWND handle, int x, int y);
 void findAllTheDupes(HWND hwndTV);
 void addNewItemToTree(HWND hwndTV, string curMD5, string quereyOutput);
 void init(wstring path);
-void deleteImage(wstring imaage);
-void deleteGallery(wstring gallery);
 void mainLogic();
 void finish();
 //usewd to time how long it takes to find the dupes
 bool readyToSearch = false;
 int start_s, stop_s, minHammingDist;
+WinToDBMiddleman middleMan;
 vector<DatabaseController::dbDataPair> hashes;
 //ProgressBar waitingMarquee;
 ProgressBar progress;

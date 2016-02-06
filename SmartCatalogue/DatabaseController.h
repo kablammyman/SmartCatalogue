@@ -37,6 +37,8 @@ public:
 	//same as before, but now we can couple data together
 	void getDataPairFromOutput(string &inputData, string colName1, string colName2, vector<dbDataPair> &returnData);
 	void getAllValuesFromCol(string &inputData, string colName, vector<string> &returnData);
+	
+
 	//test methods
 	void createTable(string tableName, string fields);
 	void testGetTable();

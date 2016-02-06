@@ -279,7 +279,6 @@ void DatabaseController::getDataPairFromOutput(string &inputData, string colName
 }
 */
 
-
 ///////////////////////////////////////////////////////////test methods
 void DatabaseController::createTable(string tableName, string fields)
 {

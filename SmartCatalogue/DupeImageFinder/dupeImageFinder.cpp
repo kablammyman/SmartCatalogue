@@ -379,14 +379,16 @@ void lilMenu(HWND handle, int x, int y)
 	{
 		if (TreeView_GetParent(handle, hItem) == NULL)
 			return;
-		deleteImage(selectedText);
+		string path(selectedText.begin(), selectedText.end());
+		middleMan.deleteImage(path);
 		TreeView_DeleteItem(handle, hItem);
 	}
 	else if (command == ID_TREEVIEW_DELETE_GALLERY)
 	{
 		if (TreeView_GetParent(handle, hItem) == NULL)
 			return;
-		deleteGallery(selectedText);
+		string path(selectedText.begin(), selectedText.end());
+		middleMan.deleteGallery(path);
 		TreeView_DeleteItem(handle, hItem);
 	}
 
@@ -479,57 +481,7 @@ void init(wstring path)
 	dupeSearch->detach();
 }
 
-void deleteImage(wstring image)
-{
-	if (image.size() < 3)// I guess the min length is 4... C:\a can be a legit file
-		return;
 
-	string fileName(image.begin(), image.end());
-	if (!MyFileDirDll::deleteFile(fileName))
-	{
-		wstring err = (L"Error deleting " + image);
-		MessageBox(NULL, err.c_str() , NULL, NULL);
-		//return;
-	}
-	string output, querey;
-	querey = "DELETE FROM Images WHERE  Images.fileName = '";
-	querey += MyFileDirDll::getFileNameFromPathString(fileName);  
-	querey += "' AND galleryID IS (SELECT galleryID FROM Gallery WHERE path = '";
-	querey += MyFileDirDll::getPathFromFullyQualifiedPathString(fileName);
-	querey += "\\');"; //the DB has the back slashes in the path, so i need to include them here
-	
-	dbCtrlr.executeSQL(querey, output);
-	cout << output << endl;
-}
-
-void deleteGallery(wstring path)
-{
-	string fileName(path.begin(), path.end());
-	string gallDir = MyFileDirDll::getPathFromFullyQualifiedPathString(fileName);
-	string result = MyFileDirDll::deleteAllFilesInDir(gallDir);
-	RemoveDirectoryA(gallDir.c_str());
-
-	if(!result.empty())
-	{
-		wstring err(result.begin(),result.end());
-		MessageBox(NULL, err.c_str(), NULL, NULL);
-		//return;
-	}
-
-	string output, querey;
-
-	querey = "DELETE FROM Images  WHERE galleryID is (select id from Gallery where path = '";
-	querey += MyFileDirDll::getPathFromFullyQualifiedPathString(fileName);
-	querey += "\\');";
-
-	dbCtrlr.executeSQL(querey, output);
-
-	querey = "delete FROM Gallery where path = '";
-	querey += MyFileDirDll::getPathFromFullyQualifiedPathString(fileName);
-	querey += "\\';";
-
-	dbCtrlr.executeSQL(querey, output);
-}
 void mainLogic()
 {
 	SetWindowTextA(statusText, "searching for dupe images...");
@@ -606,67 +558,3 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return (INT_PTR)FALSE;
 }
-
-
-/*
-BOOL InitTreeViewItems(HWND hwndTV)
-{
-HTREEITEM hti;
-
-map<int, vector<int>> dupeList;
-SimilarImage simImg;
-DatabaseController dbCtrlr;
-
-dbCtrlr.openDatabase(Utils::dbPath);
-string output;
-string command = "SELECT hash, MD5 FROM Images;";
-dbCtrlr.executeSQL(command, output);
-
-vector<DatabaseController::dbDataPair> hashes;
-dbCtrlr.removeTableNameFromOutput(output,2,1,2,hashes);
-
-//vector<vector<string>> allImages;
-//dbCtrlr.parseDBOutput(output, 2, allImages);
-
-simImg.findDupes(hashes, dupeList);
-
-wstring rootNodeOutput(Utils::dbPath.begin(), Utils::dbPath.end());
-AddItemToTree(hwndTV, (LPTSTR)rootNodeOutput.c_str(), 1);
-
-// show content:
-for (map<int, vector<int>>::iterator it = dupeList.begin(); it != dupeList.end(); ++it)
-{
-int index = it->first;
-
-string output;
-string md5Index = hashes[index].second;
-string command = ("SELECT fileName, galleryID FROM Images WHERE MD5 = '" + md5Index+"';");
-dbCtrlr.executeSQL(command, output);
-
-vector<string> imgInfo;
-dbCtrlr.removeTableNameFromOutput(output, 2, 1, imgInfo);
-
-wstring temp(imgInfo[0].begin(), imgInfo[0].end());
-hti = AddItemToTree(hwndTV, (LPTSTR)temp.c_str(), 2);
-
-vector<int> curListOfDupes = it->second;
-
-for (size_t i = 0; i < curListOfDupes.size(); i++)
-{
-//string curDir = simImg.allImages[listOfDupes[i]].path;
-md5Index = hashes[curListOfDupes[i]].second;
-command = ("SELECT fileName, galleryID FROM Images WHERE MD5 = '" + md5Index + "';");
-dbCtrlr.executeSQL(command, output);
-
-dbCtrlr.removeTableNameFromOutput(output, 2, 1, imgInfo);
-
-wstring subTemp(imgInfo[0].begin(), imgInfo[0].end());
-hti = AddItemToTree(hwndTV, (LPTSTR)subTemp.c_str(), 3);
-}
-}
-
-//if (hti == NULL)
-//return FALSE;
-return TRUE;
-}
-*/
