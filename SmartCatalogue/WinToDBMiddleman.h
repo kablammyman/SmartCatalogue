@@ -12,9 +12,14 @@ private:
 	DatabaseController dbCtrlr;
 	string getGalleryIDQuereyString(string path);
 public:
-	void deleteImage(string image);
 	void moveImage(string dest, string src);
-	void deleteGallery(string gallery);
 	void moveGallery(string dest, string src);
-	
+
+	void deleteImage(string image);
+	void deleteImageFromDisk(string image);
+	void deleteImageFromDB(string image, string &output);
+
+	void deleteGallery(string gallery);
+	void deleteGalleryFromDB(string gallery, string &output);
+	void deleteGalleryFromDisk(string gallery);
 };

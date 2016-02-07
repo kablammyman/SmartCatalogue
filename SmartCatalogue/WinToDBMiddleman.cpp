@@ -2,8 +2,14 @@
 #include "Windows.h"
 #include "WinToDBMiddleman.h"
 
-
 void WinToDBMiddleman::deleteImage(string image)
+{
+	deleteImageFromDisk(image);
+	string output;
+	deleteImageFromDB(image, output);
+}
+
+void WinToDBMiddleman::deleteImageFromDisk(string image)
 {
 	if (image.size() < 3)// I guess the min length is 4... C:\a can be a legit file
 		return;
@@ -14,7 +20,12 @@ void WinToDBMiddleman::deleteImage(string image)
 		MessageBoxA(NULL, err.c_str(), NULL, NULL);
 		return;
 	}
-	string output, querey;
+	
+}
+
+void WinToDBMiddleman::deleteImageFromDB(string image, string &output)
+{
+	string querey;
 	querey = "DELETE FROM Images WHERE  Images.fileName = '";
 	querey += MyFileDirDll::getFileNameFromPathString(image);
 	querey += "' AND galleryID IS (SELECT galleryID FROM Gallery WHERE path = '";
@@ -24,7 +35,6 @@ void WinToDBMiddleman::deleteImage(string image)
 	dbCtrlr.executeSQL(querey, output);
 	//cout << output << endl;
 }
-
 string WinToDBMiddleman::getGalleryIDQuereyString(string path)
 {
 	string querey;
@@ -77,6 +87,13 @@ void WinToDBMiddleman::moveImage(string dest, string src)
 
 void WinToDBMiddleman::deleteGallery(string gallery)
 {
+	deleteGalleryFromDisk(gallery);
+	string output;
+	deleteGalleryFromDB(gallery,output);
+}
+
+void WinToDBMiddleman::deleteGalleryFromDisk(string gallery)
+{
 	string gallDir = MyFileDirDll::getPathFromFullyQualifiedPathString(gallery);
 	string result = MyFileDirDll::deleteAllFilesInDir(gallDir);
 	RemoveDirectoryA(gallDir.c_str());
@@ -86,8 +103,11 @@ void WinToDBMiddleman::deleteGallery(string gallery)
 		MessageBoxA(NULL, result.c_str(), NULL, NULL);
 		//return;
 	}
+}
 
-	string output, querey;
+void WinToDBMiddleman::deleteGalleryFromDB(string gallery, string &output)
+{
+	string querey;
 
 	querey = "DELETE FROM Images  WHERE galleryID is (select id from Gallery where path = '";
 	querey += MyFileDirDll::getPathFromFullyQualifiedPathString(gallery);
@@ -101,7 +121,6 @@ void WinToDBMiddleman::deleteGallery(string gallery)
 
 	dbCtrlr.executeSQL(querey, output);
 }
-
 void WinToDBMiddleman::moveGallery(string dest, string src)
 {
 	
