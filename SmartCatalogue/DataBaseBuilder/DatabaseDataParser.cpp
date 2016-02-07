@@ -492,9 +492,9 @@ bool DatabaseDataParser::hasDataFromTable(string data, map<int, string> dbValues
 	return false;
 }
 //----------------------------------------------------------------------
-void DatabaseDataParser::getAllPaths(string path, vector<string> &dirsWithImages)
+void DatabaseDataParser::getAllPaths(string path, vector<string> &dirsWithImages, int numThreads)
 {
-	fileWalker->takeDirSnapShot(path);
+	fileWalker->takeDirSnapShot(path, numThreads);
 	fileWalker->getAllDirsWithImgs(dirsWithImages);
 }
 

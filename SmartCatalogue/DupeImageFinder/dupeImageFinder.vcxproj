@@ -153,6 +153,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\CFGHelper.h" />
     <ClInclude Include="..\database.h" />
     <ClInclude Include="..\DatabaseController.h" />
     <ClInclude Include="..\ProgressBar.h" />
@@ -165,6 +166,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\CFGHelper.cpp" />
     <ClCompile Include="..\database.cpp" />
     <ClCompile Include="..\DatabaseControllercpp.cpp" />
     <ClCompile Include="..\ProgressBar.cpp" />

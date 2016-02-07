@@ -9,9 +9,6 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
-
-#include "DatabaseController.h"
-
 using namespace std;
 using namespace cv;
 
@@ -29,7 +26,6 @@ struct ImageFiles
 
 class SimilarImage
 {
-	DatabaseController dbCtrlr;
 	int minHammingDist;
 	int maxNumBits;
 	

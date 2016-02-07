@@ -7,11 +7,9 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
-
 #include "myFileDirDll.h"
 #include "similarImage.h"
-#include "DatabaseController.h"
-#include "CFGReaderDll.h"
+#include "Database.h"
 
 
 void invalidParmMessageAndExit()
@@ -217,7 +215,7 @@ int main(int argc, const char *argv[])
 
 		else if (cmdArgUpper == "-ISINDB")// <imgPath> <dbPath> -> compare an image to a a DB of image hashes\n";
 		{
-			DatabaseController dbCtrlr;
+			
 			SimilarImage simImage;
 			string img1Hash;
 			string dbPath;
@@ -252,14 +250,14 @@ int main(int argc, const char *argv[])
 				dbPath = argv[i];
 				
 			}
-			dbCtrlr.openDatabase(dbPath);
-			
+			DataBase db(dbPath);
+
 			string querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID where hammingDistance('";
 			querey += img1Hash;
 			querey += "',hash) < ";
 			querey += to_string(simImage.getMinHammingDist() +2);
 			querey += ";";
-			dbCtrlr.executeSQL(querey, output);
+			db.executeSQL(querey, output);
 			if (output.empty())
 				output = "no matches found";
 			break;

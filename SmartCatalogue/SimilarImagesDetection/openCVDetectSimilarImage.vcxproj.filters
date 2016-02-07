@@ -4,9 +4,6 @@
     <ClCompile Include="CreateImageHash.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\DatabaseControllercpp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\similarImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -15,9 +12,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\DatabaseController.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\database.h">
       <Filter>Header Files</Filter>
     </ClInclude>

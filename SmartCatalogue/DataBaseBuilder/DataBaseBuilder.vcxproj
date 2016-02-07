@@ -160,6 +160,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\CFGHelper.h" />
     <ClInclude Include="..\database.h" />
     <ClInclude Include="..\MD5.h" />
     <ClInclude Include="..\Utils.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="Trie.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\CFGHelper.cpp" />
     <ClCompile Include="..\database.cpp" />
     <ClCompile Include="..\DatabaseControllercpp.cpp" />
     <ClCompile Include="..\MD5.cpp" />

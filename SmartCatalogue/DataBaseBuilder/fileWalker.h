@@ -27,7 +27,7 @@ private:
 
 public:
 	FileWalker();
-	void takeDirSnapShot(string path, bool refresh = false);
+	void takeDirSnapShot(string path, int numThreads = 0, bool refresh = false);
 	
 	void getAllDirPaths(vector<string> &ret);
 	void getAllEmptyDirs(vector<string> & emptyDirs);

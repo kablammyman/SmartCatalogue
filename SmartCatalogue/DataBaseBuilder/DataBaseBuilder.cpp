@@ -1,5 +1,6 @@
 #include "DataBaseBuilder.h"
-
+#include <thread> //for the verify method
+#include <algorithm> //for sort
 DatabaseBuilder::DatabaseBuilder(string dbPath,string root)
 {
 	dbCtrlr.openDatabase(dbPath);
@@ -349,4 +350,38 @@ bool DatabaseBuilder::isImageInDB(int galleryID, string md5Hash)
 		return true;
 	}
 	return false;
+}
+
+void DatabaseBuilder::verifyDB(string root)
+{
+	DatabaseDataParser dbParse;
+	vector<string> treeOnDisk;
+	vector<string> dbPAths;
+	//[] is the capture list, add vars that are inside the lambda here
+
+	thread getDBSnapshot([this, &dbPAths]()
+	{
+		//now get all the galleries in the currentDB
+		string querey, output;
+		querey = "SELECT path FROM Gallery";
+		dbCtrlr.executeSQL(querey, output);
+		dbCtrlr.getAllValuesFromCol(output,"path", dbPAths);
+		sort(dbPAths.begin(), dbPAths.end());
+	});
+	
+	thread getDiskSnapshot([this, &treeOnDisk, &root]()
+	{
+		//get all paths on disk that have images only
+		dbDataParser.getAllPaths(root, treeOnDisk, 10);
+		sort(treeOnDisk.begin(), treeOnDisk.end());
+	});
+
+	// synchronize threads, so we can compare the data
+	getDiskSnapshot.join();  
+	getDBSnapshot.join(); 
+
+
+	
+
+	
 }

@@ -28,7 +28,7 @@ FileWalker::FileWalker()
 
 }
 
-void FileWalker::takeDirSnapShot(string path, bool refresh)
+void FileWalker::takeDirSnapShot(string path, int numThreads, bool refresh)
 {
 	//ofstream myfile;
 	//myfile.open ("emptyDirs.txt");
@@ -39,7 +39,7 @@ void FileWalker::takeDirSnapShot(string path, bool refresh)
 	if(curPath == path && !refresh)
 		return;
 
-	MyFileDirDll::addDirTree(path);
+	MyFileDirDll::addDirTree(path, numThreads);
 	
 	curPath = path;
 }

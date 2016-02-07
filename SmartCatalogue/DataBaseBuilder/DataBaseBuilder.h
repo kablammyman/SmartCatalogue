@@ -34,5 +34,6 @@ public:
 	bool insertModelOutfitInfoIntoDB(GalleryModel &model, int clothingIndex, int galleryID);
 	bool insertImageHashInfoIntoDB(string imgeFileName, string hash, string phash, string md5, int galleryID);
 	bool insertModelsInGalleryInfoIntoDB(int modelID, int galleryID);
-	bool DatabaseBuilder::isImageInDB(int galleryID, string md5Hash);
+	bool isImageInDB(int galleryID, string md5Hash);
+	void verifyDB(string root);
 };

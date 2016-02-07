@@ -2,6 +2,7 @@
 #include "Windows.h"
 #include "WinToDBMiddleman.h"
 
+
 void WinToDBMiddleman::deleteImage(string image)
 {
 	if (image.size() < 3)// I guess the min length is 4... C:\a can be a legit file
@@ -30,6 +31,7 @@ string WinToDBMiddleman::getGalleryIDQuereyString(string path)
 	querey = "SELECT ID FROM Gallery WHERE path = '";
 	querey += MyFileDirDll::getPathFromFullyQualifiedPathString(path);
 	querey += "\\';";
+	return querey;
 }
 
 void WinToDBMiddleman::moveImage(string dest, string src)
@@ -117,7 +119,10 @@ void WinToDBMiddleman::moveGallery(string dest, string src)
 	dbCtrlr.executeSQL(querey, output);
 
 	//if the new gallery path doesnt exist, create it now!
-	if(output.empty())
+	if (output.empty())
+	{
+
+	}
 	querey = "UPDATE Images SET galleryID = ";
 	querey += getGalleryIDQuereyString(dest);
 	querey += " WHERE galleryID = ";
@@ -126,8 +131,9 @@ void WinToDBMiddleman::moveGallery(string dest, string src)
 	dbCtrlr.executeSQL(querey, output);
 
 	querey = "delete FROM Gallery where path = '";
-	querey += MyFileDirDll::getPathFromFullyQualifiedPathString(gallery);
+	querey += MyFileDirDll::getPathFromFullyQualifiedPathString(src);
 	querey += "\\';";
 
 	dbCtrlr.executeSQL(querey, output);
 }
+

@@ -11,7 +11,7 @@
 #include "similarImage.h"
 #include "myFileDirDll.h"
 #include "Utils.h"
-
+#include "CFGHelper.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -21,8 +21,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	Utils::filePathBase = Utils::getExePath();
-	Utils::loadCFGFile();
+	CFGHelper::filePathBase = Utils::getExePath();
+	CFGHelper::loadCFGFile();
 
 	// Initialize global strings
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -299,9 +299,9 @@ HTREEITEM AddItemToTree(HWND hwndTV, wchar_t* lpszItem, int nLevel)
 
 BOOL InitTreeViewItems(HWND hwndTV)
 {	
-	dbCtrlr.openDatabase(Utils::dbPath);
+	dbCtrlr.openDatabase(CFGHelper::dbPath);
 	
-	wstring rootNodeOutput(Utils::dbPath.begin(), Utils::dbPath.end());
+	wstring rootNodeOutput(CFGHelper::dbPath.begin(), CFGHelper::dbPath.end());
 	AddItemToTree(hwndTV, (LPTSTR)rootNodeOutput.c_str(), 1);
 
 	hwndTreeView = hwndTV;
@@ -534,7 +534,7 @@ void finish()
 	myfile.open("dupeImageFinder.txt");
 	if (!myfile.is_open())
 		return;
-	myfile << "parsed " << Utils::dbPath << endl;
+	myfile << "parsed " << CFGHelper::dbPath << endl;
 	myfile << timeTaken << endl;
 	myfile.close();
 }

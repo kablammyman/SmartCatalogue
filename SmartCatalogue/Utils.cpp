@@ -2,14 +2,10 @@
 
 #include <iostream>
 #include <Windows.h>
-#include "CFGReaderDll.h"
+
 #include "Utils.h"
 
-string Utils::filePathBase;
-string Utils::dbPath;
-string Utils::pathToProcess;
-string Utils::ignorePattern;
-vector<string> Utils::meta;
+
 
 string Utils::getExePath()
 {
@@ -22,34 +18,15 @@ string Utils::getExePath()
 	return string(buffer).substr(0, pos);
 }
 
-void Utils::setProgramPath(string argv)
+string Utils::setProgramPath(string argv)
 {
 	char full[MAX_PATH];
 	string temp = _fullpath(full, argv.c_str(), MAX_PATH);
 	size_t found = temp.find_last_of("/\\");
-	filePathBase = temp.substr(0, found);
+	return temp.substr(0, found);
 }
 
-void Utils::loadCFGFile(string programBasePath)
-{
-	string cfgPath;
-	if (programBasePath.empty())
-		cfgPath = Utils::filePathBase + "\\imageViewCfg.txt";
-	else
-		cfgPath = programBasePath + "\\imageViewCfg.txt";
 
-	if (!CFG::CFGReaderDLL::readCfgFile(cfgPath, '|'))
-	{
-		string errorMsg = "Error opening :";
-		errorMsg += cfgPath;
-		cout << errorMsg << "\nno cfg text file" << endl;
-	}
-
-	dbPath = CFG::CFGReaderDLL::getCfgStringValue("DBPath");
-	pathToProcess = CFG::CFGReaderDLL::getCfgStringValue("mainWorkingPath");
-	ignorePattern = CFG::CFGReaderDLL::getCfgStringValue("ignorePattern");
-	meta = CFG::CFGReaderDLL::getCfgListValue("metaWords");
-}
 
 vector<string> Utils::tokenize(string path, string delims)
 {

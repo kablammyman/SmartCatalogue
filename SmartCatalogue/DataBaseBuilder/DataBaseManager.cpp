@@ -8,6 +8,8 @@
 #include "CFGReaderDll.h"
 #include <algorithm>
 #include "Utils.h"
+#include "CFGHelper.h"
+
 #include <ctime>//check execution time
 
 //#define TEST_DATABASE_PARSER 0
@@ -21,7 +23,7 @@ int main(int argc, char *argv[])
 	doImageHash = true;
 
 	Utils::setProgramPath(argv[0]);
-	Utils::loadCFGFile();
+	CFGHelper::loadCFGFile();
 		
 	vector<string> dbTableValues = CFG::CFGReaderDLL::getCfgListValue("tableNames");
 	//if we cant find the table names in the cfg, thejust get out of here
@@ -41,21 +43,21 @@ int main(int argc, char *argv[])
 			if (i >= argc)
 				invalidParmMessageAndExit();
 
-			Utils::dbPath = argv[i];
+			CFGHelper::dbPath = argv[i];
 		}
 		else if (strcmp(argv[i], "-dataPath") == 0)
 		{
 			i++;
 			if (i >= argc)
 				invalidParmMessageAndExit();
-			Utils::pathToProcess = argv[i];
+			CFGHelper::pathToProcess = argv[i];
 		}
 		else if (strcmp(argv[i], "-ignoreBase") == 0)
 		{
 			i++;
 			if (i >= argc)
 				invalidParmMessageAndExit();
-			Utils::ignorePattern = argv[i];
+			CFGHelper::ignorePattern = argv[i];
 		}
 		else if (strcmp(argv[i], "-NoimgHash") == 0)
 			doImageHash = false;
@@ -67,12 +69,12 @@ int main(int argc, char *argv[])
 
 	}
 
-	if (Utils::dbPath == "" || Utils::pathToProcess == "")
+	if (CFGHelper::dbPath == "" || CFGHelper::pathToProcess == "")
 		invalidParmMessageAndExit();
 
-	if (!MyFileDirDll::doesPathExist(Utils::pathToProcess))
+	if (!MyFileDirDll::doesPathExist(CFGHelper::pathToProcess))
 	{
-		cout << Utils::pathToProcess << "is not valid\n";
+		cout << CFGHelper::pathToProcess << "is not valid\n";
 		exit(-1);
 	}
 
@@ -90,9 +92,9 @@ int main(int argc, char *argv[])
 	int start_s = clock();
 	
 	//get the data AS i build the dir tree
-	MyFileDirDll::startDirTreeStep(Utils::pathToProcess);
-	DatabaseBuilder dbBuilder(Utils::dbPath, Utils::ignorePattern);
-	dbBuilder.fillMetaWords(Utils::meta);
+	MyFileDirDll::startDirTreeStep(CFGHelper::pathToProcess);
+	DatabaseBuilder dbBuilder(CFGHelper::dbPath, CFGHelper::ignorePattern);
+	dbBuilder.fillMetaWords(CFGHelper::meta);
 	dbBuilder.fillPartsOfSpeechTable(dbTableValues);
 
 	while(!MyFileDirDll::isFinished())
@@ -177,7 +179,7 @@ int main(int argc, char *argv[])
 						continue;
 
 
-					string hashingCommand = "\"\"" + Utils::filePathBase + "\\CreateImageHash.exe\"  -hash \"";
+					string hashingCommand = "\"\"" + CFGHelper::filePathBase + "\\CreateImageHash.exe\"  -hash \"";
 					hashingCommand += imgeFilePath;
 					hashingCommand += "\"\"";
 

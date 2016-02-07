@@ -20,13 +20,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\database.cpp" />
-    <ClCompile Include="..\DatabaseControllercpp.cpp" />
     <ClCompile Include="..\similarImage.cpp" />
     <ClCompile Include="CreateImageHash.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\database.h" />
-    <ClInclude Include="..\DatabaseController.h" />
     <ClInclude Include="similarImage.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
