@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 	int goodDir = 0, badDir = 0, totalDir = 0;
 	doImageHash = true;
 
-	Utils::setProgramPath(argv[0]);
+	CFGHelper::filePathBase = Utils::setProgramPath(argv[0]);
 	CFGHelper::loadCFGFile();
 		
 	vector<string> dbTableValues = CFG::CFGReaderDLL::getCfgListValue("tableNames");
@@ -32,6 +32,8 @@ int main(int argc, char *argv[])
 		cout << "couldnt find the list of table names in your cfg...\n";
 		exit(-1);
 	}
+
+	
 
 	//command line args can add extra options
 	int i = 0;
@@ -89,14 +91,14 @@ int main(int argc, char *argv[])
 	dbCtrlr.testDBQuerey();
 #endif	
 
-	int start_s = clock();
-	
-	//get the data AS i build the dir tree
-	MyFileDirDll::startDirTreeStep(CFGHelper::pathToProcess);
 	DatabaseBuilder dbBuilder(CFGHelper::dbPath, CFGHelper::ignorePattern);
 	dbBuilder.fillMetaWords(CFGHelper::meta);
 	dbBuilder.fillPartsOfSpeechTable(dbTableValues);
+	//dbBuilder.verifyDB(CFGHelper::pathToProcess);
 
+	int start_s = clock();
+	//get the data AS i build the dir tree
+	MyFileDirDll::startDirTreeStep(CFGHelper::pathToProcess);
 	while(!MyFileDirDll::isFinished())
 	{
 		string curDir = MyFileDirDll::nextDirTreeStep();

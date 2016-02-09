@@ -382,6 +382,7 @@ void lilMenu(HWND handle, int x, int y)
 		string path(selectedText.begin(), selectedText.end());
 		middleMan.deleteImage(path);
 		TreeView_DeleteItem(handle, hItem);
+		//need to check to see if ther only node left is a parent with no kids, if so, remove it from the list
 	}
 	else if (command == ID_TREEVIEW_DELETE_GALLERY)
 	{
@@ -390,11 +391,13 @@ void lilMenu(HWND handle, int x, int y)
 		string path(selectedText.begin(), selectedText.end());
 		middleMan.deleteGallery(path);
 		TreeView_DeleteItem(handle, hItem);
+		//need to check to see if ther only node left is a parent with no kids, if so, remove it from the list
 	}
 
 	else if (command == ID_REMOVE_FROM_TREE)
 	{
 		//dont remove the root!
+		
 		if(TreeView_GetParent(handle, hItem) != NULL)
 			TreeView_DeleteItem(handle, hItem);
 	}
@@ -467,9 +470,9 @@ void init(wstring path)
 		string msg = ("loading DB and getting images from website " + websiteName);
 		SetWindowTextA(statusText, msg.c_str());
 
-		querey = "SELECT hash, MD5 FROM Images WHERE Images.GalleryID IN ( SELECT ID from Gallery Where WebsiteID is (SELECT ID from Website where name = '";
+		querey = "SELECT hash, MD5 FROM Images WHERE Images.GalleryID IN ( SELECT ID from Gallery Where WebsiteID is (SELECT ID from Website where name = \"";
 		querey += websiteName;
-		querey += "'));";
+		querey += "\"));";
 	}
 	
 	dbCtrlr.executeSQL(querey, output);
@@ -496,11 +499,11 @@ void mainLogic()
 			progress.updateProgressBar(i);
 			continue;
 		}
-		querey = "SELECT  Images.fileName, Gallery.path, Images.MD5 FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 != '";
+		querey = "SELECT  Images.fileName, Gallery.path, Images.MD5 FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 != \"";
 		querey += hashes[i].second;
-		querey += "' AND hammingDistance('";
+		querey += "' AND hammingDistance(\"";
 		querey += hashes[i].first;
-		querey += "',hash) < ";
+		querey += "\",hash) < ";
 		querey += to_string(/*simImage.getMinHammingDist() + 2*/ minHammingDist);
 		querey += ";";
 		dbCtrlr.executeSQL(querey, output);

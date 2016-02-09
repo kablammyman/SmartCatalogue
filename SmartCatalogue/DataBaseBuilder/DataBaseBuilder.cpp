@@ -1,6 +1,8 @@
 #include "DataBaseBuilder.h"
 #include <thread> //for the verify method
-#include <algorithm> //for sort
+#include <algorithm> //for sort and the SET functions
+
+#include "WinToDBMiddleman.h"
 DatabaseBuilder::DatabaseBuilder(string dbPath,string root)
 {
 	dbCtrlr.openDatabase(dbPath);
@@ -357,6 +359,7 @@ void DatabaseBuilder::verifyDB(string root)
 	DatabaseDataParser dbParse;
 	vector<string> treeOnDisk;
 	vector<string> dbPAths;
+	
 	//[] is the capture list, add vars that are inside the lambda here
 
 	thread getDBSnapshot([this, &dbPAths]()
@@ -366,6 +369,12 @@ void DatabaseBuilder::verifyDB(string root)
 		querey = "SELECT path FROM Gallery";
 		dbCtrlr.executeSQL(querey, output);
 		dbCtrlr.getAllValuesFromCol(output,"path", dbPAths);
+		//for testing
+		for (size_t i = 0; i < dbPAths.size(); i++)
+		{
+			//SERVER = 8 F:\ = 3
+			dbPAths[i].replace(0,3, "\\\\SERVER\\");
+		}
 		sort(dbPAths.begin(), dbPAths.end());
 	});
 	
@@ -380,8 +389,41 @@ void DatabaseBuilder::verifyDB(string root)
 	getDiskSnapshot.join();  
 	getDBSnapshot.join(); 
 
+	vector<string>::iterator it;
+	vector<string> commonDirs(treeOnDisk.size());
+	it = set_intersection(treeOnDisk.begin(), treeOnDisk.end(), dbPAths.begin(), dbPAths.end(), commonDirs.begin());
 
+	commonDirs.resize(it - commonDirs.begin());
+
+	//std::cout << "The intersection has " << (commonDirs.size()) << " elements:\n";
+	vector<string> dirsToDeleteFromDB(commonDirs.size());
+	it = set_difference(dbPAths.begin(), dbPAths.end(), commonDirs.begin(), commonDirs.end(), dirsToDeleteFromDB.begin());
+
+	dirsToDeleteFromDB.resize(it - dirsToDeleteFromDB.begin());
+	WinToDBMiddleman winDB;
+	winDB.setDBController(&dbCtrlr);
+
+	string output;
+	for (size_t i = 0; i < dirsToDeleteFromDB.size(); i++)
+	{
+		if (!winDB.deleteGalleryFromDB(dirsToDeleteFromDB[i], output))
+			cout << "error: " << output << endl;
+	}
+	cout << "removed " << dirsToDeleteFromDB.size() << " galleries from DB\n";
+
+	//std::cout << "The intersection has " << (commonDirs.size()) << " elements:\n";
+	vector<string> dirsNotInDB(treeOnDisk.size());
+	it = set_difference(treeOnDisk.begin(), treeOnDisk.end(), commonDirs.begin(), commonDirs.end(), dirsNotInDB.begin());
+
+	dirsNotInDB.resize(it - dirsNotInDB.begin());
 	
 
-	
+	/*string output;
+	for (size_t i = 0; i < dirsNotInDB.size(); i++)
+	{
+		if (!winDB.deleteGalleryFromDB(dirsNotInDB[i], output))
+			cout << "error: " << output << endl;
+	}*/
+
+	cout << "added " << dirsNotInDB.size() << " galleries to DB\n";
 }

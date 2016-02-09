@@ -164,6 +164,7 @@
     <ClInclude Include="..\database.h" />
     <ClInclude Include="..\MD5.h" />
     <ClInclude Include="..\Utils.h" />
+    <ClInclude Include="..\WinToDBMiddleman.h" />
     <ClInclude Include="DataBaseBuilder.h" />
     <ClInclude Include="DatabaseDataParser.h" />
     <ClInclude Include="DatabaseManager.h" />
@@ -180,6 +181,7 @@
     <ClCompile Include="..\DatabaseControllercpp.cpp" />
     <ClCompile Include="..\MD5.cpp" />
     <ClCompile Include="..\Utils.cpp" />
+    <ClCompile Include="..\WinToDBMiddleman.cpp" />
     <ClCompile Include="DatabaseBuilder.cpp" />
     <ClCompile Include="DataBaseManager.cpp" />
     <ClCompile Include="DatabaseDataParser.cpp" />
