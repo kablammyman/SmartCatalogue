@@ -44,7 +44,7 @@ public:
 
 	//pHash  
 	string pHashValue(Mat &src);
-
+	void setMinHammingDist(int x) { minHammingDist = x; }
 	int getMinHammingDist() { return minHammingDist; }
 	float getPercentDiff(int diff);
 	int HanmingDistance(string &str1, string &str2);

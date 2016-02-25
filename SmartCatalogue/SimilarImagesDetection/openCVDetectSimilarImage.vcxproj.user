@@ -8,6 +8,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommand>$(TargetPath) </LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-isInDB "\\SERVER\documents\pornoDB.db"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-isInDB "\\SERVER\documents\pornoDB.db" -dist 10</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

@@ -20,6 +20,7 @@ void invalidParmMessageAndExit()
 	cout << "-isInDir <imgPath> <imgDir> -> compare an image to a directory of images\n";
 	cout << "-hash <imgpath> create and return the hash of an image\n";
 	cout << "-phash <imgpath> create and return the phash of an image\n";
+	cout << "-dist <int> (optional) specify how close the images are to be considered a match\n";
 	cout << std::flush;
 	exit(1);
 }
@@ -115,12 +116,21 @@ int main(int argc, const char *argv[])
 		invalidParmMessageAndExit();
 
 	int i = 0;
-	
+	SimilarImage simImage;
 	string dbPath;
 	string pathToProcess;
 	string output = "";
 	bool err = false;
 	string cmdArgUpper;
+
+	for (int j = 0; j < argc; j++)
+	{
+		string temp = argv[j];
+		if (temp == "-dist")
+		{
+			simImage.setMinHammingDist(atoi(argv[j + 1]));
+		}
+	}
 	while (i < argc)
 	{
 		cmdArgUpper = argv[i];
@@ -149,7 +159,7 @@ int main(int argc, const char *argv[])
 			if (i >= argc)
 				invalidParmMessageAndExit();
 
-			SimilarImage simImage;
+			
 			output = simImage.getImageHash(argv[i]);
 			break;
 		}
@@ -159,13 +169,11 @@ int main(int argc, const char *argv[])
 			if (i >= argc)
 				invalidParmMessageAndExit();
 
-			SimilarImage simImage;
 			output = simImage.getImagePHash(argv[i]);
 			break;
 		}
 		else if (cmdArgUpper == "-COMPARE")// <imgpath1> <imgpath2> -> compare 2 images\n";
 		{
-			SimilarImage simImage;
 			i++;
 			if (i >= argc)
 				invalidParmMessageAndExit();
@@ -184,7 +192,6 @@ int main(int argc, const char *argv[])
 		}
 		else if (cmdArgUpper == "-ISINDIR")//  <imgPath> <imgDir> -> compare an image to a directory of images\n";
 		{
-			SimilarImage simImage;
 			i++;
 			if (i >= argc)
 				invalidParmMessageAndExit();
@@ -215,8 +222,6 @@ int main(int argc, const char *argv[])
 
 		else if (cmdArgUpper == "-ISINDB")// <imgPath> <dbPath> -> compare an image to a a DB of image hashes\n";
 		{
-			
-			SimilarImage simImage;
 			string img1Hash;
 			string dbPath;
 			i++;
@@ -234,6 +239,7 @@ int main(int argc, const char *argv[])
 				{
 					output = "no image data in clipboard or in command line params";
 					err = true;
+					break;
 				}
 			}
 			else
@@ -255,7 +261,7 @@ int main(int argc, const char *argv[])
 			string querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID where hammingDistance('";
 			querey += img1Hash;
 			querey += "',hash) < ";
-			querey += to_string(simImage.getMinHammingDist() +2);
+			querey += to_string(simImage.getMinHammingDist());
 			querey += ";";
 			db.executeSQL(querey, output);
 			if (output.empty())
