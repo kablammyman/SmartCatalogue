@@ -109,6 +109,13 @@ Mat getClipboardImage()
 
 	return returnMat;
 }
+
+struct cmdArg
+{
+	string flag;
+	vector<string> data;
+};
+
 int main(int argc, const char *argv[])
 {
 	
@@ -122,21 +129,38 @@ int main(int argc, const char *argv[])
 	string output = "";
 	bool err = false;
 	string cmdArgUpper;
-
-	for (int j = 0; j < argc; j++)
+	
+	vector<cmdArg> allArgs;
+	while (i < argc)
 	{
-		string temp = argv[j];
-		if (temp == "-dist")
+		string temp = argv[i];
+		cmdArg newArg;
+
+		if (temp[0] == '-')
 		{
-			simImage.setMinHammingDist(atoi(argv[j + 1]));
+			newArg.flag = temp[0];
+			i++;
+			while (i < argc)
+			{
+				if(argv[i][0] != '-')
+					newArg.data.push_back(argv[i]);
+				i++;
+			}
 		}
+
+		
 	}
+
 	while (i < argc)
 	{
 		cmdArgUpper = argv[i];
 		for (size_t j = 0; j < cmdArgUpper.size(); j++)
 			cmdArgUpper[j] = toupper(cmdArgUpper[j]);
-			
+
+		if (temp == "-dist")
+		{
+			simImage.setMinHammingDist(atoi(argv[j + 1]));
+		}
 
 		if (cmdArgUpper == "-DBPATH")
 		{
@@ -196,7 +220,7 @@ int main(int argc, const char *argv[])
 			if (i >= argc)
 				invalidParmMessageAndExit();
 
-			string img1Hash = simImage.getImageHash(argv[i]);
+			string img1Hash = simImage.getImagePHash(argv[i]);
 			if (img1Hash.empty())
 			{
 				output = "invalid file: "; 
@@ -211,7 +235,7 @@ int main(int argc, const char *argv[])
 			output = "possible matches:\n";
 			for (size_t j = 0; j < files.size(); j++)
 			{
-				string hash = simImage.getImageHash(files[j]);
+				string hash = simImage.getImagePHash(files[j]);
 				if (simImage.HanmingDistance(img1Hash, hash) < simImage.getMinHammingDist())
 					output += (files[j] + "\n");
 			}
@@ -234,7 +258,7 @@ int main(int argc, const char *argv[])
 			{
 				//we have the db path as first arg, check for clipboard data
 				dbPath = argv[i];
-				img1Hash = simImage.getImageHash(getClipboardImage());
+				img1Hash = simImage.getImagePHash(getClipboardImage());
 				if (img1Hash.empty())
 				{
 					output = "no image data in clipboard or in command line params";
@@ -244,7 +268,7 @@ int main(int argc, const char *argv[])
 			}
 			else
 			{
-				img1Hash = simImage.getImageHash(argv[i]);
+				img1Hash = simImage.getImagePHash(argv[i]);
 				if (img1Hash.empty())
 				{
 					cout << "invalid file: " << argv[i] << std::flush;
@@ -260,7 +284,7 @@ int main(int argc, const char *argv[])
 
 			string querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID where hammingDistance('";
 			querey += img1Hash;
-			querey += "',hash) < ";
+			querey += "',phash) < ";
 			querey += to_string(simImage.getMinHammingDist());
 			querey += ";";
 			db.executeSQL(querey, output);

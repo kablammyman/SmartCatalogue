@@ -93,7 +93,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;..\;G:\programming\my tools\Utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -108,7 +108,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;..\;G:\programming\my tools\Utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,7 +126,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;..\;G:\programming\my tools\Utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -145,7 +145,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;..\;G:\programming\my tools\Utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -160,35 +160,36 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Utils\database.h" />
+    <ClInclude Include="..\..\..\Utils\DatabaseController.h" />
+    <ClInclude Include="..\..\..\Utils\MD5.h" />
+    <ClInclude Include="..\..\..\Utils\SpellChecker.h" />
+    <ClInclude Include="..\..\..\Utils\Trie.h" />
+    <ClInclude Include="..\..\..\Utils\Utils.h" />
     <ClInclude Include="..\CFGHelper.h" />
-    <ClInclude Include="..\database.h" />
-    <ClInclude Include="..\MD5.h" />
-    <ClInclude Include="..\Utils.h" />
     <ClInclude Include="..\WinToDBMiddleman.h" />
     <ClInclude Include="DataBaseBuilder.h" />
     <ClInclude Include="DatabaseDataParser.h" />
     <ClInclude Include="DatabaseManager.h" />
     <ClInclude Include="DataBaseTableStructs.h" />
     <ClInclude Include="fileWalker.h" />
-    <ClInclude Include="SpellChecker.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Trie.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Utils\database.cpp" />
+    <ClCompile Include="..\..\..\Utils\DatabaseControllercpp.cpp" />
+    <ClCompile Include="..\..\..\Utils\MD5.cpp" />
+    <ClCompile Include="..\..\..\Utils\SpellChecker.cpp" />
+    <ClCompile Include="..\..\..\Utils\Trie.cpp" />
+    <ClCompile Include="..\..\..\Utils\Utils.cpp" />
     <ClCompile Include="..\CFGHelper.cpp" />
-    <ClCompile Include="..\database.cpp" />
-    <ClCompile Include="..\DatabaseControllercpp.cpp" />
-    <ClCompile Include="..\MD5.cpp" />
-    <ClCompile Include="..\Utils.cpp" />
     <ClCompile Include="..\WinToDBMiddleman.cpp" />
     <ClCompile Include="DatabaseBuilder.cpp" />
     <ClCompile Include="DataBaseManager.cpp" />
     <ClCompile Include="DatabaseDataParser.cpp" />
     <ClCompile Include="fileWalker.cpp" />
-    <ClCompile Include="SpellChecker.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="Trie.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

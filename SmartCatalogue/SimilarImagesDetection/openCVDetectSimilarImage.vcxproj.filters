@@ -4,20 +4,12 @@
     <ClCompile Include="CreateImageHash.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\similarImage.cpp">
+    <ClCompile Include="..\..\..\Utils\database.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\database.cpp">
+    <ClCompile Include="..\..\..\Utils\similarImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\database.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="similarImage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -26,5 +18,13 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{12c99029-866f-481a-b1c0-2ca298cb9209}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Utils\database.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Utils\similarImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -24,13 +24,13 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\DatabaseController.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\database.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Utils\DatabaseController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -41,13 +41,13 @@
     <ClCompile Include="CreateNewDB.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\DatabaseControllercpp.cpp">
+    <ClCompile Include="..\..\..\Utils\database.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\database.cpp">
+    <ClCompile Include="..\..\..\Utils\Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Utils.cpp">
+    <ClCompile Include="..\..\..\Utils\DatabaseControllercpp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

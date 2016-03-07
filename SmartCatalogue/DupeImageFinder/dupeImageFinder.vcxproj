@@ -87,7 +87,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src;G:\programming\my tools\Utils</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -102,7 +102,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src;G:\programming\my tools\Utils</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -119,7 +119,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src;G:\programming\my tools\Utils</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -138,7 +138,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src;G:\programming\my tools\Utils</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -153,12 +153,12 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Utils\database.h" />
+    <ClInclude Include="..\..\..\Utils\DatabaseController.h" />
+    <ClInclude Include="..\..\..\Utils\ProgressBar.h" />
+    <ClInclude Include="..\..\..\Utils\similarImage.h" />
+    <ClInclude Include="..\..\..\Utils\Utils.h" />
     <ClInclude Include="..\CFGHelper.h" />
-    <ClInclude Include="..\database.h" />
-    <ClInclude Include="..\DatabaseController.h" />
-    <ClInclude Include="..\ProgressBar.h" />
-    <ClInclude Include="..\similarImage.h" />
-    <ClInclude Include="..\Utils.h" />
     <ClInclude Include="..\WinToDBMiddleman.h" />
     <ClInclude Include="dupeImageFinder.h" />
     <ClInclude Include="Resource.h" />
@@ -166,12 +166,12 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Utils\database.cpp" />
+    <ClCompile Include="..\..\..\Utils\DatabaseControllercpp.cpp" />
+    <ClCompile Include="..\..\..\Utils\ProgressBar.cpp" />
+    <ClCompile Include="..\..\..\Utils\similarImage.cpp" />
+    <ClCompile Include="..\..\..\Utils\Utils.cpp" />
     <ClCompile Include="..\CFGHelper.cpp" />
-    <ClCompile Include="..\database.cpp" />
-    <ClCompile Include="..\DatabaseControllercpp.cpp" />
-    <ClCompile Include="..\ProgressBar.cpp" />
-    <ClCompile Include="..\similarImage.cpp" />
-    <ClCompile Include="..\Utils.cpp" />
     <ClCompile Include="..\WinToDBMiddleman.cpp" />
     <ClCompile Include="dupeImageFinder.cpp" />
     <ClCompile Include="stdafx.cpp">

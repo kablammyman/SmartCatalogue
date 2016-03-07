@@ -85,7 +85,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;C:\opencv\build\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;C:\opencv\build\include\;G:\programming\my tools\Utils</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -100,7 +100,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;C:\opencv\build\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;C:\opencv\build\include\;G:\programming\my tools\Utils</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -117,7 +117,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;C:\opencv\build\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;C:\opencv\build\include\;G:\programming\my tools\Utils</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -136,7 +136,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;C:\opencv\build\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;C:\opencv\build\include\;G:\programming\my tools\Utils</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -153,28 +153,28 @@
     <None Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Utils\database.h" />
+    <ClInclude Include="..\..\Utils\DatabaseController.h" />
+    <ClInclude Include="..\..\Utils\ProgressBar.h" />
     <ClInclude Include="CFGHelper.h" />
-    <ClInclude Include="database.h" />
-    <ClInclude Include="DatabaseController.h" />
     <ClInclude Include="SmartCatalogue.h" />
     <ClInclude Include="MainApp.h" />
-    <ClInclude Include="ProgressBar.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Utils.h" />
     <ClInclude Include="WinToDBMiddleman.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Utils\database.cpp" />
+    <ClCompile Include="..\..\Utils\DatabaseControllercpp.cpp" />
+    <ClCompile Include="..\..\Utils\ProgressBar.cpp" />
+    <ClCompile Include="..\..\Utils\Utils.cpp" />
     <ClCompile Include="addRecordBox.cpp" />
     <ClCompile Include="CFGHelper.cpp" />
     <ClCompile Include="childWindowCreation.cpp" />
-    <ClCompile Include="database.cpp" />
-    <ClCompile Include="DatabaseControllercpp.cpp" />
     <ClCompile Include="SmartCatalogue.cpp" />
     <ClCompile Include="itemSelector.cpp" />
     <ClCompile Include="MainApp.cpp" />
-    <ClCompile Include="ProgressBar.cpp" />
     <ClCompile Include="selectOrDelete.cpp" />
     <ClCompile Include="sqlQueryBox.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -183,7 +183,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="WinToDBMiddleman.cpp" />
   </ItemGroup>
   <ItemGroup>
