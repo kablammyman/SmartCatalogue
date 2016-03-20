@@ -15,28 +15,11 @@
 //#define TEST_DATABASE_PARSER 0
 //#define TEST_DATABASE_CONTROLLER 1
 
-
-int main(int argc, char *argv[])
+void parseCommands(vector<string> command)
 {
-	bool verboseOutput = false;
-	int goodDir = 0, badDir = 0, totalDir = 0;
-	doImageHash = true;
-
-	CFGHelper::filePathBase = Utils::setProgramPath(argv[0]);
-	CFGHelper::loadCFGFile();
-		
-	vector<string> dbTableValues = CFG::CFGReaderDLL::getCfgListValue("tableNames");
-	//if we cant find the table names in the cfg, thejust get out of here
-	if (dbTableValues.size() == 1 && dbTableValues[0].find("could not find") != string::npos)
-	{
-		cout << "couldnt find the list of table names in your cfg...\n";
-		exit(-1);
-	}
-
-	
-
 	//command line args can add extra options
 	int i = 0;
+	int argc = command.size();
 	while (i < argc)
 	{
 		if (strcmp(argv[i], "-dbPath") == 0)
@@ -63,33 +46,32 @@ int main(int argc, char *argv[])
 		}
 		else if (strcmp(argv[i], "-NoimgHash") == 0)
 			doImageHash = false;
-		
+
 		else if (strcmp(argv[i], "-verbose") == 0)
 			verboseOutput = true;
 
 		i++;
 
 	}
+}
+int main(int argc, char *argv[])
+{
+	bool verboseOutput = false;
+	int goodDir = 0, badDir = 0, totalDir = 0;
+	doImageHash = true;
 
-	if (CFGHelper::dbPath == "" || CFGHelper::pathToProcess == "")
-		invalidParmMessageAndExit();
-
-	if (!MyFileDirDll::doesPathExist(CFGHelper::pathToProcess))
+	CFGHelper::filePathBase = Utils::setProgramPath(argv[0]);
+	CFGHelper::loadCFGFile();
+		
+	vector<string> dbTableValues = CFG::CFGReaderDLL::getCfgListValue("tableNames");
+	//if we cant find the table names in the cfg, thejust get out of here
+	if (dbTableValues.size() == 1 && dbTableValues[0].find("could not find") != string::npos)
 	{
-		cout << CFGHelper::pathToProcess << "is not valid\n";
+		cout << "couldnt find the list of table names in your cfg...\n";
 		exit(-1);
 	}
 
-#ifdef TEST_DATABASE_PARSER
-	//testNamelogic();
-	//testSpellchecker();
-	dbDataParser.testGalleryCalc();
-#endif
-#ifdef TEST_DATABASE_CONTROLLER
-	dbCtrlr.testGetTable();
-	dbCtrlr.testDBEntry();
-	dbCtrlr.testDBQuerey();
-#endif	
+	
 
 	DatabaseBuilder dbBuilder(CFGHelper::dbPath, CFGHelper::ignorePattern);
 	dbBuilder.fillMetaWords(CFGHelper::meta);

@@ -26,5 +26,8 @@
     <ClInclude Include="..\..\..\Utils\similarImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CreateImageHash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
