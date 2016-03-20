@@ -103,112 +103,11 @@ int main(int argc, char *argv[])
 	{
 		string curDir = MyFileDirDll::nextDirTreeStep();
 		
-		//if the current node has folders in it, then it should NOT have images. even if it does, those images
-		//will be ignored since its not following the protocol
-		if (MyFileDirDll::getCurNodeNumFolders() > 0)
-			continue;
-
-		
-		if (verboseOutput)
-			cout << curDir;
-
-		GalleryData galleryData;
-		string galleryCalcError;
-		bool ret = dbBuilder.parsePath(curDir, galleryData, galleryCalcError);
-		if (ret)
-		{
-			if (verboseOutput)
-				cout << endl;
-
-			string output;
-			
-			if (verboseOutput)
-			{
-				cout << "catogory:       " << galleryData.category << endl;
-				cout << "websiteName:    " << galleryData.websiteName << endl;
-				cout << "subWebsiteName: " << galleryData.subWebsiteName << endl;
-				cout << "galleryName:    " << galleryData.galleryName << endl;
-				cout << "named   models: " << galleryData.models.size() << endl;
-			}
-
-			int categoryID = dbBuilder.inserCategoryInfoIntoDB(galleryData);
-			if (categoryID == -1)
-				continue;
-
-			int websiteID = dbBuilder.insertWebsiteInfoIntoDB(galleryData, categoryID);
-			if (websiteID == -1)
-				continue;
-
-			//a zero for subwebsite means there is no subwesite
-			int subWebsiteID = dbBuilder.insertSubWebsiteInfoIntoDB(galleryData, websiteID);
-			if (subWebsiteID == -1)
-				continue;
-
-			int galleryID = dbBuilder.insertGalleryInfoIntoDB(galleryData, websiteID, subWebsiteID, categoryID);
-			if (galleryID == -1)
-				continue;
-			
-			//gotta fill in meta/keywords...even if they descrivbe models outfit
-			for (size_t k = 0; k < galleryData.models.size(); k++)
-			{
-				if (verboseOutput)
-					cout << "model " << k + 1 << " name: " << galleryData.models[k].name.firstName << " "<< galleryData.models[k].name.middleName << " " << galleryData.models[k].name.lastName << endl;
-
-				if(!dbBuilder.insertModelInfoIntoDB(galleryData.models[k]))
-					continue;
-				
-				if(!dbBuilder.insertModelsInGalleryInfoIntoDB(galleryData.models[k].name.dbID, galleryID))
-					continue;
-
-				for (size_t i = 0; i < galleryData.models[k].outfit.size(); i++)
-				{
-					if(!dbBuilder.insertModelOutfitInfoIntoDB(galleryData.models[k], i, galleryID))
-						continue;
-				}		
-			}
-
-			if (doImageHash)
-			{
-				list<string> imgFiles = MyFileDirDll::getCurNodeFileList();
-
-				for (list<string>::iterator it = imgFiles.begin(); it != imgFiles.end(); ++it)
-				{
-					//when the path has spaces,we need DOUBLE quotes aka ""C:\some dir\run.exe"" 
-					string imgeFilePath = (curDir+ *it);
-					string md5Hash = createMD5Hash(imgeFilePath);
-					
-					if (dbBuilder.isImageInDB(galleryID, md5Hash))
-						continue;
-
-
-					string hashingCommand = "\"\"" + CFGHelper::filePathBase + "\\CreateImageHash.exe\"  -hash \"";
-					hashingCommand += imgeFilePath;
-					hashingCommand += "\"\"";
-
-					string hash = exec(hashingCommand.c_str());
-
-					size_t found = hashingCommand.find("-hash");
-					hashingCommand.insert(found + 1, "p");
-					string phash = exec(hashingCommand.c_str());
-
-					
-					if (!dbBuilder.insertImageHashInfoIntoDB(*it, hash, phash, md5Hash, galleryID))
-					{
-						string errString = ("couldnt hash or store: " + imgeFilePath + "\n");
-						dbBuilder.addEntryToInvalidPathFile(errString);
-						if (verboseOutput)
-							cout << errString;
-					}
-						
-				}
-			}
+		if (dbBuilder.addDirToDB(curDir))
 			goodDir++;
-		}
 		else
-		{
 			badDir++;
-			dbBuilder.reportError("invalid directory", curDir, galleryCalcError, true);
-		}
+	
 		totalDir++;
 	}
 

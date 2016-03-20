@@ -36,4 +36,5 @@ public:
 	bool insertModelsInGalleryInfoIntoDB(int modelID, int galleryID);
 	bool isImageInDB(int galleryID, string md5Hash);
 	void verifyDB(string root);
+	bool addDirToDB(string curDir);
 };
