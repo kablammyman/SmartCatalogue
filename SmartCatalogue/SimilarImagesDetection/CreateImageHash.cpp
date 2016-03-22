@@ -14,11 +14,25 @@
 #include "Database.h"
 
 
-
-struct cmdArg
+struct Options
 {
-	string flag;
+	int dist;
+	string dbPath;
+	string pathToProcess;
+
+	Options()
+	{
+		dist = 2;
+		dbPath = "";
+		pathToProcess = "";
+	}
+};
+struct CmdArg
+{
+	string cmd;
 	vector<string> data;
+	//what will the optiosn be when executing this command
+	Options opts;
 };
 
 int main(int argc, const char *argv[])
@@ -33,13 +47,11 @@ int main(int argc, const char *argv[])
 
 	int i = 0;
 	SimilarImage simImage;
-	string dbPath;
-	string pathToProcess;
 	string output = "";
 	bool err = false;
 	string cmdArgUpper;
 	
-	vector<cmdArg> allArgs;
+	vector<CmdArg> allArgs;
 
 	//how to distinguish between commandline args vs socket args?
 	//how to make all go thry same pipeline?

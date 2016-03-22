@@ -26,6 +26,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\Utils\database.h" />
     <ClInclude Include="..\..\..\Utils\similarImage.h" />
+    <ClInclude Include="Clipboard.h" />
     <ClInclude Include="CreateImageHash.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
