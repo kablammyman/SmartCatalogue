@@ -2,130 +2,72 @@
 #include <windows.h>
 #include <stdio.h>
 #include <string>
-
-#include "opencv2/core.hpp"
-#include "opencv2/highgui.hpp"
-#include "opencv2/imgproc.hpp"
+#include <queue>
 
 #include "CreateImageHash.h"
 
-#include "myFileDirDll.h"
-#include "similarImage.h"
-#include "Database.h"
-
-
-struct Options
-{
-	int dist;
-	string dbPath;
-	string pathToProcess;
-
-	Options()
-	{
-		dist = 2;
-		dbPath = "";
-		pathToProcess = "";
-	}
-};
-struct CmdArg
-{
-	string cmd;
-	vector<string> data;
-	//what will the optiosn be when executing this command
-	Options opts;
-};
-
 int main(int argc, const char *argv[])
 {
-	//START STUFF
-	cout << "starting server\n";
-	conn.startServer(SOMAXCONN, port);
-	bool done = false;
-
-	if (argc < 3)
-		invalidParmMessageAndExit();
-
-	int i = 0;
-	SimilarImage simImage;
-	string output = "";
+	bool done = true;
 	bool err = false;
-	string cmdArgUpper;
-	
-	vector<CmdArg> allArgs;
+	string output = "";
 
-	//how to distinguish between commandline args vs socket args?
-	//how to make all go thry same pipeline?
+	vector<string> argVec(argv[0],argv[argc]);
+	CmdArg newCommand = parseCommand(argVec);
+	newCommand.dest = -1;
+	queue<CmdArg> allArgs;
+	allArgs.push(newCommand);
 
-	while (i < argc)
+	if (isServer)
 	{
-		string temp = argv[i];
-		cmdArg newArg;
-
-		if (temp[0] == '-')
-		{
-			newArg.flag = temp[0];
-			i++;
-			while (i < argc)
-			{
-				if(argv[i][0] != '-')
-					newArg.data.push_back(argv[i]);
-				i++;
-			}
-		}
-
-		
+		cout << "starting server\n";
+		conn.startServer(SOMAXCONN, port);
+		done = false;
 	}
-	while (!done)
+
+	do
 	{
-		numConn = (int)conn.getNumConnections();
-		for (int i = 0; i < numConn; i++)
+		if (isServer)
 		{
-			if (conn.hasRecivedData(i))
+			numConn = (int)conn.getNumConnections();
+			for (int i = 0; i < numConn; i++)
 			{
-				iResult = conn.getData(i, recvbuf, DEFAULT_BUFLEN);
-				if (iResult > 0)
+				if (conn.hasRecivedData(i))
 				{
-					recvbuf[iResult] = '\0';
-					printf("%s -> %d bytes.\n", recvbuf, iResult);
-
-					switch (parseCommand(recvbuf))
+					iResult = conn.getData(i, recvbuf, DEFAULT_BUFLEN);
+					if (iResult > 0)
 					{
-					case 0:
-						time_t rawtime;
-						struct tm * timeinfo;
+						recvbuf[iResult] = '\0';
+						printf("%s -> %d bytes.\n", recvbuf, iResult);
 
-						time(&rawtime);
-						timeinfo = localtime(&rawtime);
-						//printf("The current date/time is: %s", asctime(timeinfo));
-						conn.sendData(i, asctime(timeinfo));
-						break;
-					case 1:
-						conn.sendData(i, "Fred");
-						break;
-					default:
-						conn.sendData(i, "unknown command");
-						break;
 					}
+					//client disconnected
+					else if (iResult == 0)
+						conn.closeConnection(i);
 
+					else
+						printf("recv failed: %d\n", WSAGetLastError());
 				}
-				//client disconnected
-				else if (iResult == 0)
-					conn.closeConnection(i);
-
-				else
-					printf("recv failed: %d\n", WSAGetLastError());
 			}
 		}
-	}
 
+		CmdArg curCommand = allArgs.front();
+		allArgs.pop();
 
-	if (output.empty())
-		output = "didnt recognize any params...";
+		output = ExecuteCommand(curCommand);
+		if (output.empty())
+			output = "didnt recognize any params...";
+
+		if(curCommand.dest == -1)
+			cout << output << std::flush;
+		else if(curCommand.dest > -1)
+			conn.sendData(curCommand.dest,output.c_str());
+
+	} while (!done)
+
 	
-	cout << output << std::flush;
-	//cout << endl; //when other programs read from this programs stdout, we dont want the new line with the actual data
-	
-	conn.shutdown();
+	if(isServer)
+		conn.shutdown();
 
 	if(!err)
 		return 0;
