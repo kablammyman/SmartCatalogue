@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string>
 #include <queue>
+#include "Utils.h"
 
 #include "CreateImageHash.h"
 
@@ -11,8 +12,9 @@ int main(int argc, const char *argv[])
 	bool done = true;
 	bool err = false;
 	string output = "";
+	char recvbuf[DEFAULT_BUFLEN];
 
-	vector<string> argVec(argv[0],argv[argc]);
+	vector<string> argVec(argv,argv + argc);
 	CmdArg newCommand = parseCommand(argVec);
 	newCommand.dest = -1;
 	queue<CmdArg> allArgs;
@@ -24,11 +26,14 @@ int main(int argc, const char *argv[])
 		conn.startServer(SOMAXCONN, port);
 		done = false;
 	}
-
+	
 	do
 	{
 		if (isServer)
 		{
+			//socket comm stuff
+			conn.waitForClientAsync();
+
 			numConn = (int)conn.getNumConnections();
 			for (int i = 0; i < numConn; i++)
 			{
@@ -38,8 +43,12 @@ int main(int argc, const char *argv[])
 					if (iResult > 0)
 					{
 						recvbuf[iResult] = '\0';
-						printf("%s -> %d bytes.\n", recvbuf, iResult);
-
+						//printf("%s -> %d bytes.\n", recvbuf, iResult);
+						argVec.clear();
+						argVec = Utils::tokenize(recvbuf, ",");
+						CmdArg newCommand = parseCommand(argVec);
+						newCommand.dest = i;
+						allArgs.push(newCommand);
 					}
 					//client disconnected
 					else if (iResult == 0)
@@ -51,19 +60,22 @@ int main(int argc, const char *argv[])
 			}
 		}
 
-		CmdArg curCommand = allArgs.front();
-		allArgs.pop();
+		if (!allArgs.empty())
+		{
+			CmdArg curCommand = allArgs.front();
+			allArgs.pop();
 
-		output = ExecuteCommand(curCommand);
-		if (output.empty())
-			output = "didnt recognize any params...";
+			output = ExecuteCommand(curCommand);
+			if (output.empty())
+				output = "didnt recognize any params...";
 
-		if(curCommand.dest == -1)
-			cout << output << std::flush;
-		else if(curCommand.dest > -1)
-			conn.sendData(curCommand.dest,output.c_str());
+			if (curCommand.dest == -1)
+				cout << output << std::flush;
+			else if (curCommand.dest > -1)
+				conn.sendData(curCommand.dest, output.c_str());
+		}
 
-	} while (!done)
+	} while (!done);
 
 	
 	if(isServer)

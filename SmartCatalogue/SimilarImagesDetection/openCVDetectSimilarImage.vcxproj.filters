@@ -10,6 +10,15 @@
     <ClCompile Include="..\..\..\Utils\similarImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Utils\ClipboardUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Utils\NetworkConnection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Utils\Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -29,7 +38,7 @@
     <ClInclude Include="CreateImageHash.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Clipboard.h">
+    <ClInclude Include="..\..\..\Utils\ClipboardUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

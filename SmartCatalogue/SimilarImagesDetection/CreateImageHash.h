@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "ClipboardUtil.h"
 
 #include "myFileDirDll.h"
 #include "similarImage.h"
@@ -134,7 +135,7 @@ string isClipboardImageInDB(string img, string dbPath)
 
 	if(img.empty())
 	{
-		img1Hash = simImage.getImagePHash(getClipboardImage());
+		img1Hash = simImage.getImagePHash(ClipboardUtil::GetClipboardImage());
 		if (img1Hash.empty())
 		{
 			string errorString = "no image data in clipboard or in command line params";
@@ -256,6 +257,8 @@ CmdArg parseCommand(vector<string> argv)
 
 		i++;
 	}
+	//if we get here, we prob turned on/off server mode and thats it
+	return command;
 }
 
 string  ExecuteCommand(CmdArg cmd)

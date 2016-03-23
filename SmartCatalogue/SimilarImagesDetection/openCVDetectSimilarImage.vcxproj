@@ -19,14 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Utils\ClipboardUtil.cpp" />
     <ClCompile Include="..\..\..\Utils\database.cpp" />
+    <ClCompile Include="..\..\..\Utils\NetworkConnection.cpp" />
     <ClCompile Include="..\..\..\Utils\similarImage.cpp" />
+    <ClCompile Include="..\..\..\Utils\Utils.cpp" />
     <ClCompile Include="CreateImageHash.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Utils\ClipboardUtil.h" />
     <ClInclude Include="..\..\..\Utils\database.h" />
     <ClInclude Include="..\..\..\Utils\similarImage.h" />
-    <ClInclude Include="Clipboard.h" />
     <ClInclude Include="CreateImageHash.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -105,7 +108,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\opencv\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>myFileDirDll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>myFileDirDll.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -121,7 +124,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\opencv\lib\Debug\x64;C:\myLibs\libs\debug\x64;C:\SQLite3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>myFileDirDll.lib;sqlite3.lib;opencv_core300d.lib;opencv_imgproc300d.lib;opencv_highgui300d.lib;opencv_ml300d.lib;opencv_features2d300d.lib;opencv_calib3d300d.lib;opencv_objdetect300d.lib;opencv_flann300d.lib;opencv_imgcodecs300d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>myFileDirDll.lib;ws2_32.lib;sqlite3.lib;opencv_core300d.lib;opencv_imgproc300d.lib;opencv_highgui300d.lib;opencv_ml300d.lib;opencv_features2d300d.lib;opencv_calib3d300d.lib;opencv_objdetect300d.lib;opencv_flann300d.lib;opencv_imgcodecs300d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -140,7 +143,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>myFileDirDll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>myFileDirDll.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -160,7 +163,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>C:\myLibs\libs\release\x64;C:\opencv\lib\Release\x64;C:\SQLite3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>myFileDirDll.lib;sqlite3.lib;opencv_core300.lib;opencv_imgproc300.lib;opencv_highgui300.lib;opencv_ml300.lib;opencv_features2d300.lib;opencv_calib3d300.lib;opencv_objdetect300.lib;opencv_flann300.lib;opencv_imgcodecs300.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>myFileDirDll.lib;ws2_32.lib;sqlite3.lib;opencv_core300.lib;opencv_imgproc300.lib;opencv_highgui300.lib;opencv_ml300.lib;opencv_features2d300.lib;opencv_calib3d300.lib;opencv_objdetect300.lib;opencv_flann300.lib;opencv_imgcodecs300.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
