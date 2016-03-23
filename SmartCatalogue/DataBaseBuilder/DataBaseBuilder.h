@@ -19,6 +19,7 @@ private:
 	DatabaseController dbCtrlr;
 	string rootPath;//the root where all images will be found (optional)
 	int getLatestID();
+	bool verboseOutput;
 public:
 	DatabaseBuilder(string dbPath, string root);
 	void fillPartsOfSpeechTable(vector<string> &dbTableValues);
@@ -36,5 +37,5 @@ public:
 	bool insertModelsInGalleryInfoIntoDB(int modelID, int galleryID);
 	bool isImageInDB(int galleryID, string md5Hash);
 	void verifyDB(string root);
-	bool addDirToDB(string curDir);
+	bool addDirToDB(string curDir, bool doImageHash);
 };

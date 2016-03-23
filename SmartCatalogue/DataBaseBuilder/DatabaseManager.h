@@ -5,6 +5,8 @@
 #include <vector>
 #include "MD5.h"
 
+#include <Windows.h>
+
 using namespace std;
 
 bool doImageHash;
@@ -40,7 +42,31 @@ string exec(const char* cmd)
 	_pclose(pipe);
 	return result;
 }
+//to use with args, there needs to be a space like so:
+//myCreateProcess("C:\\windows\\notepad.exe", " example.txt");
+void myCreateProcess(string pathAndName, string args)
+{
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
 
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+	if (!
+		CreateProcess(
+			TEXT(pathAndName.c_str()),
+			(LPSTR)args.c_str(),
+			NULL, NULL, FALSE,
+			CREATE_NEW_CONSOLE,
+			NULL, NULL,
+			&si,
+			&pi
+			)
+		)
+	{
+		cout << "Unable to execute.";
+	}
+}
 
 
 //http://stackoverflow.com/questions/1220046/how-to-get-the-md5-hash-of-a-file-in-c

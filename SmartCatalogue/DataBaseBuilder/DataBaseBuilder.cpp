@@ -428,7 +428,7 @@ void DatabaseBuilder::verifyDB(string root)
 	cout << "added " << dirsNotInDB.size() << " galleries to DB\n";
 }
 
-bool DatabaseBuilder::addDirToDB(string curDir)
+bool DatabaseBuilder::addDirToDB(string curDir, bool doImageHash)
 {
 	if (verboseOutput)
 		cout << curDir;
