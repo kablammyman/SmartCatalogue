@@ -3,21 +3,43 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "MD5.h"
-
+#include <ctime>//check execution time
 #include <Windows.h>
 
+#include "NetworkConnection.h"
+
+#include "MD5.h"
+
+
+#define SERVICE_NAME  "PornoDB Manager"
+#define CREATE_HASH_OUTPUT_IGNORE "***** VIDEOINPUT LIBRARY - 0.1995 - TFW07 *****\n"
+
+
+SERVICE_STATUS        g_ServiceStatus = { 0 };
+SERVICE_STATUS_HANDLE g_StatusHandle = NULL;
+
+HANDLE                g_ServiceStopEvent = INVALID_HANDLE_VALUE;
+HANDLE				  hDir;
+HANDLE				  hNetworkThread;
+HANDLE				  hDirWatchThread;
+
+VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv);
+VOID WINAPI ServiceCtrlHandler(DWORD);
+DWORD WINAPI doNetWorkCommunication(LPVOID lpParam);
+DWORD WINAPI doDirWatch(LPVOID lpParam);
+
+NetworkConnection conn;
+
+bool verboseOutput = false;
+bool doImageHash = true;;
+
 using namespace std;
-
-bool doImageHash;
-
 
 
 void invalidParmMessageAndExit()
 {
 	cout << "invlaid parameters. You need to provide a path to the DB and a path where your images are\n";
 	cout << "DataBaseManager -dbPath \"C:\\somePath\\\" -dataPath \"C:\\photos\\myFunPhotos\\\"\n";
-	exit(-1);
 }
 
 string exec(const char* cmd)
@@ -33,7 +55,7 @@ string exec(const char* cmd)
 	{
 		//hack until i figure out how to get rid of this message
 		//***** VIDEOINPUT LIBRARY - 0.1995 - TFW07 *****
-		if (strcmp(buffer, "***** VIDEOINPUT LIBRARY - 0.1995 - TFW07 *****\n") == 0)
+		if (strcmp(buffer, CREATE_HASH_OUTPUT_IGNORE) == 0)
 			continue;
 		if (strcmp(buffer, "\n") == 0)
 			continue;
@@ -94,3 +116,19 @@ string createMD5Hash(string fileName)
 	return returnString;
 }
 
+string jobReport(double start_s, int totalDir, int goodDir, int badDir)
+{
+	int stop_s = clock();
+	double milis = (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000;
+	string returnString = "done in " + Utils::getTimeStamp(milis)+ "\n";
+	returnString += "processed " + to_string(totalDir) + " galleries\n";
+
+	float goodPercent = ((float)goodDir / (float)totalDir);
+	goodPercent *= 100;
+	returnString += "\nGalleries added to DB: " + to_string(goodDir) + " (" + to_string(goodPercent) + "%)\n";
+	float badPercent = ((float)badDir / (float)totalDir);
+	badPercent *= 100;
+	returnString += "\nGalleries that dont conform to schema: " + to_string(badDir) + " (" + to_string(badPercent) + "%)\n";
+
+	return returnString;
+}
