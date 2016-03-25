@@ -5,6 +5,7 @@
 #include <vector>
 #include <ctime>//check execution time
 #include <Windows.h>
+#include <queue>
 
 #include "NetworkConnection.h"
 #include "Utils.h"
@@ -28,6 +29,7 @@ VOID WINAPI ServiceCtrlHandler(DWORD);
 DWORD WINAPI doNetWorkCommunication(LPVOID lpParam);
 DWORD WINAPI doDirWatch(LPVOID lpParam);
 
+queue<CmdArg> tasks;
 NetworkConnection conn;
 
 bool verboseOutput = false;
@@ -42,23 +44,26 @@ void invalidParmMessageAndExit()
 	cout << "DataBaseManager -dbPath \"C:\\somePath\\\" -dataPath \"C:\\photos\\myFunPhotos\\\"\n";
 }
 
-int parseCommand(string cmd)
+CmdArg parseCommand(vector<string> argv)
 {
-	if (cmd == "time")
-		return 0;
-	else if (cmd == "name")
-		return 1;
-
-	return -1;
-}
-void connectToRemote()
-{
-	cout << "connecting to " << ip << "\n";
-	if (conn.connectToServer(ip, port) == NETWORK_ERROR)
+	int i = 0;
+	CmdArg command;
+	//std::vector<std::string> arguments(argv + 1, argv + argc);
+	while (i < argv.size())
 	{
-		exit(-1);
+		string cmdArgUpper = argv[i];
+
+		for (size_t j = 0; j < cmdArgUpper.size(); j++)
+			cmdArgUpper[j] = toupper(cmdArgUpper[j]);
+			
+
+		i++;
 	}
+	//if we get here, we prob turned on/off server mode and thats it
+	return command;
 }
+
+
 
 void broadcastMsg(string msg)
 {
@@ -129,4 +134,14 @@ string jobReport(double start_s, int totalDir, int goodDir, int badDir)
 	returnString += "\nGalleries that dont conform to schema: " + to_string(badDir) + " (" + to_string(badPercent) + "%)\n";
 
 	return returnString;
+}
+
+int StartAndConnectToCreateImageHash()
+{
+	myCreateProcess(CFGHelper::filePathBase+"\\CreateImageHash.exe", " -server");
+	//sleep a bit, so we make sure its running
+	Sleep(2000);
+	//cout << "connecting to " <<CFG::CFGReaderDLL::getCfgStringValue("CreateImageHashIP")<< "\n";
+	//now try to connect to it
+	return conn.connectToServer(CFG::CFGReaderDLL::getCfgStringValue("CreateImageHashIP"), CFG::CFGReaderDLL::getCfgStringValue("CreateImageHashPort"));
 }

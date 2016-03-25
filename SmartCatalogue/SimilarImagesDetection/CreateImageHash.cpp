@@ -15,9 +15,9 @@ int main(int argc, const char *argv[])
 	char recvbuf[DEFAULT_BUFLEN];
 
 	vector<string> argVec(argv,argv + argc);
-	CmdArg newCommand = parseCommand(argVec);
+	HashCmdArg newCommand = parseCommand(argVec);
 	newCommand.dest = -1;
-	queue<CmdArg> allArgs;
+	queue<HashCmdArg> allArgs;
 	allArgs.push(newCommand);
 
 	if (isServer)
@@ -46,7 +46,7 @@ int main(int argc, const char *argv[])
 						//printf("%s -> %d bytes.\n", recvbuf, iResult);
 						argVec.clear();
 						argVec = Utils::tokenize(recvbuf, ",");
-						CmdArg newCommand = parseCommand(argVec);
+						HashCmdArg newCommand = parseCommand(argVec);
 						newCommand.dest = i;
 						allArgs.push(newCommand);
 					}
@@ -62,10 +62,17 @@ int main(int argc, const char *argv[])
 
 		if (!allArgs.empty())
 		{
-			CmdArg curCommand = allArgs.front();
+			HashCmdArg curCommand = allArgs.front();
 			allArgs.pop();
 
+			if (curCommand.shutdown)
+			{
+				done = true;
+				break;
+			}
+
 			output = ExecuteCommand(curCommand);
+			
 			if (output.empty())
 				output = "didnt recognize any params...";
 

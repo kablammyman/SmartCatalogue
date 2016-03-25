@@ -34,7 +34,7 @@ struct Options
 	int dist;
 	string dbPath;
 	string pathToProcess;
-
+	
 	Options()
 	{
 		dist = 2;
@@ -43,27 +43,10 @@ struct Options
 	}
 };
 
-struct CmdArg
+struct HashCmdArg : CmdArg
 {
-	//where do the results go...stdout(-1)? a socket(0-max socket) a text file (-2?)
-	int dest;
-	string cmd;
-	vector<string> data;
-	//what will the optiosn be when executing this command
 	Options options;
-	//when we have errors, clear the data and whatever else we collected
-	//so this wont tryt o run
-	void clear()
-	{
-		cmd.clear();
-		data.clear();
-	}
-	void SetCommand(string c)
-	{
-		//make sure all data we get is only for this command
-		data.clear();
-		cmd = c;
-	}
+	bool shutdown = false;
 };
 
 string getCmdArgHelp()
@@ -83,16 +66,7 @@ string invalidParmMessageAndExit()
 	cout << getCmdArgHelp <<endl;
 	exit(-1);
 }
-//img = argv[i]
-string getImageHash(string img)
-{
-	return simImage.getImageHash(img);
-}
-//img = argv[i]
-string getImagePHash(string img)
-{
-	return simImage.getImagePHash(img);
-}
+
 //string img1 = argv[i];, string img2 = argv[i];
 string compareTwoImages(string img1, string img2)
 {
@@ -168,10 +142,10 @@ string isClipboardImageInDB(string img, string dbPath)
 	return output;
 }
 
-CmdArg parseCommand(vector<string> argv)
+HashCmdArg parseCommand(vector<string> argv)
 {
 	int i = 0;
-	CmdArg command;
+	HashCmdArg command;
 	//std::vector<std::string> arguments(argv + 1, argv + argc);
 	while (i < argv.size())
 	{
@@ -186,7 +160,7 @@ CmdArg parseCommand(vector<string> argv)
 		}
 		if (cmdArgUpper == "-EXIT")
 		{
-			isServer = false;//exit when all commands have finihsed
+			command.shutdown = true;
 		}
 		else if (cmdArgUpper == "-DIST")
 		{
@@ -222,7 +196,7 @@ CmdArg parseCommand(vector<string> argv)
 			command.options.pathToProcess = argv[i];
 		}
 
-		else if (cmdArgUpper == "-HASH" || cmdArgUpper == "-PHASH")
+		else if (cmdArgUpper == "-HASH" || cmdArgUpper == "-PHASH" || cmdArgUpper == "-ALLHASH")
 		{
 			command.SetCommand(cmdArgUpper);
 			i++;
@@ -261,7 +235,7 @@ CmdArg parseCommand(vector<string> argv)
 	return command;
 }
 
-string  ExecuteCommand(CmdArg cmd)
+string  ExecuteCommand(HashCmdArg cmd)
 {
 	simImage.setMinHammingDist(cmd.options.dist);
 
@@ -269,9 +243,11 @@ string  ExecuteCommand(CmdArg cmd)
 	if(cmd.cmd.empty())
 		return getCmdArgHelp();
 	else if(cmd.cmd == "-HASH")
-		return getImageHash(cmd.data[0]);
+		return simImage.getImageHash(cmd.data[0]);
 	else if (cmd.cmd == "-PHASH")
-		return getImagePHash(cmd.data[0]);
+		return simImage.getImagePHash(cmd.data[0]);
+	else if (cmd.cmd == "-ALLHASH")
+		return  simImage.getAllHash(cmd.data[0]);
 	else if (cmd.cmd == "-COMPARE")
 		return compareTwoImages(cmd.data[0],cmd.data[1]);
 	else if (cmd.cmd == "-ISINDIR")

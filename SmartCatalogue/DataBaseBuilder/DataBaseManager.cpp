@@ -17,7 +17,6 @@
 #include "CFGReaderDll.h"
 #include "WinToDBMiddleman.h"
 
-
 #include "CFGHelper.h"
 
 
@@ -219,7 +218,7 @@ DWORD WINAPI doDirWatch(LPVOID lpParam)
 	//LPOVERLAPPED overlapped;
 
 	hDir = CreateFile(
-		pathToProcess.c_str(),
+		CFGHelper::pathToProcess.c_str(),
 		FILE_LIST_DIRECTORY,
 		FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
 		NULL,
@@ -292,25 +291,11 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 					recvbuf[iResult] = '\0';
 					printf("%s -> %d bytes.\n", recvbuf, iResult);
 
-					switch (parseCommand(recvbuf))
-					{
-					case 0:
-						time_t rawtime;
-						struct tm * timeinfo;
+					vector<string> argVec = Utils::tokenize(recvbuf, ",");
+					CmdArg newCommand = parseCommand(argVec);
 
-						time(&rawtime);
-						timeinfo = localtime(&rawtime);
-						//printf("The current date/time is: %s", asctime(timeinfo));
-						conn.sendData(i, asctime(timeinfo));
-						break;
-					case 1:
-						conn.sendData(i, "Fred");
-						break;
-					default:
-						conn.sendData(i, "unknown command");
-						break;
-					}
-
+					newCommand.dest = i;
+					tasks.push(newCommand);
 				}
 				//client disconnected
 				else if (iResult == 0)
@@ -321,16 +306,21 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 			}
 		}
 
+		if(tasks.empty())
+			continue;
+
+		CmdArg command = tasks.front();
+		tasks.pop();
+
 		//these may not be needed anymore
 		int goodDir = 0, badDir = 0, totalDir = 0;
 		int start_s = clock();
-		//get the data AS i build the dir tree
-		MyFileDirDll::startDirTreeStep(CFGHelper::pathToProcess);
-		while (!MyFileDirDll::isFinished())
-		{
-			string curDir = MyFileDirDll::nextDirTreeStep();
+		
+		vector<string> paths = getPathForCurOperation();
 
-			if (dbBuilder.addDirToDB(curDir))
+		for(size_t i = 0; i < paths.size(); i++)
+		{
+			if (dbBuilder.addDirToDB(paths[i]))
 				goodDir++;
 			else
 				badDir++;
@@ -347,3 +337,24 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 }
 
 
+/*
+
+
+//these may not be needed anymore
+int goodDir = 0, badDir = 0, totalDir = 0;
+int start_s = clock();
+
+//get the data AS i build the dir tree
+MyFileDirDll::startDirTreeStep();
+while (!MyFileDirDll::isFinished())
+{
+string curDir = MyFileDirDll::nextDirTreeStep(CFGHelper::pathToProcess);
+
+if (dbBuilder.addDirToDB(curDir))
+goodDir++;
+else
+badDir++;
+
+totalDir++;
+}
+*/
