@@ -7,8 +7,8 @@
 #include <Windows.h>
 
 #include "NetworkConnection.h"
+#include "Utils.h"
 
-#include "MD5.h"
 
 
 #define SERVICE_NAME  "PornoDB Manager"
@@ -40,6 +40,30 @@ void invalidParmMessageAndExit()
 {
 	cout << "invlaid parameters. You need to provide a path to the DB and a path where your images are\n";
 	cout << "DataBaseManager -dbPath \"C:\\somePath\\\" -dataPath \"C:\\photos\\myFunPhotos\\\"\n";
+}
+
+int parseCommand(string cmd)
+{
+	if (cmd == "time")
+		return 0;
+	else if (cmd == "name")
+		return 1;
+
+	return -1;
+}
+void connectToRemote()
+{
+	cout << "connecting to " << ip << "\n";
+	if (conn.connectToServer(ip, port) == NETWORK_ERROR)
+	{
+		exit(-1);
+	}
+}
+
+void broadcastMsg(string msg)
+{
+	cout << "sending msg \n";
+	conn.ServerBroadcast(msg.c_str());
 }
 
 string exec(const char* cmd)
@@ -88,32 +112,6 @@ void myCreateProcess(string pathAndName, string args)
 	{
 		cout << "Unable to execute.";
 	}
-}
-
-
-//http://stackoverflow.com/questions/1220046/how-to-get-the-md5-hash-of-a-file-in-c
-string createMD5Hash(string fileName)
-{
-	//Start opening your file
-	ifstream inputFile;
-	inputFile.open(fileName, std::ios::binary | std::ios::in);
-
-	//Find length of file
-	inputFile.seekg(0, std::ios::end);
-	long len = inputFile.tellg();
-	inputFile.seekg(0, std::ios::beg);
-
-	//read in the data from your file
-	char * InFileData = new char[len];
-	inputFile.read(InFileData, len);
-
-	//Calculate MD5 hash
-	string returnString = md5(InFileData, len);
-
-	//Clean up
-	delete[] InFileData;
-
-	return returnString;
 }
 
 string jobReport(double start_s, int totalDir, int goodDir, int badDir)

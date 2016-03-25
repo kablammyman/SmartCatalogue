@@ -17,8 +17,9 @@
 #include "CFGReaderDll.h"
 #include "WinToDBMiddleman.h"
 
-#include "Utils.h"
+
 #include "CFGHelper.h"
+
 
 //sc create "My Sample Service" binPath= C:\SampleService.exe
 
@@ -38,7 +39,8 @@ int main(int argc, char *argv[])
 
 	if (StartServiceCtrlDispatcher(ServiceTable) == FALSE)
 	{
-		string errorText = "My Sample Service: Main: StartServiceCtrlDispatcher returned error: " + to_wstring(GetLastError());
+		string errorText = "My Sample Service: Main: StartServiceCtrlDispatcher returned error: "; 
+		errorText += to_string(GetLastError());
 		OutputDebugString(errorText.c_str());
 		return -1;
 	}
@@ -205,15 +207,8 @@ VOID WINAPI ServiceCtrlHandler(DWORD CtrlCode)
 	OutputDebugString("My Sample Service: ServiceCtrlHandler: Exit");
 }
 
-int parseCommand(string cmd)
-{
-	if (cmd == "time")
-		return 0;
-	else if (cmd == "name")
-		return 1;
 
-	return -1;
-}
+
 //http://qualapps.blogspot.com/2010/05/understanding-readdirectorychangesw.html
 DWORD WINAPI doDirWatch(LPVOID lpParam)
 {
@@ -246,25 +241,26 @@ DWORD WINAPI doDirWatch(LPVOID lpParam)
 			wstring msg = L"File Modified: ";
 			wstring h = temp;
 			msg += h;
-			OutputDebugString(msg.c_str());
-			/*
-			ILE_ACTION_ADDED
-			0x00000001
-			The file was added to the directory.
-			FILE_ACTION_REMOVED
-			0x00000002
-			The file was removed from the directory.
-			FILE_ACTION_MODIFIED
-			0x00000003
-			The file was modified. This can be a change in the time stamp or attributes.
-			FILE_ACTION_RENAMED_OLD_NAME
-			0x00000004
-			The file was renamed and this is the old name.
-			FILE_ACTION_RENAMED_NEW_NAME
-			0x00000005
-			The file was renamed and this is the new name.
-
-			*/
+			//OutputDebugString(msg.c_str());
+			switch (strFileNotifyInfo[0].Action)
+			{
+				
+			case FILE_ACTION_ADDED: //0x00000001
+				//The file was added to the directory.
+				break;
+			case FILE_ACTION_REMOVED: //0x00000002
+				//The file was removed from the directory.
+				break;
+			case FILE_ACTION_MODIFIED://0x00000003
+				//The file was modified. This can be a change in the time stamp or attributes.
+				break;
+			case FILE_ACTION_RENAMED_OLD_NAME://0x00000004
+				//The file was renamed and this is the old name.
+				break;
+			case FILE_ACTION_RENAMED_NEW_NAME://0x00000005
+				//The file was renamed and this is the new name.
+				break;
+			}
 		}
 	}
 }
@@ -350,18 +346,4 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 	return ERROR_SUCCESS;
 }
 
-void connectToRemote()
-{
-	cout << "connecting to " << ip << "\n";
-	if (conn.connectToServer(ip, port) == NETWORK_ERROR)
-	{
-		exit(-1);
-	}
-}
-
-void broadcastMsg(string msg)
-{
-	cout << "sending msg \n";
-	conn.ServerBroadcast(msg.c_str());
-}
 

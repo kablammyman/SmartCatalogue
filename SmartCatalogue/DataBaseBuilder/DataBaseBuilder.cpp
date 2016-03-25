@@ -2,7 +2,7 @@
 
 #include <thread> //for the verify method
 #include <algorithm> //for sort and the SET functions
-
+#include "MD5.h"
 #include "WinToDBMiddleman.h"
 DatabaseBuilder::DatabaseBuilder(string dbPath,string root)
 {
@@ -512,21 +512,14 @@ bool DatabaseBuilder::addDirToDB(string curDir, bool doImageHash)
 				continue;
 
 
-			string hashingCommand = "\"\"" + CFGHelper::filePathBase + "\\CreateImageHash.exe\"  -hash \"";
-			hashingCommand += imgeFilePath;
-			hashingCommand += "\"\"";
+			string hashingCommand = ("-hash,"+imgeFilePath);
+			string pHashingCommand = ("-phash," + imgeFilePath);
+			
 
-			string hash = exec(hashingCommand.c_str());
-
-			size_t found = hashingCommand.find("-hash");
-			hashingCommand.insert(found + 1, "p");
-			string phash = exec(hashingCommand.c_str());
-
-
-			if (!dbBuilder.insertImageHashInfoIntoDB(*it, hash, phash, md5Hash, galleryID))
+			if (!insertImageHashInfoIntoDB(*it, hash, phash, md5Hash, galleryID))
 			{
 				string errString = ("couldnt hash or store: " + imgeFilePath + "\n");
-				dbBuilder.addEntryToInvalidPathFile(errString);
+				addEntryToInvalidPathFile(errString);
 				if (verboseOutput)
 					cout << errString;
 			}
