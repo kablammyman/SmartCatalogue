@@ -5,7 +5,7 @@
 
 #include "DatabaseDataParser.h"
 #include "DatabaseController.h"
-
+#include "NetworkConnection.h"
 #include "myFileDirDll.h"
 
 
@@ -32,11 +32,11 @@ public:
 	int InsertSubWebsiteInfoIntoDB(GalleryData &galleryData, int websiteID);
 	int InsertGalleryInfoIntoDB(GalleryData &galleryData, int websiteID, int subWebsiteID, int categoryID);
 	bool InsertModelInfoIntoDB(GalleryModel &model);
-	bool InsertModelOutfitInfoIntoDB(GalleryModel &model, int clothingIndex, int galleryID);
+	bool InsertModelOutfitInfoIntoDB(GalleryModel &model, size_t clothingIndex, int galleryID);
 	bool InsertImageHashInfoIntoDB(string imgeFileName, string hash, string phash, string md5, int galleryID);
 	bool InsertModelsInGalleryInfoIntoDB(int modelID, int galleryID);
 	bool IsImageInDB(int galleryID, string md5Hash);
 	void VerifyDB(string root);
 	bool AddDirToDB(string curDir, bool doImageHash);
-	bool AddImageHashesToDB(string galleryPath, int galleryID, NetworkConnection *conn, int connIndex);
+	bool RequestImageHashes(string galleryPath, int galleryID, NetworkConnection *conn, int connIndex);
 };

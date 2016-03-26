@@ -1,11 +1,10 @@
-#include "DataBaseBuilder.h"
 #include <list>
 #include <thread> //for the verify method
 #include <algorithm> //for sort and the SET functions
+
 #include "MD5.h"
 #include "WinToDBMiddleman.h"
-
-class NetworkConnection;
+#include "DataBaseBuilder.h"
 
 DatabaseBuilder::DatabaseBuilder(string dbPath,string root)
 {
@@ -54,13 +53,12 @@ int DatabaseBuilder::GetLatestID()
 //---------------------------------------------------------------------------------------------------------
 int DatabaseBuilder::AddEntryToInvalidPathFile(string message)
 {
-	FILE * pFile;
-	pFile = fopen("invalidPaths.txt", "a");
-	if (pFile == NULL)
-		return -1;
+	std::fstream fs;
+	fs.open("invalidPaths.txt", std::fstream::in | std::fstream::out | std::fstream::app);
 
-	fputs(message.c_str(), pFile);
-	fclose(pFile);
+	fs << message;
+
+	fs.close();
 
 	return 0;
 }
@@ -277,7 +275,7 @@ bool DatabaseBuilder::InsertModelInfoIntoDB(GalleryModel &model)
 	return true;
 }
 //---------------------------------------------------------------------------------------------------------
-bool DatabaseBuilder::InsertModelOutfitInfoIntoDB(GalleryModel &model, int clothingIndex, int galleryID)
+bool DatabaseBuilder::InsertModelOutfitInfoIntoDB(GalleryModel &model, size_t clothingIndex, int galleryID)
 {
 	string output;
 	vector<DatabaseController::dbDataPair> dbOutfitInfo;
@@ -500,17 +498,18 @@ bool DatabaseBuilder::AddDirToDB(string curDir, bool doImageHash)
 				return false;
 		}
 	}
-	
+
+	return true;
 }
 
-bool DatabaseBuilder::AddImageHashesToDB(string galleryPath,int galleryID, NetworkConnection *conn, int connIndex)
+bool DatabaseBuilder::RequestImageHashes(string galleryPath,int galleryID, NetworkConnection *conn, int connIndex)
 {
-	list<string> imgFiles = MyFillDirDLL::getNumFilesInDir(galleryPath);
+	vector<string> imgFiles = MyFileDirDll::getAllFileNamesInDir(galleryPath);
 
-	for (list<string>::iterator it = imgFiles.begin(); it != imgFiles.end(); ++it)
+	for (size_t i = 0; i < imgFiles.size(); i++)
 	{
 		//when the path has spaces,we need DOUBLE quotes aka ""C:\some dir\run.exe"" 
-		string imgeFilePath = (galleryPath + *it);
+		string imgeFilePath = (galleryPath + imgFiles[i]);
 		string md5Hash = createMD5Hash(imgeFilePath);
 
 		if (IsImageInDB(galleryID, md5Hash))
@@ -518,16 +517,18 @@ bool DatabaseBuilder::AddImageHashesToDB(string galleryPath,int galleryID, Netwo
 
 		//createImageHash should send back the hashes and the file path they are made from
 		string hashingCommand = ("-allHash," + imgeFilePath);
-		conn->sendData(connIndex, hashingCommand);
-
-		if (!InsertImageHashInfoIntoDB(*it, hash, phash, md5Hash, galleryID))
-		{
-			string errString = ("couldnt hash or store: " + imgeFilePath + "\n");
-			AddEntryToInvalidPathFile(errString);
-			if (verboseOutput)
-				cout << errString;
-		}
-
+		conn->sendData(connIndex, hashingCommand.c_str());
 	}
-	
+	return true;
 }
+/*
+bool DatabaseBuilder::AddToFileDB()
+{
+	if (!InsertImageHashInfoIntoDB(imgFiles[i], hash, phash, md5Hash, galleryID))
+	{
+		string errString = ("couldnt hash or store: " + imgeFilePath + "\n");
+		AddEntryToInvalidPathFile(errString);
+		if (verboseOutput)
+			cout << errString;
+	}
+}*/

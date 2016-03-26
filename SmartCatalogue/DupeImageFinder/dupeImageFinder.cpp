@@ -521,7 +521,7 @@ void mainLogic()
 			for (size_t j = 0; j < dataToCache.size(); j++)
 				foundItems[dataToCache[j]] = true;
 		}
-		progress.updateProgressBar(i);
+		progress.updateProgressBar((int)i);
 	}
 	SetWindowTextA(statusText, "done!");
 	finish();

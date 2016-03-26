@@ -14,9 +14,9 @@
 
 #include "DataBaseManager.h"
 #include "DataBaseBuilder.h"
-#include "CFGReaderDll.h"
-#include "WinToDBMiddleman.h"
 
+#include "WinToDBMiddleman.h"
+#include "CFGReaderDll.h"
 #include "CFGHelper.h"
 
 
@@ -78,23 +78,9 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 
 	//START STUFF
 	cout << "starting server\n";
-	conn.startServer(SOMAXCONN, port);
+	conn.startServer(SOMAXCONN, CFGHelper::DataBaseManagerPort);
 	
-	vector<string> dbTableValues = CFG::CFGReaderDLL::getCfgListValue("tableNames");
-	//if we cant find the table names in the cfg, thejust get out of here
-	if (dbTableValues.size() == 1 && dbTableValues[0].find("could not find") != string::npos)
-	{
-		cout << "couldnt find the list of table names in your cfg...\n";
-		exit(-1);
-	}
-
-
-
-	DatabaseBuilder dbBuilder(CFGHelper::dbPath, CFGHelper::ignorePattern);
-	dbBuilder.fillMetaWords(CFGHelper::meta);
-	dbBuilder.fillPartsOfSpeechTable(dbTableValues);
-	//dbBuilder.verifyDB(CFGHelper::pathToProcess);
-
+	
 
 	OutputDebugString("My Sample Service: ServiceMain: Performing Service Start Operations");
 
@@ -131,11 +117,13 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 
 	hDirWatchThread = CreateThread(NULL, 0, doDirWatch, NULL, 0, NULL);
 	hNetworkThread = CreateThread(NULL, 0, doNetWorkCommunication, NULL, 0, NULL);
+	hMainThread = CreateThread(NULL, 0, doMainWorkerThread, NULL, 0, NULL);
+
 
 	OutputDebugString("My Sample Service: ServiceMain: Waiting for Worker Thread to complete");
 
 	// Wait until our main worker thread exits effectively signaling that the service needs to stop
-	WaitForSingleObject(hNetworkThread, INFINITE);
+	WaitForSingleObject(hMainThread, INFINITE);
 
 	OutputDebugString("My Sample Service: ServiceMain: Worker Thread Stop Event signaled");
 
@@ -271,9 +259,6 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 	int recvbuflen = DEFAULT_BUFLEN;
 	int numConn = 0;
 
-	OutputDebugString("My Sample Service: ServiceWorkerThread: Entry");
-
-
 	//  Periodically check if the service has been requested to stop
 	while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
 	{
@@ -289,7 +274,7 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 				if (iResult > 0)
 				{
 					recvbuf[iResult] = '\0';
-					printf("%s -> %d bytes.\n", recvbuf, iResult);
+					//printf("%s -> %d bytes.\n", recvbuf, iResult);
 
 					vector<string> argVec = Utils::tokenize(recvbuf, ",");
 					CmdArg newCommand = parseCommand(argVec);
@@ -305,30 +290,6 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 					printf("recv failed: %d\n", WSAGetLastError());
 			}
 		}
-
-		if(tasks.empty())
-			continue;
-
-		CmdArg command = tasks.front();
-		tasks.pop();
-
-		//these may not be needed anymore
-		int goodDir = 0, badDir = 0, totalDir = 0;
-		int start_s = clock();
-		
-		vector<string> paths = getPathForCurOperation();
-
-		for(size_t i = 0; i < paths.size(); i++)
-		{
-			if (dbBuilder.addDirToDB(paths[i]))
-				goodDir++;
-			else
-				badDir++;
-
-			totalDir++;
-		}
-
-
 	}
 
 	OutputDebugString("My Sample Service: network communication: Exit");
@@ -336,6 +297,60 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 	return ERROR_SUCCESS;
 }
 
+DWORD WINAPI doMainWorkerThread(LPVOID lpParam)
+{
+	DatabaseBuilder dbBuilder(CFGHelper::dbPath, CFGHelper::ignorePattern);
+	dbBuilder.FillMetaWords(CFGHelper::meta);
+	
+	vector<string> dbTableValues = CFG::CFGReaderDLL::getCfgListValue("tableNames");
+	//if we cant find the table names in the cfg, thejust get out of here
+	if (dbTableValues.size() == 1 && dbTableValues[0].find("could not find") != string::npos)
+	{
+		cout << "couldnt find the list of table names in your cfg...\n";
+		return -1;
+	}
+
+	dbBuilder.FillPartsOfSpeechTable(dbTableValues);
+	//dbBuilder.verifyDB(CFGHelper::pathToProcess);
+	
+	OutputDebugString("My Sample Service: ServiceWorkerThread: Entry");
+
+	while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
+	{
+		if (tasks.empty())
+			continue;
+
+		CmdArg command = tasks.front();
+		tasks.pop();
+		
+		if (command.cmd.empty())
+			continue;
+		else if (command.cmd == "-ADDGAL")
+		{
+			//these may not be needed anymore
+			int goodDir = 0, badDir = 0, totalDir = 0;
+			int start_s = clock();
+
+			if (dbBuilder.AddDirToDB(command.data[0], true))
+				goodDir++;
+			else
+				badDir++;
+
+			totalDir++;
+
+			string report = jobReport(start_s, totalDir, goodDir, badDir);
+		}
+		else if (command.cmd == "-DELGAL")
+		{
+			
+		}
+		else if (command.cmd == "-MOVGAL")
+		{
+
+		}
+	}
+	return 0;
+}
 
 /*
 

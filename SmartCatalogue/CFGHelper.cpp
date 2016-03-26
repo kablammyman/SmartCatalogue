@@ -8,6 +8,10 @@ string CFGHelper::filePathBase;
 string CFGHelper::dbPath;
 string CFGHelper::pathToProcess;
 string CFGHelper::ignorePattern;
+string CFGHelper::CreateImageHashIP;
+int CFGHelper::CreateImageHashPort;
+int CFGHelper::DataBaseManagerPort;
+string CFGHelper::DataBaseManagerIP;
 vector<string> CFGHelper::meta;
 
 void CFGHelper::loadCFGFile(string programBasePath)
@@ -29,4 +33,9 @@ void CFGHelper::loadCFGFile(string programBasePath)
 	pathToProcess = CFG::CFGReaderDLL::getCfgStringValue("mainWorkingPath");
 	ignorePattern = CFG::CFGReaderDLL::getCfgStringValue("ignorePattern");
 	meta = CFG::CFGReaderDLL::getCfgListValue("metaWords");
+	CreateImageHashIP = CFG::CFGReaderDLL::getCfgStringValue("CreateImageHashIP");
+	CreateImageHashPort = CFG::CFGReaderDLL::getCfgIntValue("CreateImageHashPort");
+	DataBaseManagerIP = CFG::CFGReaderDLL::getCfgStringValue("DataBaseManagerIP");
+	DataBaseManagerPort = CFG::CFGReaderDLL::getCfgIntValue("DataBaseManagerPort");
+
 }

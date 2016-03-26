@@ -318,7 +318,7 @@ int DatabaseDataParser::getEntryIDFromDBTable(string table, string word)
 	vector<string> *dbEntries = DBTables[table];
 	for (size_t i = 0; i < dbEntries->size(); i++)
 		if ((*dbEntries)[i] == word)
-			return i;
+			return (int)i;
 	return -1;
 }
 //must be used with desciptive words only! otherwise we will need to add a check before, and i dont want to do that
@@ -566,13 +566,13 @@ void DatabaseDataParser::testGalleryCalc()
 			printf("\n");
 			for (size_t k = 0; k < galleryData.models.size(); k++)
 			{
-				printf("model %d name:", k + 1);
+				printf("model %d name:", (int)k + 1);
 				printf("%s %s %s\n", galleryData.models[k].name.firstName.c_str(), galleryData.models[k].name.middleName.c_str(), galleryData.models[k].name.lastName.c_str());
 				
 				
 				if (galleryData.models[k].outfit.size() > 0)
 				{
-					printf("model %d first outfit:", k + 1);
+					printf("model %d first outfit:", (int)k + 1);
 					printf("%s\n", galleryData.models[k].outfit[0].type.c_str());
 					/*printf("%d\n", galleryData.models[k].sexActionIndex);
 					printf("%d\n", galleryData.models[k].hairColorIndex);*/

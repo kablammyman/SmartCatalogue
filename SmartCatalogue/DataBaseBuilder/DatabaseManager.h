@@ -9,7 +9,7 @@
 
 #include "NetworkConnection.h"
 #include "Utils.h"
-
+#include "CFGHelper.h"
 
 
 #define SERVICE_NAME  "PornoDB Manager"
@@ -23,11 +23,13 @@ HANDLE                g_ServiceStopEvent = INVALID_HANDLE_VALUE;
 HANDLE				  hDir;
 HANDLE				  hNetworkThread;
 HANDLE				  hDirWatchThread;
+HANDLE				  hMainThread;
 
 VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv);
 VOID WINAPI ServiceCtrlHandler(DWORD);
 DWORD WINAPI doNetWorkCommunication(LPVOID lpParam);
 DWORD WINAPI doDirWatch(LPVOID lpParam);
+DWORD WINAPI doMainWorkerThread(LPVOID lpParam);
 
 queue<CmdArg> tasks;
 NetworkConnection conn;
@@ -56,7 +58,29 @@ CmdArg parseCommand(vector<string> argv)
 		for (size_t j = 0; j < cmdArgUpper.size(); j++)
 			cmdArgUpper[j] = toupper(cmdArgUpper[j]);
 			
+		command.SetCommand(cmdArgUpper);
 
+		if (cmdArgUpper == "-DEST")
+		{
+			i++;
+			if (i >= argv.size())
+			{
+				command.clear();
+				return command;
+			}
+			command.dest = atoi(argv[i].c_str());
+		}
+		else if (cmdArgUpper == "-ADDGAL" || "-DELGAL" || "-MOVGAL")
+		{
+			i++;
+			if (i >= argv.size())
+			{
+				command.clear();
+				return command;
+			}
+			command.data.push_back(argv[i]);
+		}
+			
 		i++;
 	}
 	//if we get here, we prob turned on/off server mode and thats it
@@ -143,5 +167,5 @@ int StartAndConnectToCreateImageHash()
 	Sleep(2000);
 	//cout << "connecting to " <<CFG::CFGReaderDLL::getCfgStringValue("CreateImageHashIP")<< "\n";
 	//now try to connect to it
-	return conn.connectToServer(CFG::CFGReaderDLL::getCfgStringValue("CreateImageHashIP"), CFG::CFGReaderDLL::getCfgStringValue("CreateImageHashPort"));
+	return conn.connectToServer(CFGHelper::CreateImageHashIP, CFGHelper::CreateImageHashPort);
 }
