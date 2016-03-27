@@ -276,7 +276,7 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 					recvbuf[iResult] = '\0';
 					//printf("%s -> %d bytes.\n", recvbuf, iResult);
 
-					vector<string> argVec = Utils::tokenize(recvbuf, ",");
+					vector<string> argVec = Utils::tokenize(recvbuf, "|");
 					CmdArg newCommand = parseCommand(argVec);
 
 					newCommand.dest = i;
@@ -347,6 +347,10 @@ DWORD WINAPI doMainWorkerThread(LPVOID lpParam)
 		else if (command.cmd == "-MOVGAL")
 		{
 
+		}
+		else if (command.cmd == "HASH")
+		{
+			dbBuilder.AddHashDataToDB(command.data[0], command.data[1], command.data[2]);
 		}
 	}
 	return 0;

@@ -34,7 +34,6 @@ DWORD WINAPI doMainWorkerThread(LPVOID lpParam);
 queue<CmdArg> tasks;
 NetworkConnection conn;
 
-bool verboseOutput = false;
 bool doImageHash = true;;
 
 using namespace std;
@@ -58,10 +57,11 @@ CmdArg parseCommand(vector<string> argv)
 		for (size_t j = 0; j < cmdArgUpper.size(); j++)
 			cmdArgUpper[j] = toupper(cmdArgUpper[j]);
 			
-		command.SetCommand(cmdArgUpper);
+		
 
 		if (cmdArgUpper == "-DEST")
 		{
+			command.SetCommand(cmdArgUpper);
 			i++;
 			if (i >= argv.size())
 			{
@@ -72,6 +72,7 @@ CmdArg parseCommand(vector<string> argv)
 		}
 		else if (cmdArgUpper == "-ADDGAL" || "-DELGAL" || "-MOVGAL")
 		{
+			command.SetCommand(cmdArgUpper);
 			i++;
 			if (i >= argv.size())
 			{
@@ -79,6 +80,14 @@ CmdArg parseCommand(vector<string> argv)
 				return command;
 			}
 			command.data.push_back(argv[i]);
+		}
+		//this should be an image hash returning from over the wire
+		else
+		{
+			command.SetCommand("HASH");
+			i++;
+			for (size_t j = i; j < argv.size(); j++)
+				command.data.push_back(argv[j]);
 		}
 			
 		i++;

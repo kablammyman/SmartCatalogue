@@ -319,6 +319,66 @@ bool DatabaseBuilder::InsertImageHashInfoIntoDB(string imgeFileName, string hash
 	return true;
 }
 //---------------------------------------------------------------------------------------------------------
+bool DatabaseBuilder::InsertImageHashInfoIntoDB(string imgeFileName, string md5, int galleryID)
+{
+	string output;
+	vector<DatabaseController::dbDataPair> dbImgInfo;
+	dbImgInfo.push_back(make_pair("fileName", imgeFileName));
+	dbImgInfo.push_back(make_pair("MD5", md5));
+	dbImgInfo.push_back(make_pair("galleryID", to_string(galleryID)));
+	dbCtrlr.insertNewDataEntry("Images", dbImgInfo, output);
+
+	if (!output.empty())
+	{
+		//if we are trying to input the same image again (lie we restarted the process)
+		//then its not an error
+		if (output.find("UNIQUE constraint failed") == string::npos)
+		{
+			ReportError("image hash input error", output, "filename = " + imgeFileName + "\ngalleryID = " + to_string(galleryID), false);
+			return false;
+		}
+	}
+	return true;
+}
+//---------------------------------------------------------------------------------------------------------
+bool DatabaseBuilder::AddHashDataToDB(string imgeFileName, string hash, string phash)
+{
+	string output;
+	vector<DatabaseController::dbDataPair> dbImgInfo;
+
+	string fileName = MyFileDirDll::getFileNameFromPathString(imgeFileName);
+
+	vector<DatabaseController::dbDataPair> imgQuerey;
+	imgQuerey.push_back(make_pair("fileName", fileName));
+	dbCtrlr.doDBQuerey("Images", imgQuerey, output);
+
+	//empty output means there name wasnt found
+	if (!output.empty())
+	{
+		if (output.find("error") != string::npos)
+		{
+			ReportError("image hash lookup error",output,"couldnt find: " + imgeFileName + " in DB to add phash", false);
+			return false;
+		}
+	}
+
+	dbImgInfo.push_back(make_pair("hash", hash));
+	dbImgInfo.push_back(make_pair("phash", phash));
+	dbCtrlr.insertNewDataEntry("Images", dbImgInfo, output);
+
+	if (!output.empty())
+	{
+		//if we are trying to input the same image again (like we restarted the process)
+		//then its not an error
+		if (output.find("UNIQUE constraint failed") == string::npos)
+		{
+			ReportError("image hash input error", output, "filename = " + imgeFileName, false);
+			return false;
+		}
+	}
+	return true;
+}
+//---------------------------------------------------------------------------------------------------------
 bool DatabaseBuilder::InsertModelsInGalleryInfoIntoDB(int modelID, int galleryID)
 {
 	//add the model to gallery info
@@ -515,7 +575,11 @@ bool DatabaseBuilder::RequestImageHashes(string galleryPath,int galleryID, Netwo
 		if (IsImageInDB(galleryID, md5Hash))
 			continue;
 
+		if (!InsertImageHashInfoIntoDB(imgFiles[i], md5Hash, galleryID))
+			continue;
+
 		//createImageHash should send back the hashes and the file path they are made from
+		//when the data comes back, we will add the hash/phash info
 		string hashingCommand = ("-allHash," + imgeFilePath);
 		conn->sendData(connIndex, hashingCommand.c_str());
 	}

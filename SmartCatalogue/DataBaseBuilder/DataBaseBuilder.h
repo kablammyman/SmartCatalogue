@@ -34,6 +34,8 @@ public:
 	bool InsertModelInfoIntoDB(GalleryModel &model);
 	bool InsertModelOutfitInfoIntoDB(GalleryModel &model, size_t clothingIndex, int galleryID);
 	bool InsertImageHashInfoIntoDB(string imgeFileName, string hash, string phash, string md5, int galleryID);
+	bool InsertImageHashInfoIntoDB(string imgeFileName, string md5, int galleryID);
+	bool AddHashDataToDB(string imgeFileName, string hash, string phash);
 	bool InsertModelsInGalleryInfoIntoDB(int modelID, int galleryID);
 	bool IsImageInDB(int galleryID, string md5Hash);
 	void VerifyDB(string root);
