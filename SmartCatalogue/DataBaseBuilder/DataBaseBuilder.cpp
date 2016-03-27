@@ -10,6 +10,7 @@ DatabaseBuilder::DatabaseBuilder(string dbPath,string root)
 {
 	dbCtrlr.openDatabase(dbPath);
 	dbDataParser.setDBController(&dbCtrlr);
+	WinToDBMiddleman::SetDBController(&dbCtrlr);
 	rootPath = root;
 }
 //---------------------------------------------------------------------------------------------------------
@@ -364,7 +365,7 @@ bool DatabaseBuilder::AddHashDataToDB(string imgeFileName, string hash, string p
 
 	dbImgInfo.push_back(make_pair("hash", hash));
 	dbImgInfo.push_back(make_pair("phash", phash));
-	dbCtrlr.insertNewDataEntry("Images", dbImgInfo, output);
+	dbCtrlr.UpdateEntry("Images", dbImgInfo, make_pair("fileName", fileName), output);
 
 	if (!output.empty())
 	{
@@ -372,7 +373,7 @@ bool DatabaseBuilder::AddHashDataToDB(string imgeFileName, string hash, string p
 		//then its not an error
 		if (output.find("UNIQUE constraint failed") == string::npos)
 		{
-			ReportError("image hash input error", output, "filename = " + imgeFileName, false);
+			ReportError("image hash input error", output, "filename = " + fileName, false);
 			return false;
 		}
 	}
@@ -464,11 +465,11 @@ void DatabaseBuilder::VerifyDB(string root)
 	dirsToDeleteFromDB.resize(it - dirsToDeleteFromDB.begin());
 	//WinToDBMiddleman winDB;
 	//winDB.setDBController(&dbCtrlr);
-	WinToDBMiddleman::setDBController(&dbCtrlr);
+	
 	string output;
 	for (size_t i = 0; i < dirsToDeleteFromDB.size(); i++)
 	{
-		if (!WinToDBMiddleman::deleteGalleryFromDB(dirsToDeleteFromDB[i], output))
+		if (!WinToDBMiddleman::DeleteGalleryFromDB(dirsToDeleteFromDB[i], output))
 			cout << "error: " << output << endl;
 	}
 	cout << "removed " << dirsToDeleteFromDB.size() << " galleries from DB\n";
@@ -501,7 +502,7 @@ bool DatabaseBuilder::AddDirToDB(string curDir, bool doImageHash)
 
 	GalleryData galleryData;
 	string galleryCalcError;
-	bool ret = ParsePath(curDir, galleryData, galleryCalcError);
+	bool ret = dbDataParser.calcGalleryData(curDir, rootPath, galleryData, galleryCalcError);
 	if (!ret)
 	{
 		ReportError("invalid directory", curDir, galleryCalcError, true);
@@ -561,13 +562,12 @@ bool DatabaseBuilder::AddDirToDB(string curDir, bool doImageHash)
 	return true;
 }
 
-bool DatabaseBuilder::RequestImageHashes(string galleryPath,int galleryID, NetworkConnection *conn, int connIndex)
+bool DatabaseBuilder::RequestImageHashesForDir(string galleryPath,int galleryID, NetworkConnection *conn, int connIndex)
 {
 	vector<string> imgFiles = MyFileDirDll::getAllFileNamesInDir(galleryPath);
 
 	for (size_t i = 0; i < imgFiles.size(); i++)
-	{
-		//when the path has spaces,we need DOUBLE quotes aka ""C:\some dir\run.exe"" 
+	{ 
 		string imgeFilePath = (galleryPath + imgFiles[i]);
 		string md5Hash = createMD5Hash(imgeFilePath);
 
@@ -584,6 +584,25 @@ bool DatabaseBuilder::RequestImageHashes(string galleryPath,int galleryID, Netwo
 	}
 	return true;
 }
+//since the dir watcher gets all the images we add, this makes more sense
+bool DatabaseBuilder::RequestImageHash(string imgPath, int galleryID, NetworkConnection *conn, int connIndex)
+{
+	string md5Hash = createMD5Hash(imgPath);
+
+	if (IsImageInDB(galleryID, md5Hash))
+		return false;
+	
+	if (!InsertImageHashInfoIntoDB(MyFileDirDll::getFileNameFromPathString(imgPath), md5Hash, galleryID))
+		return false;
+
+	//createImageHash should send back the hashes and the file path they are made from
+	//when the data comes back, we will add the hash/phash info
+	string hashingCommand = ("-allHash," + imgPath);
+	conn->sendData(connIndex, hashingCommand.c_str());
+	
+	return true;
+}
+
 /*
 bool DatabaseBuilder::AddToFileDB()
 {

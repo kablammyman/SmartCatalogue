@@ -381,7 +381,7 @@ void lilMenu(HWND handle, int x, int y)
 			return;
 		string path(selectedText.begin(), selectedText.end());
 		//middleMan.deleteImage(path);
-		WinToDBMiddleman::deleteImage(path);
+		WinToDBMiddleman::DeleteImage(path);
 		TreeView_DeleteItem(handle, hItem);
 		//need to check to see if ther only node left is a parent with no kids, if so, remove it from the list
 	}
@@ -391,7 +391,7 @@ void lilMenu(HWND handle, int x, int y)
 			return;
 		string path(selectedText.begin(), selectedText.end());
 		//middleMan.deleteGallery(path);
-		WinToDBMiddleman::deleteGallery(path);
+		WinToDBMiddleman::DeleteGallery(path);
 		TreeView_DeleteItem(handle, hItem);
 		//need to check to see if ther only node left is a parent with no kids, if so, remove it from the list
 	}

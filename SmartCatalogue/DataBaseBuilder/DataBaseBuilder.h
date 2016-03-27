@@ -40,5 +40,6 @@ public:
 	bool IsImageInDB(int galleryID, string md5Hash);
 	void VerifyDB(string root);
 	bool AddDirToDB(string curDir, bool doImageHash);
-	bool RequestImageHashes(string galleryPath, int galleryID, NetworkConnection *conn, int connIndex);
+	bool RequestImageHashesForDir(string galleryPath, int galleryID, NetworkConnection *conn, int connIndex);
+	bool RequestImageHash(string imgPath, int galleryID, NetworkConnection *conn, int connIndex);
 };

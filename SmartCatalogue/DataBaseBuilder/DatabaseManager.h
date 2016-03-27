@@ -35,7 +35,7 @@ DWORD WINAPI doMainWorkerThread(LPVOID lpParam);
 queue<CmdArg> tasks;
 NetworkConnection conn;
 
-bool doImageHash = true;;
+bool isService = true;
 int createImageHashSocket = -1;
 
 using namespace std;
@@ -72,7 +72,7 @@ CmdArg parseCommand(vector<string> argv)
 			}
 			command.dest = atoi(argv[i].c_str());
 		}
-		else if (cmdArgUpper == "-ADDGAL" || "-DELGAL" || "-MOVGAL" || "-VERIFY")
+		else if (cmdArgUpper == "-ADDGAL" || cmdArgUpper ==  "-DELGAL" || cmdArgUpper == "-MOVGAL" || cmdArgUpper == "-VERIFY")
 		{
 			command.SetCommand(cmdArgUpper);
 			i++;
@@ -88,9 +88,10 @@ CmdArg parseCommand(vector<string> argv)
 		else
 		{
 			command.SetCommand("HASH");
-			i++;
 			for (size_t j = i; j < argv.size(); j++)
 				command.data.push_back(argv[j]);
+
+			break;
 		}
 			
 		i++;
@@ -196,9 +197,10 @@ void ShutdownCreateImageHash()
 {
 	if(hCreateImageHashProc == NULL)
 		return;
-	hCreateImageHashProc = NULL;
+	
 	conn.sendData(createImageHashSocket,"-exit");
 	createImageHashSocket = -1;
+	hCreateImageHashProc = NULL;
 }
 
 string GetTimeStamp()
@@ -210,4 +212,12 @@ string GetTimeStamp()
 	timeinfo = localtime(&rawtime);
 	return asctime(timeinfo);
 	//printf("The current date/time is: %s", asctime(timeinfo));
+}
+
+void DebugPrint(string msg)
+{
+	if(isService)
+		OutputDebugString(msg.c_str());
+	else
+		cout << msg <<endl;
 }

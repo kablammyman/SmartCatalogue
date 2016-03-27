@@ -39,3 +39,43 @@ void CFGHelper::loadCFGFile(string programBasePath)
 	DataBaseManagerPort = CFG::CFGReaderDLL::getCfgIntValue("DataBaseManagerPort");
 
 }
+//check to make sure everything loaded
+bool CFGHelper::IsCFGComplete(string &err)
+{
+	if (dbPath == "")
+	{
+		err = "dbPath is missing";
+		return false;
+	}
+	if (pathToProcess == "")
+	{
+		err = "pathToProcess is missing";
+		return false;
+	}
+	if (ignorePattern == "")
+	{
+		err = "ignorePattern is missing";
+		return false;
+	}
+	if (CreateImageHashIP == "")
+	{
+		err = "CreateImageHashIP is missing";
+		return false;
+	}
+	if (DataBaseManagerIP == "")
+	{
+		err = "DataBaseManagerIP is missing";
+		return false;
+	}
+	if (CreateImageHashPort < 1000)
+	{
+		err = "CreateImageHashPort is missing or is less than 1000";
+		return false;
+	}
+	if (DataBaseManagerPort < 1000)
+	{
+		err = "DataBaseManagerPort is missing or is less than 1000";
+		return false;
+	}
+	return true;
+}

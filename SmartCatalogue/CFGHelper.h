@@ -20,4 +20,6 @@ public:
 	static string DataBaseManagerIP;
 	
 	static void loadCFGFile(string programBasePath = "");
+
+	static bool IsCFGComplete(string &err);
 };
