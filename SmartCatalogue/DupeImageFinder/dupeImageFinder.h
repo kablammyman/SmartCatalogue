@@ -45,7 +45,7 @@ void finish();
 //usewd to time how long it takes to find the dupes
 bool readyToSearch = false;
 int start_s, stop_s, minHammingDist;
-WinToDBMiddleman middleMan;
+//WinToDBMiddleman middleMan;
 vector<DatabaseController::dbDataPair> hashes;
 //ProgressBar waitingMarquee;
 ProgressBar progress;

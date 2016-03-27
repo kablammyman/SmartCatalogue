@@ -9,21 +9,21 @@ using namespace std;
 class WinToDBMiddleman
 {
 private:
-	DatabaseController *dbCtrlr;
-	string getGalleryIDQuereyString(string path);
+	static DatabaseController *dbCtrlr;
+	static string getGalleryIDQuereyString(string path);
 public:
-	void initDBController(string path);
-	void setDBController(DatabaseController *db);
-	bool moveImage(string dest, string src);
-	bool moveGallery(string dest, string src);
+	static void initDBController(string path);
+	static void setDBController(DatabaseController *db);
+	static bool moveImage(string dest, string src);
+	static bool moveGallery(string dest, string src);
 
-	bool deleteImage(string image);
-	bool deleteImageFromDisk(string image);
-	bool deleteImageFromDB(string image, string &output);
+	static bool deleteImage(string image);
+	static bool deleteImageFromDisk(string image);
+	static bool deleteImageFromDB(string image, string &output);
 
-	bool deleteGalleryAndImagesFromDB(string gallery, string &output);
+	static bool deleteGalleryAndImagesFromDB(string gallery, string &output);
 
-	bool deleteGallery(string gallery);
-	bool deleteGalleryFromDB(string gallery, string &output);
-	bool deleteGalleryFromDisk(string gallery);
+	static bool deleteGallery(string gallery);
+	static bool deleteGalleryFromDB(string gallery, string &output);
+	static bool deleteGalleryFromDisk(string gallery);
 };

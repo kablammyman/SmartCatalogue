@@ -462,13 +462,13 @@ void DatabaseBuilder::VerifyDB(string root)
 	it = set_difference(dbPAths.begin(), dbPAths.end(), commonDirs.begin(), commonDirs.end(), dirsToDeleteFromDB.begin());
 
 	dirsToDeleteFromDB.resize(it - dirsToDeleteFromDB.begin());
-	WinToDBMiddleman winDB;
-	winDB.setDBController(&dbCtrlr);
-
+	//WinToDBMiddleman winDB;
+	//winDB.setDBController(&dbCtrlr);
+	WinToDBMiddleman::setDBController(&dbCtrlr);
 	string output;
 	for (size_t i = 0; i < dirsToDeleteFromDB.size(); i++)
 	{
-		if (!winDB.deleteGalleryFromDB(dirsToDeleteFromDB[i], output))
+		if (!WinToDBMiddleman::deleteGalleryFromDB(dirsToDeleteFromDB[i], output))
 			cout << "error: " << output << endl;
 	}
 	cout << "removed " << dirsToDeleteFromDB.size() << " galleries from DB\n";
@@ -480,12 +480,11 @@ void DatabaseBuilder::VerifyDB(string root)
 	dirsNotInDB.resize(it - dirsNotInDB.begin());
 	
 
-	/*string output;
 	for (size_t i = 0; i < dirsNotInDB.size(); i++)
 	{
-		if (!winDB.deleteGalleryFromDB(dirsNotInDB[i], output))
+		if (!AddDirToDB(dirsNotInDB[i], true))
 			cout << "error: " << output << endl;
-	}*/
+	}
 
 	cout << "added " << dirsNotInDB.size() << " galleries to DB\n";
 }

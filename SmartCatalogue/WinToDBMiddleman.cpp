@@ -2,6 +2,8 @@
 #include "Windows.h"
 #include "WinToDBMiddleman.h"
 
+DatabaseController *WinToDBMiddleman::dbCtrlr;
+
 void WinToDBMiddleman::initDBController(string path)
 {
 	dbCtrlr = new DatabaseController();

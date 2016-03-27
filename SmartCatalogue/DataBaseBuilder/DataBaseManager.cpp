@@ -20,7 +20,7 @@
 #include "CFGHelper.h"
 
 
-//sc create "My Sample Service" binPath= C:\SampleService.exe
+//sc create "PornoDB Manager" binPath= C:\SampleService.exe
 
 
 int main(int argc, char *argv[])
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	CFGHelper::filePathBase = Utils::setProgramPath(argv[0]);
 	CFGHelper::loadCFGFile();
 
-	OutputDebugString("My Sample Service: Main: Entry");
+	OutputDebugString("PornoDB Manager: Main: Entry");
 
 	SERVICE_TABLE_ENTRY ServiceTable[] =
 	{
@@ -38,13 +38,13 @@ int main(int argc, char *argv[])
 
 	if (StartServiceCtrlDispatcher(ServiceTable) == FALSE)
 	{
-		string errorText = "My Sample Service: Main: StartServiceCtrlDispatcher returned error: "; 
+		string errorText = "PornoDB Manager: Main: StartServiceCtrlDispatcher returned error: "; 
 		errorText += to_string(GetLastError());
 		OutputDebugString(errorText.c_str());
 		return -1;
 	}
 
-	OutputDebugString("My Sample Service: Main: Exit");
+	OutputDebugString("PornoDB Manager: Main: Exit");
 	return 0;
 }
 
@@ -52,13 +52,13 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 {
 	DWORD Status = E_FAIL;
 
-	OutputDebugString("My Sample Service: ServiceMain: Entry");
+	OutputDebugString("PornoDB Manager: ServiceMain: Entry");
 
 	g_StatusHandle = RegisterServiceCtrlHandler(SERVICE_NAME, ServiceCtrlHandler);
 
 	if (g_StatusHandle == NULL)
 	{
-		OutputDebugString("My Sample Service: ServiceMain: RegisterServiceCtrlHandler returned error");
+		OutputDebugString("PornoDB Manager: ServiceMain: RegisterServiceCtrlHandler returned error");
 		goto EXIT;
 	}
 
@@ -73,7 +73,7 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 
 	if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
 	{
-		OutputDebugString("My Sample Service: ServiceMain: SetServiceStatus returned error");
+		OutputDebugString("PornoDB Manager: ServiceMain: SetServiceStatus returned error");
 	}
 
 	//START STUFF
@@ -82,13 +82,13 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 	
 	
 
-	OutputDebugString("My Sample Service: ServiceMain: Performing Service Start Operations");
+	OutputDebugString("PornoDB Manager: ServiceMain: Performing Service Start Operations");
 
 	// Create stop event to wait on later.
 	g_ServiceStopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	if (g_ServiceStopEvent == NULL)
 	{
-		OutputDebugString("My Sample Service: ServiceMain: CreateEvent(g_ServiceStopEvent) returned error");
+		OutputDebugString("PornoDB Manager: ServiceMain: CreateEvent(g_ServiceStopEvent) returned error");
 
 		g_ServiceStatus.dwControlsAccepted = 0;
 		g_ServiceStatus.dwCurrentState = SERVICE_STOPPED;
@@ -97,7 +97,7 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 
 		if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
 		{
-			OutputDebugString("My Sample Service: ServiceMain: SetServiceStatus returned error");
+			OutputDebugString("PornoDB Manager: ServiceMain: SetServiceStatus returned error");
 		}
 		goto EXIT;
 	}
@@ -110,7 +110,7 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 
 	if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
 	{
-		OutputDebugString("My Sample Service: ServiceMain: SetServiceStatus returned error");
+		OutputDebugString("PornoDB Manager: ServiceMain: SetServiceStatus returned error");
 	}
 
 	// Start the thread that will perform the main task of the service
@@ -120,17 +120,17 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 	hMainThread = CreateThread(NULL, 0, doMainWorkerThread, NULL, 0, NULL);
 
 
-	OutputDebugString("My Sample Service: ServiceMain: Waiting for Worker Thread to complete");
+	OutputDebugString("PornoDB Manager: ServiceMain: Waiting for Worker Thread to complete");
 
 	// Wait until our main worker thread exits effectively signaling that the service needs to stop
 	WaitForSingleObject(hMainThread, INFINITE);
 
-	OutputDebugString("My Sample Service: ServiceMain: Worker Thread Stop Event signaled");
+	OutputDebugString("PornoDB Manager: ServiceMain: Worker Thread Stop Event signaled");
 
 	/*
 	* Perform any cleanup tasks
 	*/
-	OutputDebugString("My Sample Service: ServiceMain: Performing Cleanup Operations");
+	OutputDebugString("PornoDB Manager: ServiceMain: Performing Cleanup Operations");
 
 	conn.shutdown();
 	CancelIo(hDir);
@@ -147,24 +147,24 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 
 	if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
 	{
-		OutputDebugString("My Sample Service: ServiceMain: SetServiceStatus returned error");
+		OutputDebugString("PornoDB Manager: ServiceMain: SetServiceStatus returned error");
 	}
 
 EXIT:
-	OutputDebugString("My Sample Service: ServiceMain: Exit");
+	OutputDebugString("PornoDB Manager: ServiceMain: Exit");
 
 	return;
 }
 
 VOID WINAPI ServiceCtrlHandler(DWORD CtrlCode)
 {
-	OutputDebugString("My Sample Service: ServiceCtrlHandler: Entry");
+	OutputDebugString("PornoDB Manager: ServiceCtrlHandler: Entry");
 
 	switch (CtrlCode)
 	{
 	case SERVICE_CONTROL_STOP:
 
-		OutputDebugString("My Sample Service: ServiceCtrlHandler: SERVICE_CONTROL_STOP Request");
+		OutputDebugString("PornoDB Manager: ServiceCtrlHandler: SERVICE_CONTROL_STOP Request");
 
 		if (g_ServiceStatus.dwCurrentState != SERVICE_RUNNING)
 			break;
@@ -179,7 +179,7 @@ VOID WINAPI ServiceCtrlHandler(DWORD CtrlCode)
 
 		if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
 		{
-			OutputDebugString("My Sample Service: ServiceCtrlHandler: SetServiceStatus returned error");
+			OutputDebugString("PornoDB Manager: ServiceCtrlHandler: SetServiceStatus returned error");
 		}
 
 		// This will signal the worker thread to start shutting down
@@ -191,7 +191,7 @@ VOID WINAPI ServiceCtrlHandler(DWORD CtrlCode)
 		break;
 	}
 
-	OutputDebugString("My Sample Service: ServiceCtrlHandler: Exit");
+	OutputDebugString("PornoDB Manager: ServiceCtrlHandler: Exit");
 }
 
 
@@ -224,30 +224,41 @@ DWORD WINAPI doDirWatch(LPVOID lpParam)
 		}
 		else
 		{
-			wchar_t* temp = strFileNotifyInfo[0].FileName;
-			wstring msg = L"File Modified: ";
+			char *fileName = new char[strFileNotifyInfo[0].FileNameLength];
+			wcstombs(fileName, strFileNotifyInfo[0].FileName, strFileNotifyInfo[0].FileNameLength);
+		/*	wstring msg = L"File Modified: ";
 			wstring h = temp;
 			msg += h;
-			//OutputDebugString(msg.c_str());
+			OutputDebugString(msg.c_str());*/
+
+			CmdArg newCommand;
+			newCommand.data.push_back(fileName);
+
 			switch (strFileNotifyInfo[0].Action)
 			{
 				
 			case FILE_ACTION_ADDED: //0x00000001
 				//The file was added to the directory.
+				newCommand.SetCommand("-ADDGAL");
 				break;
 			case FILE_ACTION_REMOVED: //0x00000002
 				//The file was removed from the directory.
+				newCommand.SetCommand("-DELGAL");
 				break;
 			case FILE_ACTION_MODIFIED://0x00000003
 				//The file was modified. This can be a change in the time stamp or attributes.
 				break;
 			case FILE_ACTION_RENAMED_OLD_NAME://0x00000004
 				//The file was renamed and this is the old name.
+				newCommand.SetCommand("-DELGAL");
 				break;
 			case FILE_ACTION_RENAMED_NEW_NAME://0x00000005
 				//The file was renamed and this is the new name.
+				newCommand.SetCommand("-ADDGAL");
 				break;
 			}
+
+			tasks.push(newCommand);
 		}
 	}
 }
@@ -292,7 +303,7 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 		}
 	}
 
-	OutputDebugString("My Sample Service: network communication: Exit");
+	OutputDebugString("PornoDB Manager: network communication: Exit");
 
 	return ERROR_SUCCESS;
 }
@@ -313,7 +324,7 @@ DWORD WINAPI doMainWorkerThread(LPVOID lpParam)
 	dbBuilder.FillPartsOfSpeechTable(dbTableValues);
 	//dbBuilder.verifyDB(CFGHelper::pathToProcess);
 	
-	OutputDebugString("My Sample Service: ServiceWorkerThread: Entry");
+	OutputDebugString("PornoDB Manager: ServiceWorkerThread: Entry");
 
 	while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
 	{
@@ -327,7 +338,8 @@ DWORD WINAPI doMainWorkerThread(LPVOID lpParam)
 			continue;
 		else if (command.cmd == "-ADDGAL")
 		{
-			//these may not be needed anymore
+			StartAndConnectToCreateImageHash();
+
 			int goodDir = 0, badDir = 0, totalDir = 0;
 			int start_s = clock();
 
@@ -339,14 +351,22 @@ DWORD WINAPI doMainWorkerThread(LPVOID lpParam)
 			totalDir++;
 
 			string report = jobReport(start_s, totalDir, goodDir, badDir);
+			//ShutdownCreateImageHash();
 		}
 		else if (command.cmd == "-DELGAL")
 		{
-			
+			WinToDBMiddleman::deleteGallery(command.data[0]);
 		}
 		else if (command.cmd == "-MOVGAL")
 		{
-
+			WinToDBMiddleman::moveGallery(command.data[0], command.data[1]);
+		}
+		else if (command.cmd == "-VERIFY")
+		{
+			string msg = "PornoDB Manager: Verify DB with disk at: ";
+			msg += GetTimeStamp();
+			OutputDebugString(msg.c_str());
+			dbBuilder.VerifyDB(command.data[0]);
 		}
 		else if (command.cmd == "HASH")
 		{

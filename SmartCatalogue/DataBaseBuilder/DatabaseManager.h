@@ -20,10 +20,11 @@ SERVICE_STATUS        g_ServiceStatus = { 0 };
 SERVICE_STATUS_HANDLE g_StatusHandle = NULL;
 
 HANDLE                g_ServiceStopEvent = INVALID_HANDLE_VALUE;
-HANDLE				  hDir;
-HANDLE				  hNetworkThread;
-HANDLE				  hDirWatchThread;
-HANDLE				  hMainThread;
+HANDLE				  hDir = NULL;
+HANDLE				  hNetworkThread = NULL;
+HANDLE				  hDirWatchThread = NULL;
+HANDLE				  hMainThread = NULL;
+HANDLE				  hCreateImageHashProc = NULL;
 
 VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv);
 VOID WINAPI ServiceCtrlHandler(DWORD);
@@ -35,6 +36,7 @@ queue<CmdArg> tasks;
 NetworkConnection conn;
 
 bool doImageHash = true;;
+int createImageHashSocket = -1;
 
 using namespace std;
 
@@ -70,7 +72,7 @@ CmdArg parseCommand(vector<string> argv)
 			}
 			command.dest = atoi(argv[i].c_str());
 		}
-		else if (cmdArgUpper == "-ADDGAL" || "-DELGAL" || "-MOVGAL")
+		else if (cmdArgUpper == "-ADDGAL" || "-DELGAL" || "-MOVGAL" || "-VERIFY")
 		{
 			command.SetCommand(cmdArgUpper);
 			i++;
@@ -81,6 +83,7 @@ CmdArg parseCommand(vector<string> argv)
 			}
 			command.data.push_back(argv[i]);
 		}
+	
 		//this should be an image hash returning from over the wire
 		else
 		{
@@ -128,7 +131,7 @@ string exec(const char* cmd)
 }
 //to use with args, there needs to be a space like so:
 //myCreateProcess("C:\\windows\\notepad.exe", " example.txt");
-void myCreateProcess(string pathAndName, string args)
+bool myCreateProcess(string pathAndName, string args)
 {
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -148,8 +151,12 @@ void myCreateProcess(string pathAndName, string args)
 			)
 		)
 	{
-		cout << "Unable to execute.";
+		return false;
 	}
+
+	hCreateImageHashProc = pi.hProcess;
+
+	return true;
 }
 
 string jobReport(double start_s, int totalDir, int goodDir, int badDir)
@@ -169,12 +176,38 @@ string jobReport(double start_s, int totalDir, int goodDir, int badDir)
 	return returnString;
 }
 
-int StartAndConnectToCreateImageHash()
+void StartAndConnectToCreateImageHash()
 {
+	unsigned long exitCode;
+	GetExitCodeProcess(hCreateImageHashProc, &exitCode);
+	
+	if(exitCode == STILL_ACTIVE)
+		return;
+
 	myCreateProcess(CFGHelper::filePathBase+"\\CreateImageHash.exe", " -server");
 	//sleep a bit, so we make sure its running
 	Sleep(2000);
 	//cout << "connecting to " <<CFG::CFGReaderDLL::getCfgStringValue("CreateImageHashIP")<< "\n";
 	//now try to connect to it
-	return conn.connectToServer(CFGHelper::CreateImageHashIP, CFGHelper::CreateImageHashPort);
+	createImageHashSocket = conn.connectToServer(CFGHelper::CreateImageHashIP, CFGHelper::CreateImageHashPort);
+}
+
+void ShutdownCreateImageHash()
+{
+	if(hCreateImageHashProc == NULL)
+		return;
+	hCreateImageHashProc = NULL;
+	conn.sendData(createImageHashSocket,"-exit");
+	createImageHashSocket = -1;
+}
+
+string GetTimeStamp()
+{
+	time_t rawtime;
+	struct tm * timeinfo;
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+	return asctime(timeinfo);
+	//printf("The current date/time is: %s", asctime(timeinfo));
 }

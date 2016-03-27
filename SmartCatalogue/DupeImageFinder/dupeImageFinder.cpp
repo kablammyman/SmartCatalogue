@@ -380,7 +380,8 @@ void lilMenu(HWND handle, int x, int y)
 		if (TreeView_GetParent(handle, hItem) == NULL)
 			return;
 		string path(selectedText.begin(), selectedText.end());
-		middleMan.deleteImage(path);
+		//middleMan.deleteImage(path);
+		WinToDBMiddleman::deleteImage(path);
 		TreeView_DeleteItem(handle, hItem);
 		//need to check to see if ther only node left is a parent with no kids, if so, remove it from the list
 	}
@@ -389,7 +390,8 @@ void lilMenu(HWND handle, int x, int y)
 		if (TreeView_GetParent(handle, hItem) == NULL)
 			return;
 		string path(selectedText.begin(), selectedText.end());
-		middleMan.deleteGallery(path);
+		//middleMan.deleteGallery(path);
+		WinToDBMiddleman::deleteGallery(path);
 		TreeView_DeleteItem(handle, hItem);
 		//need to check to see if ther only node left is a parent with no kids, if so, remove it from the list
 	}
