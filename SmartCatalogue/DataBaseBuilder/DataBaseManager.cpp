@@ -19,7 +19,8 @@
 #include "CFGReaderDll.h"
 #include "CFGHelper.h"
 
-
+#define SHORT_SLEEP 1000
+#define LONG_SLEEP 10000
 //sc create "PornoDB Manager" binPath= C:\SampleService.exe
 
 void Start()
@@ -344,18 +345,24 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen = DEFAULT_BUFLEN;
 	int numConn = 0;
-
+	bool recvData = false;
 	//  Periodically check if the service has been requested to stop
 	while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
 	{
 		//socket comm stuff
 		conn.waitForClientAsync();
-
+		recvData = false;
 		numConn = (int)conn.getNumConnections();
+		if (numConn == 0)
+		{
+			Sleep(LONG_SLEEP);
+			continue;
+		}
 		for (int i = 0; i < numConn; i++)
 		{
 			if (conn.hasRecivedData(i))
 			{
+				recvData = true;
 				iResult = conn.getData(i, recvbuf, DEFAULT_BUFLEN);
 				if (iResult > 0)
 				{
@@ -376,6 +383,8 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 					printf("recv failed: %d\n", WSAGetLastError());
 			}
 		}
+		if(!recvData)
+			Sleep(SHORT_SLEEP);
 	}
 
 	DebugPrint("PornoDB Manager: network communication: Exit");
@@ -404,8 +413,10 @@ DWORD WINAPI doMainWorkerThread(LPVOID lpParam)
 	while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
 	{
 		if (tasks.empty())
+		{
+			Sleep(LONG_SLEEP);
 			continue;
-
+		}
 		CmdArg command = tasks.front();
 		tasks.pop();
 		
@@ -461,6 +472,10 @@ DWORD WINAPI doMainWorkerThread(LPVOID lpParam)
 		{
 			string output;
 			WinToDBMiddleman::DeleteImageFromDB(command.data[0], output);
+		}
+		else if (command.cmd == "-MOVIMG")
+		{
+			
 		}
 		else if (command.cmd == "HASH")
 		{

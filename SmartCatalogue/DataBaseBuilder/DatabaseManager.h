@@ -72,7 +72,8 @@ CmdArg parseCommand(vector<string> argv)
 			}
 			command.dest = atoi(argv[i].c_str());
 		}
-		else if (cmdArgUpper == "-ADDGAL" || cmdArgUpper ==  "-DELGAL" || cmdArgUpper == "-MOVGAL" || cmdArgUpper == "-VERIFY")
+		else if (cmdArgUpper == "-ADDGAL" || cmdArgUpper ==  "-DELGAL" || cmdArgUpper == "-MOVGAL" || cmdArgUpper == "-VERIFY" ||
+			cmdArgUpper == "-ADDIMG" || cmdArgUpper == "-DELIMG" || cmdArgUpper == "-MOVIMG" || cmdArgUpper == "-VERIFY")
 		{
 			command.SetCommand(cmdArgUpper);
 			i++;
