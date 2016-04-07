@@ -23,14 +23,18 @@ HANDLE                g_ServiceStopEvent = INVALID_HANDLE_VALUE;
 HANDLE				  hDir = NULL;
 HANDLE				  hNetworkThread = NULL;
 HANDLE				  hDirWatchThread = NULL;
+HANDLE				  hWaitForClientThread = NULL;
 HANDLE				  hMainThread = NULL;
 HANDLE				  hCreateImageHashProc = NULL;
 
 VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv);
 VOID WINAPI ServiceCtrlHandler(DWORD);
 DWORD WINAPI doNetWorkCommunication(LPVOID lpParam);
+DWORD WINAPI doWaitForRemoteConnections(LPVOID lpParam);
 DWORD WINAPI doDirWatch(LPVOID lpParam);
 DWORD WINAPI doMainWorkerThread(LPVOID lpParam);
+CONDITION_VARIABLE stuffToDo;
+CONDITION_VARIABLE isThereRemoteClients;
 
 queue<CmdArg> tasks;
 NetworkConnection conn;

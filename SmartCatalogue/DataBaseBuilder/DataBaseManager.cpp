@@ -30,6 +30,7 @@ void Start()
 	conn.startServer(SOMAXCONN, CFGHelper::DataBaseManagerPort);
 	hDirWatchThread = CreateThread(NULL, 0, doDirWatch, NULL, 0, NULL);
 	hNetworkThread = CreateThread(NULL, 0, doNetWorkCommunication, NULL, 0, NULL);
+	hWaitForClientThread = CreateThread(NULL, 0, doWaitForRemoteConnections, NULL, 0, NULL);
 	hMainThread = CreateThread(NULL, 0, doMainWorkerThread, NULL, 0, NULL);
 }
 
@@ -338,7 +339,13 @@ DWORD WINAPI doDirWatch(LPVOID lpParam)
 		}
 	}
 }
-
+DWORD WINAPI doWaitForRemoteConnections(LPVOID lpParam)
+{
+	while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
+	{
+		conn.waitForFirstClientConnect();
+	}	
+}
 DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 {
 	int iResult;
@@ -348,43 +355,44 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 	bool recvData = false;
 	//  Periodically check if the service has been requested to stop
 	while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
-	{
-		//socket comm stuff
-		conn.waitForClientAsync();
-		recvData = false;
+	{//socket comm stuff
+		
 		numConn = (int)conn.getNumConnections();
 		if (numConn == 0)
 		{
-			Sleep(LONG_SLEEP);
-			continue;
+			SleepConditionVariableCS(&isThereRemoteClients, NULL, INFINITE);
 		}
-		for (int i = 0; i < numConn; i++)
+		else
 		{
-			if (conn.hasRecivedData(i))
+			recvData = false;
+			for (int i = 0; i < numConn; i++)
 			{
-				recvData = true;
-				iResult = conn.getData(i, recvbuf, DEFAULT_BUFLEN);
-				if (iResult > 0)
+				if (conn.hasRecivedData(i))
 				{
-					recvbuf[iResult] = '\0';
-					//printf("%s -> %d bytes.\n", recvbuf, iResult);
+					recvData = true;
+					iResult = conn.getData(i, recvbuf, DEFAULT_BUFLEN);
+					if (iResult > 0)
+					{
+						recvbuf[iResult] = '\0';
+						//printf("%s -> %d bytes.\n", recvbuf, iResult);
 
-					vector<string> argVec = Utils::tokenize(recvbuf, "|");
-					CmdArg newCommand = parseCommand(argVec);
+						vector<string> argVec = Utils::tokenize(recvbuf, "|");
+						CmdArg newCommand = parseCommand(argVec);
 
-					newCommand.dest = i;
-					tasks.push(newCommand);
+						newCommand.dest = i;
+						tasks.push(newCommand);
+					}
+					//client disconnected
+					else if (iResult == 0)
+						conn.closeConnection(i);
+
+					else
+						printf("recv failed: %d\n", WSAGetLastError());
 				}
-				//client disconnected
-				else if (iResult == 0)
-					conn.closeConnection(i);
-
-				else
-					printf("recv failed: %d\n", WSAGetLastError());
 			}
+			if (!recvData)
+				Sleep(SHORT_SLEEP);
 		}
-		if(!recvData)
-			Sleep(SHORT_SLEEP);
 	}
 
 	DebugPrint("PornoDB Manager: network communication: Exit");
@@ -414,9 +422,9 @@ DWORD WINAPI doMainWorkerThread(LPVOID lpParam)
 	{
 		if (tasks.empty())
 		{
-			Sleep(LONG_SLEEP);
-			continue;
+			SleepConditionVariableCS(&stuffToDo,NULL, INFINITE);
 		}
+
 		CmdArg command = tasks.front();
 		tasks.pop();
 		
