@@ -7,6 +7,10 @@
 #include <Windows.h>
 #include <queue>
 
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
 #include "NetworkConnection.h"
 #include "Utils.h"
 #include "CFGHelper.h"
@@ -21,20 +25,22 @@ SERVICE_STATUS_HANDLE g_StatusHandle = NULL;
 
 HANDLE                g_ServiceStopEvent = INVALID_HANDLE_VALUE;
 HANDLE				  hDir = NULL;
-HANDLE				  hNetworkThread = NULL;
+/*HANDLE				  hNetworkThread = NULL;
 HANDLE				  hDirWatchThread = NULL;
 HANDLE				  hWaitForClientThread = NULL;
-HANDLE				  hMainThread = NULL;
+HANDLE				  hMainThread = NULL;*/
+
+//i need to be able to start CerateUmageHash.exe, and this handle will let me know if i did that already
 HANDLE				  hCreateImageHashProc = NULL;
+
+
 
 VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv);
 VOID WINAPI ServiceCtrlHandler(DWORD);
-DWORD WINAPI doNetWorkCommunication(LPVOID lpParam);
-DWORD WINAPI doWaitForRemoteConnections(LPVOID lpParam);
-DWORD WINAPI doDirWatch(LPVOID lpParam);
-DWORD WINAPI doMainWorkerThread(LPVOID lpParam);
-CONDITION_VARIABLE stuffToDo;
-CONDITION_VARIABLE isThereRemoteClients;
+int doNetWorkCommunication(void);
+int doWaitForRemoteConnections(void);
+int doDirWatch(void);
+int doMainWorkerThread(void);
 
 queue<CmdArg> tasks;
 NetworkConnection conn;
@@ -43,8 +49,17 @@ bool isService = true;
 int createImageHashSocket = -1;
 
 using namespace std;
-
-
+thread	* networkThread;
+thread	* dirWatchThread;
+thread	* waitForClientThread;
+thread	* mainThread;
+thread	* createImageHashProc;
+mutex              g_lockConnection;
+mutex              g_lockqueue;
+condition_variable g_queuecheck;
+condition_variable g_connectionCheck;
+bool               g_notified;
+bool               g_hasConnections;
 void invalidParmMessageAndExit()
 {
 	cout << "invlaid parameters. You need to provide a path to the DB and a path where your images are\n";
@@ -137,7 +152,7 @@ string exec(const char* cmd)
 }
 //to use with args, there needs to be a space like so:
 //myCreateProcess("C:\\windows\\notepad.exe", " example.txt");
-bool myCreateProcess(string pathAndName, string args)
+bool myCreateProcess(string pathAndName, string args, HANDLE &processCreated)
 {
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -160,7 +175,7 @@ bool myCreateProcess(string pathAndName, string args)
 		return false;
 	}
 
-	hCreateImageHashProc = pi.hProcess;
+	processCreated = pi.hProcess;
 
 	return true;
 }
@@ -190,12 +205,14 @@ void StartAndConnectToCreateImageHash()
 	if(exitCode == STILL_ACTIVE)
 		return;
 
-	myCreateProcess(CFGHelper::filePathBase+"\\CreateImageHash.exe", " -server");
+	myCreateProcess(CFGHelper::filePathBase+"\\CreateImageHash.exe", " -server", hCreateImageHashProc);
 	//sleep a bit, so we make sure its running
 	Sleep(2000);
 	//cout << "connecting to " <<CFG::CFGReaderDLL::getCfgStringValue("CreateImageHashIP")<< "\n";
 	//now try to connect to it
 	createImageHashSocket = conn.connectToServer(CFGHelper::CreateImageHashIP, CFGHelper::CreateImageHashPort);
+	g_hasConnections = true;
+	networkThread = new thread(doNetWorkCommunication); 
 }
 
 void ShutdownCreateImageHash()

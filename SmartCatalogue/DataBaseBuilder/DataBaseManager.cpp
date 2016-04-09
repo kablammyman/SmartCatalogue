@@ -19,7 +19,7 @@
 #include "CFGReaderDll.h"
 #include "CFGHelper.h"
 
-#define SHORT_SLEEP 1000
+#define SHORT_SLEEP 1
 #define LONG_SLEEP 10000
 //sc create "PornoDB Manager" binPath= C:\SampleService.exe
 
@@ -28,10 +28,16 @@ void Start()
 	//START STUFF
 	cout << "starting server\n";
 	conn.startServer(SOMAXCONN, CFGHelper::DataBaseManagerPort);
-	hDirWatchThread = CreateThread(NULL, 0, doDirWatch, NULL, 0, NULL);
+	/*hDirWatchThread = CreateThread(NULL, 0, doDirWatch, NULL, 0, NULL);
 	hNetworkThread = CreateThread(NULL, 0, doNetWorkCommunication, NULL, 0, NULL);
 	hWaitForClientThread = CreateThread(NULL, 0, doWaitForRemoteConnections, NULL, 0, NULL);
-	hMainThread = CreateThread(NULL, 0, doMainWorkerThread, NULL, 0, NULL);
+	hMainThread = CreateThread(NULL, 0, doMainWorkerThread, NULL, 0, NULL);*/
+	 networkThread = NULL;
+	 dirWatchThread = new thread(doDirWatch);
+	 waitForClientThread = new thread(doWaitForRemoteConnections);
+	 mainThread = new thread(doMainWorkerThread);
+	
+
 }
 
 void Finish()
@@ -39,7 +45,8 @@ void Finish()
 	conn.shutdown();
 	CancelIo(hDir);
 	int exitCode = 0;
-	TerminateThread(hDirWatchThread, exitCode);
+	std::terminate();
+	//TerminateThread(hDirWatchThread, exitCode);
 	//CancelIoEx(hDir, overlapped);
 }
 
@@ -69,9 +76,10 @@ int main(int argc, char *argv[])
 
 		DebugPrint("PornoDB Manager: ServiceMain: Waiting for Worker Thread to complete");
 
-		// Wait until our main worker thread exits effectively signaling that the service needs to stop
-		WaitForSingleObject(hMainThread, INFINITE);
 
+		// Wait until our main worker thread exits effectively signaling that the service needs to stop
+		//WaitForSingleObject(hMainThread, INFINITE);
+		mainThread->join();
 		DebugPrint("PornoDB Manager: ServiceMain: Worker Thread Stop Event signaled");
 
 		/*
@@ -172,7 +180,8 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 	DebugPrint("PornoDB Manager: ServiceMain: Waiting for Worker Thread to complete");
 
 	// Wait until our main worker thread exits effectively signaling that the service needs to stop
-	WaitForSingleObject(hMainThread, INFINITE);
+	//WaitForSingleObject(hMainThread, INFINITE);
+	mainThread->join();
 
 	DebugPrint("PornoDB Manager: ServiceMain: Worker Thread Stop Event signaled");
 
@@ -242,14 +251,14 @@ VOID WINAPI ServiceCtrlHandler(DWORD CtrlCode)
 
 
 //http://qualapps.blogspot.com/2010/05/understanding-readdirectorychangesw.html
-DWORD WINAPI doDirWatch(LPVOID lpParam)
+int doDirWatch(void)
 {
 	
 	int nCounter = 0;
 	FILE_NOTIFY_INFORMATION strFileNotifyInfo[1024];
 	DWORD dwBytesReturned = 0;
 	//LPOVERLAPPED overlapped;
-
+	//vector<CmdArg> commandStaging;
 	hDir = CreateFile(
 		CFGHelper::pathToProcess.c_str(),
 		FILE_LIST_DIRECTORY,
@@ -261,32 +270,26 @@ DWORD WINAPI doDirWatch(LPVOID lpParam)
 		);
 
 	//main thread will close this down
-	for (;;)
+	int counter = 0;
+	while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
 	{
 		if (ReadDirectoryChangesW(hDir, (LPVOID)&strFileNotifyInfo, 
 			sizeof(strFileNotifyInfo), 
 			TRUE, 
 			//FILE_NOTIFY_CHANGE_LAST_WRITE,// | //this seems to track everything and nothing at the same time!
-			FILE_NOTIFY_CHANGE_SIZE |  // in file or subdir
+			//FILE_NOTIFY_CHANGE_SIZE |  // in file or subdir
 			//FILE_NOTIFY_CHANGE_ATTRIBUTES |
 			FILE_NOTIFY_CHANGE_DIR_NAME | // creating, deleting a directory or sub
 			FILE_NOTIFY_CHANGE_FILE_NAME, // renaming,creating,deleting a file
-			&dwBytesReturned, NULL, NULL) == 0)
-		{
-			DebugPrint("Reading Directory Change");
-		}
-		else 
+			&dwBytesReturned, NULL, NULL) != 0)
 		{
 			int len = strFileNotifyInfo[0].FileNameLength / sizeof(WCHAR);
 			char *fileName = new char[len+1];
 			
 			wcstombs(fileName, strFileNotifyInfo[0].FileName, len);
 			fileName[len] = '\0';
-
-		/*	wstring msg = L"File Modified: ";
-			wstring h = temp;
-			msg += h;
-			DebugPrint(msg.c_str());*/
+			counter++;
+			
 			bool isFile = false;
 			CmdArg newCommand;
 			for (size_t i = 0; i < len; i++)
@@ -328,25 +331,39 @@ DWORD WINAPI doDirWatch(LPVOID lpParam)
 			}
 
 			newCommand.data.push_back(fullPath);
-
+			
 			delete fileName;
 			fileName = NULL;
+			//commandStaging.push_back(newCommand);
 
+
+		//	unique_lock<mutex> locker(g_lockqueue);
+			tasks.push(newCommand);
 			//for some reason, it randomly triggers...so lets not deal with it
-			if(newCommand.cmd != "")
-				tasks.push(newCommand);
-			
+			/*for(size_t i = 0; i < commandStaging.size(); i++)
+				if (commandStaging[i].cmd != "")
+					tasks.push(commandStaging[i]);*/
+			//counter = 0;
+
+			//commandStaging.clear();
+			g_notified = true;
+			g_queuecheck.notify_one();
 		}
 	}
+	return 0;
 }
-DWORD WINAPI doWaitForRemoteConnections(LPVOID lpParam)
+int doWaitForRemoteConnections(void)
 {
 	while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
 	{
 		conn.waitForFirstClientConnect();
+		if(conn.getNumConnections() > 0)
+			g_hasConnections = true;
 	}	
+
+	return 0;
 }
-DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
+int doNetWorkCommunication(void)
 {
 	int iResult;
 	char recvbuf[DEFAULT_BUFLEN];
@@ -354,17 +371,23 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 	int numConn = 0;
 	bool recvData = false;
 	//  Periodically check if the service has been requested to stop
-	while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
+	//while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
 	{//socket comm stuff
-		
-		numConn = (int)conn.getNumConnections();
-		if (numConn == 0)
+		/*std::unique_lock<std::mutex> connLocker(g_lockConnection);
+		while (!g_hasConnections)
 		{
-			SleepConditionVariableCS(&isThereRemoteClients, NULL, INFINITE);
-		}
-		else
+			g_connectionCheck.wait(connLocker);
+		}*/
+		
+		while (g_hasConnections)
 		{
 			recvData = false;
+			numConn = (int)conn.getNumConnections();
+			if (numConn == 0)
+			{
+				g_hasConnections = false;
+				break;
+			}
 			for (int i = 0; i < numConn; i++)
 			{
 				if (conn.hasRecivedData(i))
@@ -373,19 +396,24 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 					iResult = conn.getData(i, recvbuf, DEFAULT_BUFLEN);
 					if (iResult > 0)
 					{
-						recvbuf[iResult] = '\0';
-						//printf("%s -> %d bytes.\n", recvbuf, iResult);
+						recvbuf[iResult-1] = '\0';
+						printf("%s -> %d bytes.\n", recvbuf, iResult);
 
 						vector<string> argVec = Utils::tokenize(recvbuf, "|");
 						CmdArg newCommand = parseCommand(argVec);
 
 						newCommand.dest = i;
+						
+						//unique_lock<mutex> locker(g_lockqueue);
 						tasks.push(newCommand);
+						g_notified = true;
+						g_queuecheck.notify_one();
 					}
 					//client disconnected
 					else if (iResult == 0)
+					{
 						conn.closeConnection(i);
-
+					}
 					else
 						printf("recv failed: %d\n", WSAGetLastError());
 				}
@@ -393,14 +421,15 @@ DWORD WINAPI doNetWorkCommunication(LPVOID lpParam)
 			if (!recvData)
 				Sleep(SHORT_SLEEP);
 		}
+
 	}
 
 	DebugPrint("PornoDB Manager: network communication: Exit");
-
+	networkThread = NULL;
 	return ERROR_SUCCESS;
 }
 
-DWORD WINAPI doMainWorkerThread(LPVOID lpParam)
+int doMainWorkerThread(void)
 {
 	DatabaseBuilder dbBuilder(CFGHelper::dbPath, CFGHelper::ignorePattern);
 	dbBuilder.FillMetaWords(CFGHelper::meta);
@@ -420,76 +449,86 @@ DWORD WINAPI doMainWorkerThread(LPVOID lpParam)
 
 	while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
 	{
-		if (tasks.empty())
-		{
-			SleepConditionVariableCS(&stuffToDo,NULL, INFINITE);
-		}
+		std::unique_lock<std::mutex> locker(g_lockqueue);
+		while (!g_notified) // used to avoid spurious wakeups 
+			g_queuecheck.wait(locker);
 
-		CmdArg command = tasks.front();
-		tasks.pop();
-		
-		if (command.cmd.empty())
-			continue;
-		else if (command.cmd == "-ADDGAL")
+		while (!tasks.empty())
 		{
-			StartAndConnectToCreateImageHash();
+			CmdArg command = tasks.front();
+			tasks.pop();
 
-			int goodDir = 0, badDir = 0, totalDir = 0;
-			int start_s = clock();
-
-			if (dbBuilder.AddDirToDB(command.data[0], true))
-				goodDir++;
-			else
-				badDir++;
-
-			totalDir++;
-
-			string report = jobReport(start_s, totalDir, goodDir, badDir);
-			//ShutdownCreateImageHash();
-		}
-		else if (command.cmd == "-DELGAL")
-		{
-			string output;
-			WinToDBMiddleman::DeleteGalleryFromDB(command.data[0],output);
-		}
-		else if (command.cmd == "-MOVGAL")
-		{
-			WinToDBMiddleman::MoveGalleryOnDB(command.data[0], command.data[1]);
-		}
-		else if (command.cmd == "-VERIFY")
-		{
-			string msg = "PornoDB Manager: Verify DB with disk at: ";
-			msg += GetTimeStamp();
-			DebugPrint(msg.c_str());
-			dbBuilder.VerifyDB(command.data[0]);
-		}
-		else if (command.cmd == "-ADDIMG")
-		{
-			string galleryPath= MyFileDirDll::getPathFromFullyQualifiedPathString(command.data[0]);
-			//argh! sometimes i have a trailing slash at the end of the pathi n theDB, sometimes i dont!
-			//galleryPath += "\\";
-			int galleryID = WinToDBMiddleman::GetGalleryIDFromPath(galleryPath);
-
-			//couldnt find the gallery
-			if(galleryID == -1)
+			if (command.cmd.empty())
 				continue;
+			else if (command.cmd == "-ADDGAL")
+			{
+				StartAndConnectToCreateImageHash();
 
-			dbBuilder.RequestImageHash(command.data[0],  galleryID, &conn, createImageHashSocket);
+				int goodDir = 0, badDir = 0, totalDir = 0;
+				int start_s = clock();
+
+				if (dbBuilder.AddDirToDB(command.data[0], true))
+				{
+					//int galleryID = WinToDBMiddleman::GetGalleryIDFromPath(command.data[0]);
+					//dbBuilder.RequestImageHashesForDir(command.data[0], galleryID, &conn, createImageHashSocket);
+					goodDir++;
+				}
+				else
+					badDir++;
+
+				totalDir++;
+
+				string report = jobReport(start_s, totalDir, goodDir, badDir);
+
+				//ShutdownCreateImageHash();
+			}
+			else if (command.cmd == "-DELGAL")
+			{
+				string output;
+				WinToDBMiddleman::DeleteGalleryFromDB(command.data[0], output);
+			}
+			else if (command.cmd == "-MOVGAL")
+			{
+				WinToDBMiddleman::MoveGalleryOnDB(command.data[0], command.data[1]);
+			}
+			else if (command.cmd == "-VERIFY")
+			{
+				string msg = "PornoDB Manager: Verify DB with disk at: ";
+				msg += GetTimeStamp();
+				DebugPrint(msg.c_str());
+				dbBuilder.VerifyDB(command.data[0]);
+			}
+			else if (command.cmd == "-ADDIMG")
+			{
+				string galleryPath = MyFileDirDll::getPathFromFullyQualifiedPathString(command.data[0]);
+				//argh! sometimes i have a trailing slash at the end of the pathi n theDB, sometimes i dont!
+				//galleryPath += "\\";
+				int galleryID = WinToDBMiddleman::GetGalleryIDFromPath(galleryPath);
+
+				//couldnt find the gallery
+				if (galleryID == -1)
+					continue;
+
+				dbBuilder.RequestImageHash(command.data[0], galleryID, &conn, createImageHashSocket);
+				
+			}
+			else if (command.cmd == "-DELIMG")
+			{
+				string output;
+				WinToDBMiddleman::DeleteImageFromDB(command.data[0], output);
+			}
+			else if (command.cmd == "-MOVIMG")
+			{
+
+			}
+			else if (command.cmd == "HASH")
+			{
+				if (!dbBuilder.AddHashDataToDB(command.data[0], command.data[1], command.data[2]))
+					printf("error adding: %s\n", command.data[0].c_str());
+			}
 		}
-		else if (command.cmd == "-DELIMG")
-		{
-			string output;
-			WinToDBMiddleman::DeleteImageFromDB(command.data[0], output);
-		}
-		else if (command.cmd == "-MOVIMG")
-		{
-			
-		}
-		else if (command.cmd == "HASH")
-		{
-			if(!dbBuilder.AddHashDataToDB(command.data[0], command.data[1], command.data[2]))
-				printf ("error adding: %s\n", command.data[0].c_str());
-		}
+
+		g_notified = false;
 	}
 
 	ShutdownCreateImageHash();

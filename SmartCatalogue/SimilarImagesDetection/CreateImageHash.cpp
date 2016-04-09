@@ -55,7 +55,10 @@ int main(int argc, const char *argv[])
 						conn.closeConnection(i);
 
 					else
+					{
 						printf("recv failed: %d\n", WSAGetLastError());
+						done = true;
+					}
 				}
 			}
 		}
