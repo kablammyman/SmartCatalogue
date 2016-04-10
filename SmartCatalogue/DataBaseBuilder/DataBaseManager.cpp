@@ -26,6 +26,7 @@
 void Start()
 {
 	//START STUFF
+	Sleep(10000);
 	cout << "starting server\n";
 	conn.startServer(SOMAXCONN, CFGHelper::DataBaseManagerPort);
 	/*hDirWatchThread = CreateThread(NULL, 0, doDirWatch, NULL, 0, NULL);
@@ -44,9 +45,11 @@ void Finish()
 {
 	conn.shutdown();
 	CancelIo(hDir);
-	int exitCode = 0;
-	std::terminate();
-	//TerminateThread(hDirWatchThread, exitCode);
+	
+	//std::terminate();
+
+	//int exitCode = 0;
+	//TerminateThread(dirWatchThread, exitCode);
 	//CancelIoEx(hDir, overlapped);
 }
 
@@ -114,7 +117,7 @@ int main(int argc, char *argv[])
 VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 {
 	DWORD Status = E_FAIL;
-
+	
 	DebugPrint("PornoDB Manager: ServiceMain: Entry");
 
 	g_StatusHandle = RegisterServiceCtrlHandler(SERVICE_NAME, ServiceCtrlHandler);
@@ -223,9 +226,6 @@ VOID WINAPI ServiceCtrlHandler(DWORD CtrlCode)
 		if (g_ServiceStatus.dwCurrentState != SERVICE_RUNNING)
 			break;
 
-		//STOP STUFF
-
-
 		g_ServiceStatus.dwControlsAccepted = 0;
 		g_ServiceStatus.dwCurrentState = SERVICE_STOP_PENDING;
 		g_ServiceStatus.dwWin32ExitCode = 0;
@@ -238,6 +238,10 @@ VOID WINAPI ServiceCtrlHandler(DWORD CtrlCode)
 
 		// This will signal the worker thread to start shutting down
 		SetEvent(g_ServiceStopEvent);
+
+		//if we are waiting for the thign to do, then lets make sure we still can stop the service
+		g_notified = true;
+		g_queuecheck.notify_one();
 
 		break;
 
@@ -259,7 +263,9 @@ int doDirWatch(void)
 	DWORD dwBytesReturned = 0;
 	//LPOVERLAPPED overlapped;
 	//vector<CmdArg> commandStaging;
-	hDir = CreateFile(
+	//string dirPAth(CFGHelper::pathToProcess.begin(), CFGHelper::pathToProcess.end());
+	
+	hDir = CreateFileA(
 		CFGHelper::pathToProcess.c_str(),
 		FILE_LIST_DIRECTORY,
 		FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
@@ -268,12 +274,18 @@ int doDirWatch(void)
 		FILE_FLAG_BACKUP_SEMANTICS,
 		NULL
 		);
+	if (hDir == INVALID_HANDLE_VALUE)
+	{
+		int winErr = GetLastError();
+		printf("error: %d\n", winErr);
+	}
+
 
 	//main thread will close this down
 	int counter = 0;
 	while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
 	{
-		if (ReadDirectoryChangesW(hDir, (LPVOID)&strFileNotifyInfo, 
+		int err = ReadDirectoryChangesW(hDir, (LPVOID)&strFileNotifyInfo, 
 			sizeof(strFileNotifyInfo), 
 			TRUE, 
 			//FILE_NOTIFY_CHANGE_LAST_WRITE,// | //this seems to track everything and nothing at the same time!
@@ -281,7 +293,9 @@ int doDirWatch(void)
 			//FILE_NOTIFY_CHANGE_ATTRIBUTES |
 			FILE_NOTIFY_CHANGE_DIR_NAME | // creating, deleting a directory or sub
 			FILE_NOTIFY_CHANGE_FILE_NAME, // renaming,creating,deleting a file
-			&dwBytesReturned, NULL, NULL) != 0)
+			&dwBytesReturned, NULL, NULL);
+
+		if(err != 0)
 		{
 			int len = strFileNotifyInfo[0].FileNameLength / sizeof(WCHAR);
 			char *fileName = new char[len+1];
@@ -349,6 +363,11 @@ int doDirWatch(void)
 			g_notified = true;
 			g_queuecheck.notify_one();
 		}
+		else
+		{
+			int winErr = GetLastError();
+			printf("error: %d\n%d\n",err, winErr);
+		}
 	}
 	return 0;
 }
@@ -370,6 +389,7 @@ int doNetWorkCommunication(void)
 	int recvbuflen = DEFAULT_BUFLEN;
 	int numConn = 0;
 	bool recvData = false;
+	std::clock_t  heartBeat;
 	//  Periodically check if the service has been requested to stop
 	//while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
 	{//socket comm stuff
@@ -397,7 +417,7 @@ int doNetWorkCommunication(void)
 					if (iResult > 0)
 					{
 						recvbuf[iResult-1] = '\0';
-						printf("%s -> %d bytes.\n", recvbuf, iResult);
+						//printf("%s -> %d bytes.\n", recvbuf, iResult);
 
 						vector<string> argVec = Utils::tokenize(recvbuf, "|");
 						CmdArg newCommand = parseCommand(argVec);
@@ -408,6 +428,7 @@ int doNetWorkCommunication(void)
 						tasks.push(newCommand);
 						g_notified = true;
 						g_queuecheck.notify_one();
+						heartBeat = std::clock();
 					}
 					//client disconnected
 					else if (iResult == 0)
@@ -419,7 +440,12 @@ int doNetWorkCommunication(void)
 				}
 			}
 			if (!recvData)
-				Sleep(SHORT_SLEEP);
+			{
+				Sleep(SHORT_SLEEP);  
+				float curTime = (std::clock() - heartBeat) / CLOCKS_PER_SEC;
+				if(curTime > 600)
+					ShutdownCreateImageHash();
+			}
 		}
 
 	}
@@ -452,7 +478,7 @@ int doMainWorkerThread(void)
 		std::unique_lock<std::mutex> locker(g_lockqueue);
 		while (!g_notified) // used to avoid spurious wakeups 
 			g_queuecheck.wait(locker);
-
+		
 		while (!tasks.empty())
 		{
 			CmdArg command = tasks.front();

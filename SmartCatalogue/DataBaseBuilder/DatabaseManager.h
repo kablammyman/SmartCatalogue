@@ -54,10 +54,9 @@ thread	* dirWatchThread;
 thread	* waitForClientThread;
 thread	* mainThread;
 thread	* createImageHashProc;
-mutex              g_lockConnection;
 mutex              g_lockqueue;
 condition_variable g_queuecheck;
-condition_variable g_connectionCheck;
+//condition_variable g_connectionCheck;
 bool               g_notified;
 bool               g_hasConnections;
 void invalidParmMessageAndExit()
