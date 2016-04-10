@@ -39,6 +39,7 @@ public:
 	bool InsertModelsInGalleryInfoIntoDB(int modelID, int galleryID);
 	bool IsImageInDB(int galleryID, string md5Hash);
 	void VerifyDB(string root);
+	bool VerifyImage(string imagePath, int &galleryID);
 	bool AddDirToDB(string curDir, bool doImageHash);
 	bool RequestImageHashesForDir(string galleryPath, int galleryID, NetworkConnection *conn, int connIndex);
 	bool RequestImageHash(string imgPath, int galleryID, NetworkConnection *conn, int connIndex);

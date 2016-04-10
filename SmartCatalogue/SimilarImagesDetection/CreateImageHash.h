@@ -26,7 +26,7 @@ HANDLE hNetworkThread;
 using namespace std;
 
 
-#define DEFAULT_BUFLEN 512
+#define DEFAULT_BUFLEN 1024
 #define NETWORK_ERROR -1
 #define NETWORK_OK     0
 
@@ -244,11 +244,11 @@ string  ExecuteCommand(HashCmdArg cmd)
 	if(cmd.cmd.empty())
 		return getCmdArgHelp();
 	else if(cmd.cmd == "-HASH")
-		return cmd.data[0] + DELIM + simImage.getImageHash(cmd.data[0]);
+		return (cmd.data[0] + DELIM + simImage.getImageHash(cmd.data[0]));
 	else if (cmd.cmd == "-PHASH")
-		return cmd.data[0] + DELIM + simImage.getImagePHash(cmd.data[0]);
+		return (cmd.data[0] + DELIM + simImage.getImagePHash(cmd.data[0]));
 	else if (cmd.cmd == "-ALLHASH")
-		return cmd.data[0] + DELIM + simImage.getAllHash(cmd.data[0]);
+		return (cmd.data[0] + DELIM + simImage.getAllHash(cmd.data[0]));
 	else if (cmd.cmd == "-COMPARE")
 		return compareTwoImages(cmd.data[0],cmd.data[1]);
 	else if (cmd.cmd == "-ISINDIR")

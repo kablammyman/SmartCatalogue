@@ -42,7 +42,8 @@ int main(int argc, const char *argv[])
 					iResult = conn.getData(i, recvbuf, DEFAULT_BUFLEN);
 					if (iResult > 0)
 					{
-						recvbuf[iResult] = '\0';
+						if(iResult < DEFAULT_BUFLEN)
+							recvbuf[iResult] = '\0';
 						//printf("%s -> %d bytes.\n", recvbuf, iResult);
 						argVec.clear();
 						argVec = Utils::tokenize(recvbuf, ",");
@@ -82,7 +83,10 @@ int main(int argc, const char *argv[])
 			if (curCommand.dest == -1)
 				cout << output << std::flush;
 			else if (curCommand.dest > -1)
-				conn.sendData(curCommand.dest, output.c_str());
+			{
+				string message = (curCommand.cmd +"|"+ output);
+				conn.sendData(curCommand.dest, message.c_str());
+			}
 		}
 
 	} while (!done);

@@ -26,19 +26,14 @@
 void Start()
 {
 	//START STUFF
-	Sleep(10000);
-	cout << "starting server\n";
+	//Sleep(10000);
+	DebugPrint("starting server");
 	conn.startServer(SOMAXCONN, CFGHelper::DataBaseManagerPort);
-	/*hDirWatchThread = CreateThread(NULL, 0, doDirWatch, NULL, 0, NULL);
-	hNetworkThread = CreateThread(NULL, 0, doNetWorkCommunication, NULL, 0, NULL);
-	hWaitForClientThread = CreateThread(NULL, 0, doWaitForRemoteConnections, NULL, 0, NULL);
-	hMainThread = CreateThread(NULL, 0, doMainWorkerThread, NULL, 0, NULL);*/
+
 	 networkThread = NULL;
 	 dirWatchThread = new thread(doDirWatch);
 	 waitForClientThread = new thread(doWaitForRemoteConnections);
 	 mainThread = new thread(doMainWorkerThread);
-	
-
 }
 
 void Finish()
@@ -46,8 +41,6 @@ void Finish()
 	conn.shutdown();
 	CancelIo(hDir);
 	
-	//std::terminate();
-
 	//int exitCode = 0;
 	//TerminateThread(dirWatchThread, exitCode);
 	//CancelIoEx(hDir, overlapped);
@@ -261,10 +254,7 @@ int doDirWatch(void)
 	int nCounter = 0;
 	FILE_NOTIFY_INFORMATION strFileNotifyInfo[1024];
 	DWORD dwBytesReturned = 0;
-	//LPOVERLAPPED overlapped;
-	//vector<CmdArg> commandStaging;
-	//string dirPAth(CFGHelper::pathToProcess.begin(), CFGHelper::pathToProcess.end());
-	
+		
 	hDir = CreateFileA(
 		CFGHelper::pathToProcess.c_str(),
 		FILE_LIST_DIRECTORY,
@@ -276,8 +266,9 @@ int doDirWatch(void)
 		);
 	if (hDir == INVALID_HANDLE_VALUE)
 	{
-		int winErr = GetLastError();
-		printf("error: %d\n", winErr);
+		string errString = "fileWatcher invalid handle error: " + to_string(GetLastError());
+		DebugPrint(errString);
+		//exit(-1);
 	}
 
 
@@ -315,58 +306,45 @@ int doDirWatch(void)
 				}
 			}
 			string fullPath(CFGHelper::pathToProcess + fileName);
-			
+			string cmdNamePostFix;
+			if(isFile)
+				cmdNamePostFix = "IMG";
+			else
+				cmdNamePostFix = "GAL";
+
 			switch (strFileNotifyInfo[0].Action)
 			{
 				
 			case FILE_ACTION_ADDED: //0x00000001
+			case FILE_ACTION_RENAMED_NEW_NAME://0x00000005
 				//The file was added to the directory.
-				if(isFile)
-					newCommand.SetCommand("-ADDIMG");
-				else
-					newCommand.SetCommand("-ADDGAL");
+					newCommand.SetCommand("-ADD"+ cmdNamePostFix);
 				break;
 			case FILE_ACTION_REMOVED: //0x00000002
+			case FILE_ACTION_RENAMED_OLD_NAME://0x00000004
 				//The file was removed from the directory.
-				newCommand.SetCommand("-DELGAL");
+					newCommand.SetCommand("-DEL"+ cmdNamePostFix);
 				break;
 			case FILE_ACTION_MODIFIED://0x00000003
 				//The file was modified. This can be a change in the time stamp or attributes.
-				//newCommand.SetCommand("-ADDGAL");
-				break;
-			case FILE_ACTION_RENAMED_OLD_NAME://0x00000004
-				//The file was renamed and this is the old name.
-				newCommand.SetCommand("-DELGAL");
-				break;
-			case FILE_ACTION_RENAMED_NEW_NAME://0x00000005
-				//The file was renamed and this is the new name.
-				//newCommand.SetCommand("-ADDGAL");
+					newCommand.SetCommand("-VERIFY"+ cmdNamePostFix);
 				break;
 			}
 
 			newCommand.data.push_back(fullPath);
-			
+			newCommand.dest = -1;
 			delete fileName;
 			fileName = NULL;
-			//commandStaging.push_back(newCommand);
-
 
 		//	unique_lock<mutex> locker(g_lockqueue);
 			tasks.push(newCommand);
-			//for some reason, it randomly triggers...so lets not deal with it
-			/*for(size_t i = 0; i < commandStaging.size(); i++)
-				if (commandStaging[i].cmd != "")
-					tasks.push(commandStaging[i]);*/
-			//counter = 0;
-
-			//commandStaging.clear();
 			g_notified = true;
 			g_queuecheck.notify_one();
 		}
 		else
 		{
-			int winErr = GetLastError();
-			printf("error: %d\n%d\n",err, winErr);
+			string errString = "fileWatcher error: " + to_string(GetLastError());
+			DebugPrint(errString);
 		}
 	}
 	return 0;
@@ -376,8 +354,12 @@ int doWaitForRemoteConnections(void)
 	while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
 	{
 		conn.waitForFirstClientConnect();
-		if(conn.getNumConnections() > 0)
+		if (conn.getNumConnections() > 0)
+		{
 			g_hasConnections = true;
+			if(networkThread == NULL)
+				networkThread = new thread(doNetWorkCommunication);
+		}
 	}	
 
 	return 0;
@@ -389,65 +371,62 @@ int doNetWorkCommunication(void)
 	int recvbuflen = DEFAULT_BUFLEN;
 	int numConn = 0;
 	bool recvData = false;
-	std::clock_t  heartBeat;
-	//  Periodically check if the service has been requested to stop
-	//while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
-	{//socket comm stuff
-		/*std::unique_lock<std::mutex> connLocker(g_lockConnection);
-		while (!g_hasConnections)
+	std::clock_t  heartBeat = 0;
+	
+	while (g_hasConnections)
+	{
+		recvData = false;
+		numConn = (int)conn.getNumConnections();
+		if (numConn == 0)
 		{
-			g_connectionCheck.wait(connLocker);
-		}*/
-		
-		while (g_hasConnections)
+			g_hasConnections = false;
+			break;
+		}
+		for (int i = 0; i < numConn; i++)
 		{
-			recvData = false;
-			numConn = (int)conn.getNumConnections();
-			if (numConn == 0)
+			if (conn.hasRecivedData(i))
 			{
-				g_hasConnections = false;
-				break;
-			}
-			for (int i = 0; i < numConn; i++)
-			{
-				if (conn.hasRecivedData(i))
+				recvData = true;
+				iResult = conn.getData(i, recvbuf, DEFAULT_BUFLEN);
+				if (iResult > 0)
 				{
-					recvData = true;
-					iResult = conn.getData(i, recvbuf, DEFAULT_BUFLEN);
-					if (iResult > 0)
-					{
-						recvbuf[iResult-1] = '\0';
-						//printf("%s -> %d bytes.\n", recvbuf, iResult);
+					if (iResult < DEFAULT_BUFLEN)
+						recvbuf[iResult] = '\0';
+					//printf("%s -> %d bytes.\n", recvbuf, iResult);
 
-						vector<string> argVec = Utils::tokenize(recvbuf, "|");
-						CmdArg newCommand = parseCommand(argVec);
+					vector<string> argVec = Utils::tokenize(recvbuf, "|");
+					CmdArg newCommand = parseCommand(argVec);
 
-						newCommand.dest = i;
+					newCommand.dest = i;
 						
-						//unique_lock<mutex> locker(g_lockqueue);
-						tasks.push(newCommand);
-						g_notified = true;
-						g_queuecheck.notify_one();
+					//unique_lock<mutex> locker(g_lockqueue);
+					tasks.push(newCommand);
+					g_notified = true;
+					g_queuecheck.notify_one();
+
+					if(i == createImageHashSocket)
 						heartBeat = std::clock();
-					}
-					//client disconnected
-					else if (iResult == 0)
-					{
-						conn.closeConnection(i);
-					}
-					else
-						printf("recv failed: %d\n", WSAGetLastError());
+				}
+				//client disconnected
+				else if (iResult == 0)
+				{
+					conn.closeConnection(i);
+				}
+				else
+				{
+					string errString = "network communication error: " + to_string(GetLastError());
+					DebugPrint(errString);
+					conn.closeConnection(i);
 				}
 			}
-			if (!recvData)
-			{
-				Sleep(SHORT_SLEEP);  
-				float curTime = (std::clock() - heartBeat) / CLOCKS_PER_SEC;
-				if(curTime > 600)
-					ShutdownCreateImageHash();
-			}
 		}
-
+		if (!recvData)
+		{
+			Sleep(SHORT_SLEEP);  
+			float curTime = (std::clock() - heartBeat) / CLOCKS_PER_SEC;
+			if(curTime > 60000)
+				ShutdownCreateImageHash();
+		}
 	}
 
 	DebugPrint("PornoDB Manager: network communication: Exit");
@@ -505,24 +484,40 @@ int doMainWorkerThread(void)
 				totalDir++;
 
 				string report = jobReport(start_s, totalDir, goodDir, badDir);
-
-				//ShutdownCreateImageHash();
+				SendReportBackOriginator(report, command.dest);
 			}
 			else if (command.cmd == "-DELGAL")
 			{
 				string output;
 				WinToDBMiddleman::DeleteGalleryFromDB(command.data[0], output);
+				if(output.empty())
+					output = command.data[0] + "delete successful";
+				SendReportBackOriginator(output, command.dest);
 			}
 			else if (command.cmd == "-MOVGAL")
 			{
 				WinToDBMiddleman::MoveGalleryOnDB(command.data[0], command.data[1]);
+				SendReportBackOriginator("did you really want to move a gallery?", command.dest);
 			}
-			else if (command.cmd == "-VERIFY")
+			else if (command.cmd == "-VERIFYGAL")
 			{
-				string msg = "PornoDB Manager: Verify DB with disk at: ";
+				string msg = "PornoDB Manager: Verify DB with disk START: ";
 				msg += GetTimeStamp();
 				DebugPrint(msg.c_str());
+				SendReportBackOriginator(msg, command.dest);
+
 				dbBuilder.VerifyDB(command.data[0]);
+
+				msg = "PornoDB Manager: Verify DB with disk FINISH: ";
+				msg += GetTimeStamp();
+				DebugPrint(msg.c_str());
+				SendReportBackOriginator(msg, command.dest);
+			}
+			else if (command.cmd == "-VERIFYIMG")
+			{
+				int galleryID = -1;
+				if (!dbBuilder.VerifyImage(command.data[0], galleryID))
+					dbBuilder.RequestImageHash(command.data[0], galleryID, &conn, createImageHashSocket);
 			}
 			else if (command.cmd == "-ADDIMG")
 			{
@@ -542,15 +537,27 @@ int doMainWorkerThread(void)
 			{
 				string output;
 				WinToDBMiddleman::DeleteImageFromDB(command.data[0], output);
+				if (output.empty())
+					output = command.data[0] + "delete successful";
+				SendReportBackOriginator(output, command.dest);
 			}
 			else if (command.cmd == "-MOVIMG")
 			{
-
+				WinToDBMiddleman::MoveImageOnDB(command.data[0], command.data[1]);
+				SendReportBackOriginator("did you really want to move an image?", command.dest);
 			}
-			else if (command.cmd == "HASH")
+			else if (command.cmd == "-HASH")
 			{
 				if (!dbBuilder.AddHashDataToDB(command.data[0], command.data[1], command.data[2]))
-					printf("error adding: %s\n", command.data[0].c_str());
+					DebugPrint("error adding hash: "+ command.data[0]);
+			}
+			else
+			{
+				string msg = "unrecognized command: " + command.cmd;
+				DebugPrint(msg);
+
+				if(command.dest != createImageHashSocket)
+					SendReportBackOriginator(msg, command.dest);
 			}
 		}
 
@@ -560,25 +567,3 @@ int doMainWorkerThread(void)
 	ShutdownCreateImageHash();
 	return 0;
 }
-
-/*
-
-
-//these may not be needed anymore
-int goodDir = 0, badDir = 0, totalDir = 0;
-int start_s = clock();
-
-//get the data AS i build the dir tree
-MyFileDirDll::startDirTreeStep();
-while (!MyFileDirDll::isFinished())
-{
-string curDir = MyFileDirDll::nextDirTreeStep(CFGHelper::pathToProcess);
-
-if (dbBuilder.addDirToDB(curDir))
-goodDir++;
-else
-badDir++;
-
-totalDir++;
-}
-*/

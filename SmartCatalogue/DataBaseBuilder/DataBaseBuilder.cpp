@@ -416,7 +416,15 @@ bool DatabaseBuilder::IsImageInDB(int galleryID, string md5Hash)
 	}
 	return false;
 }
-
+bool DatabaseBuilder::VerifyImage(string imagePath, int &galleryID)
+{
+	string md5Hash = createMD5Hash(imagePath);
+	string galleryPath = MyFileDirDll::getPathFromFullyQualifiedPathString(imagePath);
+	galleryID = WinToDBMiddleman::GetGalleryIDFromPath(galleryPath);
+	if(!IsImageInDB(galleryID, md5Hash))
+		return false;
+	return true;
+}
 void DatabaseBuilder::VerifyDB(string root)
 {
 	DatabaseDataParser dbParse;
@@ -425,24 +433,27 @@ void DatabaseBuilder::VerifyDB(string root)
 	
 	//[] is the capture list, add vars that are inside the lambda here
 
-	thread getDBSnapshot([this, &dbPAths]()
+	thread getDBSnapshot([this, root, &dbPAths]()
 	{
 		//now get all the galleries in the currentDB
 		string querey, output;
-		querey = "SELECT path FROM Gallery";
+		querey = ("SELECT path FROM Gallery WHERE path LIKE \"" + root + "%\"");
 		dbCtrlr.executeSQL(querey, output);
 		dbCtrlr.getAllValuesFromCol(output,"path", dbPAths);
 		//for testing
-		for (size_t i = 0; i < dbPAths.size(); i++)
+		/*for (size_t i = 0; i < dbPAths.size(); i++)
 		{
 			//SERVER = 8 F:\ = 3
-			dbPAths[i].replace(0,3, "\\\\SERVER\\");
-		}
+			if(dbPAths[1][0] == 'F')
+				dbPAths[i].replace(0,3, "\\\\SERVER\\");
+		}*/
 		sort(dbPAths.begin(), dbPAths.end());
 	});
+
 	
 	thread getDiskSnapshot([this, &treeOnDisk, &root]()
 	{
+		//root.replace(0, 3, "\\\\SERVER\\");
 		//get all paths on disk that have images only
 		dbDataParser.getAllPaths(root, treeOnDisk, 10);
 		sort(treeOnDisk.begin(), treeOnDisk.end());
@@ -459,27 +470,26 @@ void DatabaseBuilder::VerifyDB(string root)
 	commonDirs.resize(it - commonDirs.begin());
 
 	//std::cout << "The intersection has " << (commonDirs.size()) << " elements:\n";
-	vector<string> dirsToDeleteFromDB(commonDirs.size());
+	vector<string> dirsToDeleteFromDB(dbPAths.size());
 	it = set_difference(dbPAths.begin(), dbPAths.end(), commonDirs.begin(), commonDirs.end(), dirsToDeleteFromDB.begin());
 
 	dirsToDeleteFromDB.resize(it - dirsToDeleteFromDB.begin());
-	//WinToDBMiddleman winDB;
-	//winDB.setDBController(&dbCtrlr);
 	
 	string output;
 	for (size_t i = 0; i < dirsToDeleteFromDB.size(); i++)
 	{
 		if (!WinToDBMiddleman::DeleteGalleryFromDB(dirsToDeleteFromDB[i], output))
-			cout << "error: " << output << endl;
+			AddEntryToInvalidPathFile("error: " + output);
 	}
-	cout << "removed " << dirsToDeleteFromDB.size() << " galleries from DB\n";
 
+	string removeMsg = ("removed " + to_string(dirsToDeleteFromDB.size()) + " galleries from DB");
+	cout << removeMsg <<endl;
 	//std::cout << "The intersection has " << (commonDirs.size()) << " elements:\n";
+	
 	vector<string> dirsNotInDB(treeOnDisk.size());
 	it = set_difference(treeOnDisk.begin(), treeOnDisk.end(), commonDirs.begin(), commonDirs.end(), dirsNotInDB.begin());
 
 	dirsNotInDB.resize(it - dirsNotInDB.begin());
-	
 
 	for (size_t i = 0; i < dirsNotInDB.size(); i++)
 	{
@@ -487,7 +497,8 @@ void DatabaseBuilder::VerifyDB(string root)
 			cout << "error: " << output << endl;
 	}
 
-	cout << "added " << dirsNotInDB.size() << " galleries to DB\n";
+	string addMsg = ("added " + to_string( dirsNotInDB.size()) + " galleries to DB");
+	cout << addMsg << endl;
 }
 
 bool DatabaseBuilder::AddDirToDB(string curDir, bool doImageHash)
@@ -602,15 +613,3 @@ bool DatabaseBuilder::RequestImageHash(string imgPath, int galleryID, NetworkCon
 	
 	return true;
 }
-
-/*
-bool DatabaseBuilder::AddToFileDB()
-{
-	if (!InsertImageHashInfoIntoDB(imgFiles[i], hash, phash, md5Hash, galleryID))
-	{
-		string errString = ("couldnt hash or store: " + imgeFilePath + "\n");
-		AddEntryToInvalidPathFile(errString);
-		if (verboseOutput)
-			cout << errString;
-	}
-}*/

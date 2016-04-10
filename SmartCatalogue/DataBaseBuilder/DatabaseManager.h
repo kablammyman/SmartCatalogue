@@ -25,10 +25,6 @@ SERVICE_STATUS_HANDLE g_StatusHandle = NULL;
 
 HANDLE                g_ServiceStopEvent = INVALID_HANDLE_VALUE;
 HANDLE				  hDir = NULL;
-/*HANDLE				  hNetworkThread = NULL;
-HANDLE				  hDirWatchThread = NULL;
-HANDLE				  hWaitForClientThread = NULL;
-HANDLE				  hMainThread = NULL;*/
 
 //i need to be able to start CerateUmageHash.exe, and this handle will let me know if i did that already
 HANDLE				  hCreateImageHashProc = NULL;
@@ -77,7 +73,6 @@ CmdArg parseCommand(vector<string> argv)
 		for (size_t j = 0; j < cmdArgUpper.size(); j++)
 			cmdArgUpper[j] = toupper(cmdArgUpper[j]);
 			
-		
 
 		if (cmdArgUpper == "-DEST")
 		{
@@ -90,8 +85,8 @@ CmdArg parseCommand(vector<string> argv)
 			}
 			command.dest = atoi(argv[i].c_str());
 		}
-		else if (cmdArgUpper == "-ADDGAL" || cmdArgUpper ==  "-DELGAL" || cmdArgUpper == "-MOVGAL" || cmdArgUpper == "-VERIFY" ||
-			cmdArgUpper == "-ADDIMG" || cmdArgUpper == "-DELIMG" || cmdArgUpper == "-MOVIMG" || cmdArgUpper == "-VERIFY")
+		else if (cmdArgUpper == "-ADDGAL" || cmdArgUpper ==  "-DELGAL" || cmdArgUpper == "-MOVGAL" || cmdArgUpper == "-VERIFYGAL" ||
+			cmdArgUpper == "-ADDIMG" || cmdArgUpper == "-DELIMG" || cmdArgUpper == "-MOVIMG" || cmdArgUpper == "-VERIFYIMG")
 		{
 			command.SetCommand(cmdArgUpper);
 			i++;
@@ -104,15 +99,16 @@ CmdArg parseCommand(vector<string> argv)
 		}
 	
 		//this should be an image hash returning from over the wire
-		else
+		else if(cmdArgUpper.find("HASH") != string ::npos)
 		{
-			command.SetCommand("HASH");
+			i++;
+			command.SetCommand("-HASH");
 			for (size_t j = i; j < argv.size(); j++)
 				command.data.push_back(argv[j]);
 
 			break;
 		}
-			
+		
 		i++;
 	}
 	//if we get here, we prob turned on/off server mode and thats it
@@ -206,8 +202,8 @@ void StartAndConnectToCreateImageHash()
 
 	myCreateProcess(CFGHelper::filePathBase+"\\CreateImageHash.exe", " -server", hCreateImageHashProc);
 	//sleep a bit, so we make sure its running
-	Sleep(2000);
-	//cout << "connecting to " <<CFG::CFGReaderDLL::getCfgStringValue("CreateImageHashIP")<< "\n";
+	Sleep(1000);
+
 	//now try to connect to it
 	createImageHashSocket = conn.connectToServer(CFGHelper::CreateImageHashIP, CFGHelper::CreateImageHashPort);
 	g_hasConnections = true;
@@ -241,4 +237,13 @@ void DebugPrint(string msg)
 		OutputDebugString(msg.c_str());
 	else
 		cout << msg <<endl;
+}
+
+//when we have out put, does it go to the screen, a log, or back over the wire
+void SendReportBackOriginator(string msg, int dest)
+{
+	if(dest == -1)
+		DebugPrint(msg);
+	else
+		conn.sendData(dest, msg.c_str());
 }
