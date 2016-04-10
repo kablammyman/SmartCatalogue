@@ -108,7 +108,11 @@ CmdArg parseCommand(vector<string> argv)
 
 			break;
 		}
-		
+		else
+		{
+			i++;
+			command.SetCommand(cmdArgUpper);
+		}
 		i++;
 	}
 	//if we get here, we prob turned on/off server mode and thats it
