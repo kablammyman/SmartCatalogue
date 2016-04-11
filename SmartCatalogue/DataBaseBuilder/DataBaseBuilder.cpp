@@ -51,33 +51,8 @@ int DatabaseBuilder::GetLatestID()
 	string rowID = output.substr(found + 1);
 	return atoi(rowID.c_str());
 }
-//---------------------------------------------------------------------------------------------------------
-int DatabaseBuilder::AddEntryToInvalidPathFile(string message)
-{
-	std::fstream fs;
-	fs.open("invalidPaths.txt", std::fstream::in | std::fstream::out | std::fstream::app);
 
-	fs << message;
 
-	fs.close();
-
-	return 0;
-}
-
-//---------------------------------------------------------------------------------------------------------
-void DatabaseBuilder::ReportError(string erreorType, string errorMessage, string extraInfo, bool outputToLog)
-{
-	string msg = (erreorType + ": " + errorMessage);
-
-	if (!extraInfo.empty())
-		msg += ("\n" + extraInfo);
-
-	msg += "\n";
-	if (outputToLog)
-		AddEntryToInvalidPathFile(msg);
-
-	cout << msg;
-}
 //---------------------------------------------------------------------------------------------------------
 int DatabaseBuilder::InsertCategoryInfoIntoDB(GalleryData &galleryData)
 {
@@ -92,7 +67,7 @@ int DatabaseBuilder::InsertCategoryInfoIntoDB(GalleryData &galleryData)
 	{
 		if (output.find("error") != string::npos)
 		{
-			ReportError("category querey error", output, ("category = " + galleryData.category + "\npath = " + galleryData.path), false);
+			logger->WriteMessage(LOG_LEVEL_ERROR,"category querey "+ output + ("category = " + galleryData.category + "\npath = " + galleryData.path));
 			return -1;
 		}
 		vector <vector<string>> categoryInfo; 
@@ -106,7 +81,7 @@ int DatabaseBuilder::InsertCategoryInfoIntoDB(GalleryData &galleryData)
 
 	if (!output.empty())
 	{
-		ReportError("category input error", output, ("category = " + galleryData.category + "\npath = " + galleryData.path), false);
+		logger->WriteMessage(LOG_LEVEL_ERROR, "category input error " + output + ("category = " + galleryData.category + "\npath = " + galleryData.path));
 		return -1;
 	}
 	return GetLatestID();
@@ -130,7 +105,7 @@ int DatabaseBuilder::InsertWebsiteInfoIntoDB(GalleryData &galleryData, int categ
 	{
 		if (output.find("error") != string::npos)
 		{
-			ReportError("website querey error", output, ("website = " + galleryData.websiteName + "\npath = " + galleryData.path), false);
+			logger->WriteMessage(LOG_LEVEL_ERROR, "website querey error " + output + ("website = " + galleryData.websiteName + "\npath = " + galleryData.path));
 			return -1;
 		}
 		vector <vector<string>> websiteInfo;
@@ -146,7 +121,7 @@ int DatabaseBuilder::InsertWebsiteInfoIntoDB(GalleryData &galleryData, int categ
 	dbCtrlr.insertNewDataEntry("Website", dbWebInfo, output);
 	if (!output.empty())
 	{
-		ReportError("website input error", output, ("website = " + galleryData.websiteName + "\npath = " + galleryData.path), false);
+		logger->WriteMessage(LOG_LEVEL_ERROR, "website input error " + output + ("website = " + galleryData.websiteName + "\npath = " + galleryData.path));
 		return -1;
 	}
 	return GetLatestID();
@@ -174,7 +149,7 @@ int DatabaseBuilder::InsertSubWebsiteInfoIntoDB(GalleryData &galleryData, int we
 	{
 		if (output.find("error") != string::npos)
 		{
-			ReportError("subWebsite querey error", output, ("website = " + galleryData.subWebsiteName + "\npath = " + galleryData.path), false);
+			logger->WriteMessage(LOG_LEVEL_ERROR, "subWebsite querey error " + output + ("website = " + galleryData.subWebsiteName + "\npath = " + galleryData.path));
 			return -1;
 		}
 		vector <vector<string>> modelsInDB; 
@@ -190,7 +165,7 @@ int DatabaseBuilder::InsertSubWebsiteInfoIntoDB(GalleryData &galleryData, int we
 
 	if (!output.empty())
 	{
-		ReportError("subWebsite input error", output, ("website = " + galleryData.subWebsiteName + "\npath = " + galleryData.path), false);
+		logger->WriteMessage(LOG_LEVEL_ERROR, "subWebsite input error " + output + ("website = " + galleryData.subWebsiteName + "\npath = " + galleryData.path));
 		return -1;
 	}
 	return GetLatestID();
@@ -210,7 +185,7 @@ int DatabaseBuilder::InsertGalleryInfoIntoDB(GalleryData &galleryData, int websi
 	{
 		if (output.find("error") != string::npos)
 		{
-			ReportError("gallery querey error", output, ("gallery = " + galleryData.galleryName + "\npath = " + galleryData.path), false);
+			logger->WriteMessage(LOG_LEVEL_ERROR, "gallery querey error " + output + ("gallery = " + galleryData.galleryName + "\npath = " + galleryData.path));
 			return -1;
 		}
 		vector <vector<string>> modelsInDB; 
@@ -228,7 +203,7 @@ int DatabaseBuilder::InsertGalleryInfoIntoDB(GalleryData &galleryData, int websi
 	dbCtrlr.insertNewDataEntry("Gallery", dbGalleryInfo, output);
 	if (!output.empty())
 	{
-		ReportError("gallery input error", output, ("gallery = " + galleryData.galleryName + "\npath = " + galleryData.path), false);
+		logger->WriteMessage(LOG_LEVEL_ERROR, "gallery input error " + output + ("gallery = " + galleryData.galleryName + "\npath = " + galleryData.path));
 		return -1;
 	}
 	return GetLatestID();
@@ -250,7 +225,7 @@ bool DatabaseBuilder::InsertModelInfoIntoDB(GalleryModel &model)
 	{
 		if (output.find("error") != string::npos)
 		{
-			ReportError("model querey error", output, ("model = " + model.name.firstName + " " + model.name.middleName + " " + model.name.lastName), false);
+			logger->WriteMessage(LOG_LEVEL_ERROR, "model querey error " +output+ ("model = " + model.name.firstName + " " + model.name.middleName + " " + model.name.lastName));
 			return false;
 		}
 		vector <vector<string>> modelsInDB; 
@@ -268,7 +243,7 @@ bool DatabaseBuilder::InsertModelInfoIntoDB(GalleryModel &model)
 
 	if (!output.empty())
 	{
-		ReportError("model input error", output, ("model = " + model.name.firstName + " " + model.name.middleName + " " + model.name.lastName), false);
+		logger->WriteMessage(LOG_LEVEL_ERROR, "model input error " + output + ("model = " + model.name.firstName + " " + model.name.middleName + " " + model.name.lastName));
 		return false;
 	}
 
@@ -290,7 +265,7 @@ bool DatabaseBuilder::InsertModelOutfitInfoIntoDB(GalleryModel &model, size_t cl
 	dbCtrlr.insertNewDataEntry("Outfit", dbOutfitInfo, output);
 	if (!output.empty())
 	{
-		ReportError("model outfit input error", output, ("model = " + model.name.firstName + " " + model.name.middleName + " " + model.name.lastName + "\ngalleryID = " + to_string(galleryID)), false);
+		logger->WriteMessage(LOG_LEVEL_ERROR, "model outfit input error "+ output+ ("model = " + model.name.firstName + " " + model.name.middleName + " " + model.name.lastName + "\ngalleryID = " + to_string(galleryID)));
 		return false;
 	}
 	return true;
@@ -313,7 +288,7 @@ bool DatabaseBuilder::InsertImageHashInfoIntoDB(string imgeFileName, string hash
 		//then its not an error
 		if (output.find("UNIQUE constraint failed") == string::npos)
 		{
-			ReportError("image hash input error", output, "filename = " + imgeFileName + "\ngalleryID = " + to_string(galleryID), false);
+			logger->WriteMessage(LOG_LEVEL_ERROR, "image hash input error " + output + "filename = " + imgeFileName + "\ngalleryID = " + to_string(galleryID));
 			return false;
 		}
 	}
@@ -335,7 +310,7 @@ bool DatabaseBuilder::InsertImageHashInfoIntoDB(string imgeFileName, string md5,
 		//then its not an error
 		if (output.find("UNIQUE constraint failed") == string::npos)
 		{
-			ReportError("image hash input error", output, "filename = " + imgeFileName + "\ngalleryID = " + to_string(galleryID), false);
+			logger->WriteMessage(LOG_LEVEL_ERROR, "image hash input error "+ output+ "filename = " + imgeFileName + "\ngalleryID = " + to_string(galleryID));
 			return false;
 		}
 	}
@@ -358,7 +333,7 @@ bool DatabaseBuilder::AddHashDataToDB(string imgeFileName, string hash, string p
 	{
 		if (output.find("error") != string::npos)
 		{
-			ReportError("image hash lookup error",output,"couldnt find: " + imgeFileName + " in DB to add phash", false);
+			logger->WriteMessage(LOG_LEVEL_ERROR, "image hash lookup error " + output + "couldnt find: " + imgeFileName + " in DB to add phash\n");
 			return false;
 		}
 	}
@@ -373,7 +348,7 @@ bool DatabaseBuilder::AddHashDataToDB(string imgeFileName, string hash, string p
 		//then its not an error
 		if (output.find("UNIQUE constraint failed") == string::npos)
 		{
-			ReportError("image hash input error", output, "filename = " + fileName, false);
+			logger->WriteMessage(LOG_LEVEL_ERROR, "image hash input error "+ output+ "filename = " + fileName);
 			return false;
 		}
 	}
@@ -410,7 +385,7 @@ bool DatabaseBuilder::IsImageInDB(int galleryID, string md5Hash)
 		{
 			string errString = ("image querey error: " + output + "\n");
 			cout << errString;
-			AddEntryToInvalidPathFile(errString);
+			logger->WriteMessage(LOG_LEVEL_ERROR, errString);
 		}
 		return true;
 	}
@@ -455,7 +430,7 @@ void DatabaseBuilder::VerifyDB(string root)
 	{
 		//root.replace(0, 3, "\\\\SERVER\\");
 		//get all paths on disk that have images only
-		dbDataParser.getAllPaths(root, treeOnDisk, 10);
+		dbDataParser.getAllPaths(root, treeOnDisk, 10,true);
 		sort(treeOnDisk.begin(), treeOnDisk.end());
 	});
 
@@ -468,37 +443,45 @@ void DatabaseBuilder::VerifyDB(string root)
 	it = set_intersection(treeOnDisk.begin(), treeOnDisk.end(), dbPAths.begin(), dbPAths.end(), commonDirs.begin());
 
 	commonDirs.resize(it - commonDirs.begin());
+	string intersectionStr = ("The common dirs " + to_string(commonDirs.size()) + " elements\n");
+	logger->WriteMessage(LOG_LEVEL_DEBUG,intersectionStr);
 
-	//std::cout << "The intersection has " << (commonDirs.size()) << " elements:\n";
 	vector<string> dirsToDeleteFromDB(dbPAths.size());
 	it = set_difference(dbPAths.begin(), dbPAths.end(), commonDirs.begin(), commonDirs.end(), dirsToDeleteFromDB.begin());
 
 	dirsToDeleteFromDB.resize(it - dirsToDeleteFromDB.begin());
-	
+	intersectionStr = ("The delete dirs " + to_string(dirsToDeleteFromDB.size()) + " elements\n");
+	logger->WriteMessage(LOG_LEVEL_DEBUG, intersectionStr);
+
 	string output;
+	int counter = 0;
 	for (size_t i = 0; i < dirsToDeleteFromDB.size(); i++)
 	{
 		if (!WinToDBMiddleman::DeleteGalleryFromDB(dirsToDeleteFromDB[i], output))
-			AddEntryToInvalidPathFile("error: " + output);
+			logger->WriteMessage(LOG_LEVEL_ERROR,"deleteing from db error: "+ output + " for " + dirsToDeleteFromDB[i]);
+		else
+			counter++;
 	}
 
-	string removeMsg = ("removed " + to_string(dirsToDeleteFromDB.size()) + " galleries from DB");
-	cout << removeMsg <<endl;
-	//std::cout << "The intersection has " << (commonDirs.size()) << " elements:\n";
+	string removeMsg = ("removed " + to_string(counter) + " galleries from DB");
+	logger->WriteMessage(LOG_LEVEL_DEBUG, removeMsg);
 	
 	vector<string> dirsNotInDB(treeOnDisk.size());
 	it = set_difference(treeOnDisk.begin(), treeOnDisk.end(), commonDirs.begin(), commonDirs.end(), dirsNotInDB.begin());
 
 	dirsNotInDB.resize(it - dirsNotInDB.begin());
-
+	
+	counter = 0;
 	for (size_t i = 0; i < dirsNotInDB.size(); i++)
 	{
 		if (!AddDirToDB(dirsNotInDB[i], true))
-			cout << "error: " << output << endl;
+			logger->WriteMessage(LOG_LEVEL_ERROR, "adding to db error: " + output + " for " + dirsNotInDB[i]);
+		else
+			counter++;
 	}
 
-	string addMsg = ("added " + to_string( dirsNotInDB.size()) + " galleries to DB");
-	cout << addMsg << endl;
+	string addMsg = ("added " + to_string(counter) + " galleries to DB");
+	logger->WriteMessage(LOG_LEVEL_DEBUG, addMsg); 
 }
 
 bool DatabaseBuilder::AddDirToDB(string curDir, bool doImageHash)
@@ -516,7 +499,7 @@ bool DatabaseBuilder::AddDirToDB(string curDir, bool doImageHash)
 	bool ret = dbDataParser.calcGalleryData(curDir, rootPath, galleryData, galleryCalcError);
 	if (!ret)
 	{
-		ReportError("invalid directory", curDir, galleryCalcError, true);
+		logger->WriteMessage(LOG_LEVEL_ERROR, "invalid directory "+ curDir+ galleryCalcError);
 		return false;
 	}
 

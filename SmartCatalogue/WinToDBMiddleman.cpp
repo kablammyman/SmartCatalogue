@@ -153,14 +153,38 @@ bool WinToDBMiddleman::DeleteGalleryFromDisk(string gallery)
 bool WinToDBMiddleman::DeleteGalleryFromDB(string gallery, string &output)
 {
 	string querey;
+	//since a delete always "succeeds" even if there was nothing to delete, lets do a select first
 
-	querey = "DELETE FROM Gallery where path = \"";
+	querey = "SELECT path FROM Gallery where path = \"";
+	querey += MyFileDirDll::getPathFromFullyQualifiedPathString(gallery);
+	querey += "\";";
+
+	dbCtrlr->executeSQL(querey, output);
+	
+	if (!output.empty())
+	{
+		querey = "DELETE FROM Gallery where path = \"";
+		querey += MyFileDirDll::getPathFromFullyQualifiedPathString(gallery);
+		querey += "\";";
+		return true;
+	}
+
+	//try with the trailing slash if it didnt find without one
+	output.clear();
+	querey = "SELECT path FROM Gallery where path = \"";
 	querey += MyFileDirDll::getPathFromFullyQualifiedPathString(gallery);
 	querey += "\\\";";
 
 	dbCtrlr->executeSQL(querey, output);
-	if (output.empty())
+
+	if (!output.empty())
+	{
+		querey = "DELETE FROM Gallery where path = \"";
+		querey += MyFileDirDll::getPathFromFullyQualifiedPathString(gallery);
+		querey += "\\\";";
 		return true;
+	}
+
 	return false;
 }
 
@@ -185,15 +209,10 @@ bool WinToDBMiddleman::DeleteGalleryAndImagesFromDB(string gallery, string &outp
 	querey += "\\\");";
 
 	dbCtrlr->executeSQL(querey, output);
+	if(!output.empty())
+		return false;
 
-	querey = "DELETE FROM Gallery where path = \"";
-	querey += MyFileDirDll::getPathFromFullyQualifiedPathString(gallery);
-	querey += "\\\";";
-
-	dbCtrlr->executeSQL(querey, output);
-	if (output.empty())
-		return true;
-	return false;
+	return DeleteGalleryFromDB(gallery, output);
 }
 bool WinToDBMiddleman::MoveGalleryOnDisk(string dest, string src)
 {

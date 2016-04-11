@@ -19,6 +19,7 @@
 #include "CFGReaderDll.h"
 #include "CFGHelper.h"
 
+
 #define SHORT_SLEEP 1
 #define LONG_SLEEP 10000
 //sc create "PornoDB Manager" binPath= C:\SampleService.exe
@@ -371,8 +372,11 @@ int doNetWorkCommunication(void)
 	int recvbuflen = DEFAULT_BUFLEN;
 	int numConn = 0;
 	bool recvData = false;
-	std::clock_t  heartBeat = 0;
+	clock_t  heartBeat = 0;
 	
+	if (tcpOut == NULL)
+		tcpOut = new TCPOutput(&conn,0);
+
 	while (g_hasConnections)
 	{
 		recvData = false;
@@ -405,7 +409,7 @@ int doNetWorkCommunication(void)
 					g_queuecheck.notify_one();
 
 					if(i == createImageHashSocket)
-						heartBeat = std::clock();
+						heartBeat = clock();
 				}
 				//client disconnected
 				else if (iResult == 0)
@@ -423,7 +427,7 @@ int doNetWorkCommunication(void)
 		if (!recvData)
 		{
 			Sleep(SHORT_SLEEP);  
-			float curTime = (std::clock() - heartBeat) / CLOCKS_PER_SEC;
+			float curTime = (clock() - heartBeat) / CLOCKS_PER_SEC;
 			if(curTime > 60000)
 				ShutdownCreateImageHash();
 		}
@@ -431,6 +435,8 @@ int doNetWorkCommunication(void)
 
 	DebugPrint("PornoDB Manager: network communication: Exit");
 	networkThread = NULL;
+	delete tcpOut;
+	tcpOut = NULL;
 	return ERROR_SUCCESS;
 }
 
@@ -438,7 +444,7 @@ int doMainWorkerThread(void)
 {
 	DatabaseBuilder dbBuilder(CFGHelper::dbPath, CFGHelper::ignorePattern);
 	dbBuilder.FillMetaWords(CFGHelper::meta);
-	
+		
 	vector<string> dbTableValues = CFG::CFGReaderDLL::getCfgListValue("tableNames");
 	//if we cant find the table names in the cfg, thejust get out of here
 	if (dbTableValues.size() == 1 && dbTableValues[0].find("could not find") != string::npos)
@@ -501,16 +507,16 @@ int doMainWorkerThread(void)
 			}
 			else if (command.cmd == "-VERIFYGAL")
 			{
-				string msg = "PornoDB Manager: Verify DB with disk START: ";
-				msg += GetTimeStamp();
-				DebugPrint(msg.c_str());
+				//temp code!
+				tcpOut->ChangeSocketIndex(command.dest);
+				dbBuilder.logger = tcpOut;
+
+				string msg = "PornoDB Manager: Verify DB with " + command.data[0] +" START: ";
 				SendReportBackOriginator(msg, command.dest);
 
 				dbBuilder.VerifyDB(command.data[0]);
 
-				msg = "PornoDB Manager: Verify DB with disk FINISH: ";
-				msg += GetTimeStamp();
-				DebugPrint(msg.c_str());
+				msg = "PornoDB Manager: Verify DB with " + command.data[0] + " FINISH: ";
 				SendReportBackOriginator(msg, command.dest);
 			}
 			else if (command.cmd == "-VERIFYIMG")

@@ -68,7 +68,7 @@ public:
 	bool getDBTableValues(string tableName);
 	bool fillPartOfSpeechTable(string pofTableName);
 	void setDBController(DatabaseController *dbc);
-	void getAllPaths(string path, vector<string> &dirsWithImages, int numThreads = 0);
+	void getAllPaths(string path, vector<string> &dirsWithImages, int numThreads = 0, bool refresh = false);
 	bool calcGalleryData(string input, string ignorePattern, GalleryData &gallery, string &error);
 	void transformClothingNameAlias(string &phrase);
 	void transformSexToyAlias(string &phrase);

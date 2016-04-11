@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <ctime>//check execution time
+
 #include <Windows.h>
 #include <queue>
 
@@ -14,7 +14,7 @@
 #include "NetworkConnection.h"
 #include "Utils.h"
 #include "CFGHelper.h"
-
+#include "MessageRouter.h"
 
 #define SERVICE_NAME  "PornoDB Manager"
 #define CREATE_HASH_OUTPUT_IGNORE "***** VIDEOINPUT LIBRARY - 0.1995 - TFW07 *****\n"
@@ -30,6 +30,7 @@ HANDLE				  hDir = NULL;
 HANDLE				  hCreateImageHashProc = NULL;
 
 
+TCPOutput *tcpOut = NULL;
 
 VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv);
 VOID WINAPI ServiceCtrlHandler(DWORD);
@@ -224,16 +225,6 @@ void ShutdownCreateImageHash()
 	hCreateImageHashProc = NULL;
 }
 
-string GetTimeStamp()
-{
-	time_t rawtime;
-	struct tm * timeinfo;
-
-	time(&rawtime);
-	timeinfo = localtime(&rawtime);
-	return asctime(timeinfo);
-	//printf("The current date/time is: %s", asctime(timeinfo));
-}
 
 void DebugPrint(string msg)
 {

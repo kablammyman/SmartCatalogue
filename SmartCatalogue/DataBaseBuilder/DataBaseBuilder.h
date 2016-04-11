@@ -1,13 +1,12 @@
 #pragma once
 #include <string>
-#include <iostream>
 #include <vector>
 
 #include "DatabaseDataParser.h"
 #include "DatabaseController.h"
 #include "NetworkConnection.h"
 #include "myFileDirDll.h"
-
+#include "MessageRouter.h"
 
 
 using namespace std;
@@ -20,13 +19,15 @@ private:
 	string rootPath;//the root where all images will be found (optional)
 	int GetLatestID();
 	bool verboseOutput;
+	
 public:
+	LogOutput *logger;
+
 	DatabaseBuilder(string dbPath, string root);
 	void FillPartsOfSpeechTable(vector<string> &dbTableValues);
 	void FillMetaWords(vector<string> &meta);
-	int AddEntryToInvalidPathFile(string message);
+
 	bool ParsePath(string curDir, GalleryData galleryData, string err);
-	void ReportError(string erreorType, string errorMessage, string extraInfo, bool outputToLog);
 	int InsertCategoryInfoIntoDB(GalleryData &galleryData);
 	int InsertWebsiteInfoIntoDB(GalleryData &galleryData, int categoryID);
 	int InsertSubWebsiteInfoIntoDB(GalleryData &galleryData, int websiteID);
