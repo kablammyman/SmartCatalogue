@@ -18,7 +18,7 @@
 #include "WinToDBMiddleman.h"
 #include "CFGReaderDll.h"
 #include "CFGHelper.h"
-
+#include "LogMessage.h"
 
 #define SHORT_SLEEP 1
 #define LONG_SLEEP 10000
@@ -28,7 +28,7 @@ void Start()
 {
 	//START STUFF
 	//Sleep(10000);
-	DebugPrint("starting server");
+	logRouter.Log(LOG_LEVEL_INFORMATIONAL,"starting server");
 	conn.startServer(SOMAXCONN, CFGHelper::DataBaseManagerPort);
 
 	 networkThread = NULL;
@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
 {
 	CFGHelper::filePathBase = Utils::setProgramPath(argv[0]);
 	CFGHelper::loadCFGFile();
+	
 	string err;
 	if (!CFGHelper::IsCFGComplete(err))
 	{
@@ -59,8 +60,10 @@ int main(int argc, char *argv[])
 		MessageBox(NULL, msg.c_str(), NULL, NULL);
 		exit(0);
 	}
+	
+	logRouter.GetLoggingInfoFromCFG();
 
-	DebugPrint("PornoDB Manager: Main: Entry");
+	logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: Main: Entry");
 
 	if(argc >= 2)
 		isService = false;
@@ -71,18 +74,18 @@ int main(int argc, char *argv[])
 		// Start the thread that will perform the main task of the service
 		Start();
 
-		DebugPrint("PornoDB Manager: ServiceMain: Waiting for Worker Thread to complete");
+		logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: ServiceMain: Waiting for Worker Thread to complete");
 
 
 		// Wait until our main worker thread exits effectively signaling that the service needs to stop
 		//WaitForSingleObject(hMainThread, INFINITE);
 		mainThread->join();
-		DebugPrint("PornoDB Manager: ServiceMain: Worker Thread Stop Event signaled");
+		logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: ServiceMain: Worker Thread Stop Event signaled");
 
 		/*
 		* Perform any cleanup tasks
 		*/
-		DebugPrint("PornoDB Manager: ServiceMain: Performing Cleanup Operations");
+		logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: ServiceMain: Performing Cleanup Operations");
 
 		Finish();
 		return 0;
@@ -99,11 +102,11 @@ int main(int argc, char *argv[])
 	{
 		string errorText = "PornoDB Manager: Main: StartServiceCtrlDispatcher returned error: "; 
 		errorText += to_string(GetLastError());
-		DebugPrint(errorText.c_str());
+		logRouter.Log(LOG_LEVEL_ERROR, errorText.c_str());
 		return -1;
 	}
 
-	DebugPrint("PornoDB Manager: Main: Exit");
+	logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: Main: Exit");
 	return 0;
 }
 
@@ -112,13 +115,13 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 {
 	DWORD Status = E_FAIL;
 	
-	DebugPrint("PornoDB Manager: ServiceMain: Entry");
+	logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: ServiceMain: Entry");
 
 	g_StatusHandle = RegisterServiceCtrlHandler(SERVICE_NAME, ServiceCtrlHandler);
 
 	if (g_StatusHandle == NULL)
 	{
-		DebugPrint("PornoDB Manager: ServiceMain: RegisterServiceCtrlHandler returned error");
+		logRouter.Log(LOG_LEVEL_ERROR, "PornoDB Manager: ServiceMain: RegisterServiceCtrlHandler returned error");
 		goto EXIT;
 	}
 
@@ -133,19 +136,19 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 
 	if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
 	{
-		DebugPrint("PornoDB Manager: ServiceMain: SetServiceStatus returned error");
+		logRouter.Log(LOG_LEVEL_ERROR, "PornoDB Manager: ServiceMain: SetServiceStatus returned error");
 	}
 
 	
 	
 
-	DebugPrint("PornoDB Manager: ServiceMain: Performing Service Start Operations");
+	logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: ServiceMain: Performing Service Start Operations");
 
 	// Create stop event to wait on later.
 	g_ServiceStopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	if (g_ServiceStopEvent == NULL)
 	{
-		DebugPrint("PornoDB Manager: ServiceMain: CreateEvent(g_ServiceStopEvent) returned error");
+		logRouter.Log(LOG_LEVEL_ERROR, "PornoDB Manager: ServiceMain: CreateEvent(g_ServiceStopEvent) returned error");
 
 		g_ServiceStatus.dwControlsAccepted = 0;
 		g_ServiceStatus.dwCurrentState = SERVICE_STOPPED;
@@ -154,7 +157,7 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 
 		if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
 		{
-			DebugPrint("PornoDB Manager: ServiceMain: SetServiceStatus returned error");
+			logRouter.Log(LOG_LEVEL_ERROR, "PornoDB Manager: ServiceMain: SetServiceStatus returned error");
 		}
 		goto EXIT;
 	}
@@ -168,24 +171,24 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 
 	if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
 	{
-		DebugPrint("PornoDB Manager: ServiceMain: SetServiceStatus returned error");
+		logRouter.Log(LOG_LEVEL_ERROR, "PornoDB Manager: ServiceMain: SetServiceStatus returned error");
 	}
 
 	// Start the thread that will perform the main task of the service
 	Start();
 
-	DebugPrint("PornoDB Manager: ServiceMain: Waiting for Worker Thread to complete");
+	logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: ServiceMain: Waiting for Worker Thread to complete");
 
 	// Wait until our main worker thread exits effectively signaling that the service needs to stop
 	//WaitForSingleObject(hMainThread, INFINITE);
 	mainThread->join();
 
-	DebugPrint("PornoDB Manager: ServiceMain: Worker Thread Stop Event signaled");
+	logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: ServiceMain: Worker Thread Stop Event signaled");
 
 	/*
 	* Perform any cleanup tasks
 	*/
-	DebugPrint("PornoDB Manager: ServiceMain: Performing Cleanup Operations");
+	logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: ServiceMain: Performing Cleanup Operations");
 
 	Finish();
 
@@ -198,24 +201,24 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 
 	if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
 	{
-		DebugPrint("PornoDB Manager: ServiceMain: SetServiceStatus returned error");
+		logRouter.Log(LOG_LEVEL_ERROR, "PornoDB Manager: ServiceMain: SetServiceStatus returned error");
 	}
 
 EXIT:
-	DebugPrint("PornoDB Manager: ServiceMain: Exit");
+	logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: ServiceMain: Exit");
 
 	return;
 }
 
 VOID WINAPI ServiceCtrlHandler(DWORD CtrlCode)
 {
-	DebugPrint("PornoDB Manager: ServiceCtrlHandler: Entry");
+	logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: ServiceCtrlHandler: Entry");
 
 	switch (CtrlCode)
 	{
 	case SERVICE_CONTROL_STOP:
 
-		DebugPrint("PornoDB Manager: ServiceCtrlHandler: SERVICE_CONTROL_STOP Request");
+		logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: ServiceCtrlHandler: SERVICE_CONTROL_STOP Request");
 
 		if (g_ServiceStatus.dwCurrentState != SERVICE_RUNNING)
 			break;
@@ -227,7 +230,7 @@ VOID WINAPI ServiceCtrlHandler(DWORD CtrlCode)
 
 		if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
 		{
-			DebugPrint("PornoDB Manager: ServiceCtrlHandler: SetServiceStatus returned error");
+			logRouter.Log(LOG_LEVEL_ERROR, "PornoDB Manager: ServiceCtrlHandler: SetServiceStatus returned error");
 		}
 
 		// This will signal the worker thread to start shutting down
@@ -243,7 +246,7 @@ VOID WINAPI ServiceCtrlHandler(DWORD CtrlCode)
 		break;
 	}
 
-	DebugPrint("PornoDB Manager: ServiceCtrlHandler: Exit");
+	logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: ServiceCtrlHandler: Exit");
 }
 
 
@@ -268,7 +271,7 @@ int doDirWatch(void)
 	if (hDir == INVALID_HANDLE_VALUE)
 	{
 		string errString = "fileWatcher invalid handle error: " + to_string(GetLastError());
-		DebugPrint(errString);
+		logRouter.Log(LOG_LEVEL_ERROR, errString);
 		//exit(-1);
 	}
 
@@ -345,7 +348,7 @@ int doDirWatch(void)
 		else
 		{
 			string errString = "fileWatcher error: " + to_string(GetLastError());
-			DebugPrint(errString);
+			logRouter.Log(LOG_LEVEL_ERROR, errString);
 		}
 	}
 	return 0;
@@ -419,7 +422,7 @@ int doNetWorkCommunication(void)
 				else
 				{
 					string errString = "network communication error: " + to_string(GetLastError());
-					DebugPrint(errString);
+					logRouter.Log(LOG_LEVEL_ERROR, errString);
 					conn.closeConnection(i);
 				}
 			}
@@ -433,7 +436,7 @@ int doNetWorkCommunication(void)
 		}
 	}
 
-	DebugPrint("PornoDB Manager: network communication: Exit");
+	logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: network communication: Exit");
 	networkThread = NULL;
 	delete tcpOut;
 	tcpOut = NULL;
@@ -444,7 +447,8 @@ int doMainWorkerThread(void)
 {
 	DatabaseBuilder dbBuilder(CFGHelper::dbPath, CFGHelper::ignorePattern);
 	dbBuilder.FillMetaWords(CFGHelper::meta);
-		
+	dbBuilder.SetLogRouter(&logRouter);
+
 	vector<string> dbTableValues = CFG::CFGReaderDLL::getCfgListValue("tableNames");
 	//if we cant find the table names in the cfg, thejust get out of here
 	if (dbTableValues.size() == 1 && dbTableValues[0].find("could not find") != string::npos)
@@ -456,7 +460,7 @@ int doMainWorkerThread(void)
 	dbBuilder.FillPartsOfSpeechTable(dbTableValues);
 	//dbBuilder.verifyDB(CFGHelper::pathToProcess);
 	
-	DebugPrint("PornoDB Manager: ServiceWorkerThread: Entry");
+	logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: ServiceWorkerThread: Entry");
 
 	while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
 	{
@@ -473,6 +477,10 @@ int doMainWorkerThread(void)
 				continue;
 			else if (command.cmd == "-ADDGAL")
 			{
+				//temp code!
+				//tcpOut->ChangeSocketIndex(command.dest);
+				//dbBuilder.logger = tcpOut;
+
 				StartAndConnectToCreateImageHash();
 
 				int goodDir = 0, badDir = 0, totalDir = 0;
@@ -507,10 +515,7 @@ int doMainWorkerThread(void)
 			}
 			else if (command.cmd == "-VERIFYGAL")
 			{
-				//temp code!
-				tcpOut->ChangeSocketIndex(command.dest);
-				dbBuilder.logger = tcpOut;
-
+				
 				string msg = "PornoDB Manager: Verify DB with " + command.data[0] +" START: ";
 				SendReportBackOriginator(msg, command.dest);
 
@@ -555,12 +560,12 @@ int doMainWorkerThread(void)
 			else if (command.cmd == "-HASH")
 			{
 				if (!dbBuilder.AddHashDataToDB(command.data[0], command.data[1], command.data[2]))
-					DebugPrint("error adding hash: "+ command.data[0]);
+					logRouter.Log(LOG_LEVEL_ERROR, "error adding hash: "+ command.data[0]);
 			}
 			else
 			{
 				string msg = "unrecognized command: " + command.cmd;
-				DebugPrint(msg);
+				logRouter.Log(LOG_LEVEL_WARNING, msg);
 
 				if(command.dest != createImageHashSocket)
 					SendReportBackOriginator(msg, command.dest);

@@ -60,7 +60,10 @@
     <ClInclude Include="..\..\..\Utils\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MessageRouter.h">
+    <ClInclude Include="..\..\..\Utils\LogMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Utils\LogRouter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -107,7 +110,10 @@
     <ClCompile Include="..\..\..\Utils\NetworkConnection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MessageRouter.cpp">
+    <ClCompile Include="..\..\..\Utils\LogMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Utils\LogRouter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -6,8 +6,8 @@
 #include "DatabaseController.h"
 #include "NetworkConnection.h"
 #include "myFileDirDll.h"
-#include "MessageRouter.h"
 
+#include "LogRouter.h"
 
 using namespace std;
 
@@ -19,10 +19,13 @@ private:
 	string rootPath;//the root where all images will be found (optional)
 	int GetLatestID();
 	bool verboseOutput;
-	
+	LogRouter *logRouter;
 public:
-	LogOutput *logger;
-
+	
+	void SetLogRouter(LogRouter *lr)
+	{
+		logRouter = lr;
+	}
 	DatabaseBuilder(string dbPath, string root);
 	void FillPartsOfSpeechTable(vector<string> &dbTableValues);
 	void FillMetaWords(vector<string> &meta);

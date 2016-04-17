@@ -14,7 +14,7 @@
 #include "NetworkConnection.h"
 #include "Utils.h"
 #include "CFGHelper.h"
-#include "MessageRouter.h"
+#include "LogRouter.h"
 
 #define SERVICE_NAME  "PornoDB Manager"
 #define CREATE_HASH_OUTPUT_IGNORE "***** VIDEOINPUT LIBRARY - 0.1995 - TFW07 *****\n"
@@ -41,6 +41,7 @@ int doMainWorkerThread(void);
 
 queue<CmdArg> tasks;
 NetworkConnection conn;
+LogRouter logRouter;
 
 bool isService = true;
 int createImageHashSocket = -1;
@@ -120,13 +121,6 @@ CmdArg parseCommand(vector<string> argv)
 	return command;
 }
 
-
-
-void broadcastMsg(string msg)
-{
-	cout << "sending msg \n";
-	conn.ServerBroadcast(msg.c_str());
-}
 
 string exec(const char* cmd)
 {
@@ -226,19 +220,19 @@ void ShutdownCreateImageHash()
 }
 
 
-void DebugPrint(string msg)
+/*void DebugPrint(string msg)
 {
 	if(isService)
 		OutputDebugString(msg.c_str());
 	else
 		cout << msg <<endl;
-}
+}*/
 
 //when we have out put, does it go to the screen, a log, or back over the wire
 void SendReportBackOriginator(string msg, int dest)
 {
 	if(dest == -1)
-		DebugPrint(msg);
+		logRouter.Log(LOG_LEVEL_INFORMATIONAL, msg);
 	else
 		conn.sendData(dest, msg.c_str());
 }
