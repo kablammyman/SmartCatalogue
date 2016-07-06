@@ -11,9 +11,9 @@
 #include <mutex>
 #include <condition_variable>
 
-#include "NetworkConnection.h"
-#include "Utils.h"
 #include "CFGHelper.h"
+#include "TCPUtils.h"
+#include "CommandLineUtils.h"
 #include "LogRouter.h"
 
 #define SERVICE_NAME  "PornoDB Manager"
@@ -40,7 +40,7 @@ int doDirWatch(void);
 int doMainWorkerThread(void);
 
 queue<CmdArg> tasks;
-NetworkConnection conn;
+TCPUtils conn;
 LogRouter logRouter;
 
 bool isService = true;
@@ -65,7 +65,7 @@ void invalidParmMessageAndExit()
 
 CmdArg parseCommand(vector<string> argv)
 {
-	int i = 0;
+	size_t i = 0;
 	CmdArg command;
 	//std::vector<std::string> arguments(argv + 1, argv + argc);
 	while (i < argv.size())
@@ -178,7 +178,7 @@ string jobReport(double start_s, int totalDir, int goodDir, int badDir)
 {
 	int stop_s = clock();
 	double milis = (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000;
-	string returnString = "done in " + Utils::getTimeStamp(milis)+ "\n";
+	string returnString = "done in " + LogOutput::GetTimeStampFromMilis(milis)+ "\n";
 	returnString += "processed " + to_string(totalDir) + " galleries\n";
 
 	float goodPercent = ((float)goodDir / (float)totalDir);

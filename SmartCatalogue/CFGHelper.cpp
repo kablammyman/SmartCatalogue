@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "CFGHelper.h"
-#include "CFGReaderDll.h"
+#include "CFGUtils.h"
 
 
 string CFGHelper::filePathBase;
@@ -22,21 +22,21 @@ void CFGHelper::loadCFGFile(string programBasePath)
 	else
 		cfgPath = programBasePath + "\\imageViewCfg.txt";
 
-	if (!CFG::CFGReaderDLL::readCfgFile(cfgPath, '|'))
+	if (!CFGUtils::ReadCfgFile(cfgPath, '|'))
 	{
 		string errorMsg = "Error opening :";
 		errorMsg += cfgPath;
 		//cout << errorMsg << "\nno cfg text file" << endl;
 	}
 
-	dbPath = CFG::CFGReaderDLL::getCfgStringValue("DBPath");
-	pathToProcess = CFG::CFGReaderDLL::getCfgStringValue("mainWorkingPath");
-	ignorePattern = CFG::CFGReaderDLL::getCfgStringValue("ignorePattern");
-	meta = CFG::CFGReaderDLL::getCfgListValue("metaWords");
-	CreateImageHashIP = CFG::CFGReaderDLL::getCfgStringValue("CreateImageHashIP");
-	CreateImageHashPort = CFG::CFGReaderDLL::getCfgIntValue("CreateImageHashPort");
-	DataBaseManagerIP = CFG::CFGReaderDLL::getCfgStringValue("DataBaseManagerIP");
-	DataBaseManagerPort = CFG::CFGReaderDLL::getCfgIntValue("DataBaseManagerPort");
+	dbPath = CFGUtils::GetCfgStringValue("DBPath");
+	pathToProcess = CFGUtils::GetCfgStringValue("mainWorkingPath");
+	ignorePattern = CFGUtils::GetCfgStringValue("ignorePattern");
+	meta = CFGUtils::GetCfgListValue("metaWords");
+	CreateImageHashIP = CFGUtils::GetCfgStringValue("CreateImageHashIP");
+	CreateImageHashPort = CFGUtils::GetCfgIntValue("CreateImageHashPort");
+	DataBaseManagerIP = CFGUtils::GetCfgStringValue("DataBaseManagerIP");
+	DataBaseManagerPort = CFGUtils::GetCfgIntValue("DataBaseManagerPort");
 
 }
 //check to make sure everything loaded

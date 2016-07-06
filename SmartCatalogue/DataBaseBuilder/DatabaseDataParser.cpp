@@ -620,7 +620,7 @@ void DatabaseDataParser::getAllDirsWithBadPath(string ignorePattern, vector<stri
 {
 	
 	//dont in FileWalker
-	vector<string> allDirs = MyFileDirDll::dumpTreeToVector(true);
+	vector<string> allDirs = FileUtils::dumpTreeToVector(true);
 	for (size_t i = 0; i < allDirs.size(); i++)
 	{
 		string input = allDirs[i];

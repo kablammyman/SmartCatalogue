@@ -449,7 +449,7 @@ int doMainWorkerThread(void)
 	dbBuilder.FillMetaWords(CFGHelper::meta);
 	dbBuilder.SetLogRouter(&logRouter);
 
-	vector<string> dbTableValues = CFG::CFGReaderDLL::getCfgListValue("tableNames");
+	vector<string> dbTableValues = CFGUtils::getCfgListValue("tableNames");
 	//if we cant find the table names in the cfg, thejust get out of here
 	if (dbTableValues.size() == 1 && dbTableValues[0].find("could not find") != string::npos)
 	{
@@ -532,7 +532,7 @@ int doMainWorkerThread(void)
 			}
 			else if (command.cmd == "-ADDIMG")
 			{
-				string galleryPath = MyFileDirDll::getPathFromFullyQualifiedPathString(command.data[0]);
+				string galleryPath = FileUtils::getPathFromFullyQualifiedPathString(command.data[0]);
 				//argh! sometimes i have a trailing slash at the end of the pathi n theDB, sometimes i dont!
 				//galleryPath += "\\";
 				int galleryID = WinToDBMiddleman::GetGalleryIDFromPath(galleryPath);

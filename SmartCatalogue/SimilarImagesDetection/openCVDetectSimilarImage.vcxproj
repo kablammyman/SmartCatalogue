@@ -21,9 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Utils\ClipboardUtil.cpp" />
     <ClCompile Include="..\..\..\Utils\database.cpp" />
-    <ClCompile Include="..\..\..\Utils\NetworkConnection.cpp" />
-    <ClCompile Include="..\..\..\Utils\similarImage.cpp" />
-    <ClCompile Include="..\..\..\Utils\Utils.cpp" />
+    <ClCompile Include="..\similarImage.cpp" />
     <ClCompile Include="CreateImageHash.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -102,7 +100,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src;..\..\..\Utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,7 +116,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src;..\..\..\Utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -136,7 +134,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src;..\..\..\Utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,7 +153,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src;..\..\..\Utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

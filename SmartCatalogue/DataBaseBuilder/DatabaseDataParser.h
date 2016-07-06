@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "Trie.h"
+#include "StringUtils.h"
 
 #include "DatabaseController.h"
 #include "DatabaseTableStructs.h"

@@ -4,7 +4,7 @@
 
 #include "DatabaseDataParser.h"
 #include "DatabaseController.h"
-#include "NetworkConnection.h"
+#include "TCPUtils.h"
 #include "myFileDirDll.h"
 
 #include "LogRouter.h"
@@ -45,6 +45,6 @@ public:
 	void VerifyDB(string root);
 	bool VerifyImage(string imagePath, int &galleryID);
 	bool AddDirToDB(string curDir, bool doImageHash);
-	bool RequestImageHashesForDir(string galleryPath, int galleryID, NetworkConnection *conn, int connIndex);
-	bool RequestImageHash(string imgPath, int galleryID, NetworkConnection *conn, int connIndex);
+	bool RequestImageHashesForDir(string galleryPath, int galleryID, TCPUtils *conn, int connIndex);
+	bool RequestImageHash(string imgPath, int galleryID, TCPUtils *conn, int connIndex);
 };

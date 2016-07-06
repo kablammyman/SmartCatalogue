@@ -93,7 +93,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;..\;..\..\..\Utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);C:\myLibs\includes;C:\SQLite3\src;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,7 +112,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;..\;..\..\..\Utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);C:\myLibs\includes;C:\SQLite3\src;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,7 +134,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;..\;..\..\..\Utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);C:\myLibs\includes;C:\SQLite3\src;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -157,7 +157,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\SQLite3\src;..\;..\..\..\Utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);C:\myLibs\includes;C:\SQLite3\src;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -175,12 +175,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\Utils\database.h" />
     <ClInclude Include="..\..\..\Utils\DatabaseController.h" />
-    <ClInclude Include="..\..\..\Utils\LogMessage.h" />
-    <ClInclude Include="..\..\..\Utils\LogRouter.h" />
-    <ClInclude Include="..\..\..\Utils\MD5.h" />
-    <ClInclude Include="..\..\..\Utils\SpellChecker.h" />
-    <ClInclude Include="..\..\..\Utils\Trie.h" />
-    <ClInclude Include="..\..\..\Utils\Utils.h" />
     <ClInclude Include="..\CFGHelper.h" />
     <ClInclude Include="..\WinToDBMiddleman.h" />
     <ClInclude Include="DataBaseBuilder.h" />
@@ -194,13 +188,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Utils\database.cpp" />
     <ClCompile Include="..\..\..\Utils\DatabaseControllercpp.cpp" />
-    <ClCompile Include="..\..\..\Utils\LogMessage.cpp" />
-    <ClCompile Include="..\..\..\Utils\LogRouter.cpp" />
-    <ClCompile Include="..\..\..\Utils\MD5.cpp" />
-    <ClCompile Include="..\..\..\Utils\NetworkConnection.cpp" />
-    <ClCompile Include="..\..\..\Utils\SpellChecker.cpp" />
-    <ClCompile Include="..\..\..\Utils\Trie.cpp" />
-    <ClCompile Include="..\..\..\Utils\Utils.cpp" />
     <ClCompile Include="..\CFGHelper.cpp" />
     <ClCompile Include="..\WinToDBMiddleman.cpp" />
     <ClCompile Include="DatabaseBuilder.cpp" />
