@@ -50,7 +50,7 @@ void Finish()
 
 int main(int argc, char *argv[])
 {
-	CFGHelper::filePathBase = Utils::setProgramPath(argv[0]);
+	CFGHelper::filePathBase = StringUtils::setProgramPath(argv[0]);
 	CFGHelper::loadCFGFile();
 	
 	string err;
@@ -401,7 +401,7 @@ int doNetWorkCommunication(void)
 						recvbuf[iResult] = '\0';
 					//printf("%s -> %d bytes.\n", recvbuf, iResult);
 
-					vector<string> argVec = Utils::tokenize(recvbuf, "|");
+					vector<string> argVec = StringUtils::tokenize(recvbuf, "|");
 					CmdArg newCommand = parseCommand(argVec);
 
 					newCommand.dest = i;

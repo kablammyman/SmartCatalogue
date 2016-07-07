@@ -178,7 +178,7 @@ string jobReport(double start_s, int totalDir, int goodDir, int badDir)
 {
 	int stop_s = clock();
 	double milis = (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000;
-	string returnString = "done in " + Utils::getTimeStamp(milis)+ "\n";
+	string returnString = "done in " + StringUtils::getTimeStamp(milis)+ "\n";
 	returnString += "processed " + to_string(totalDir) + " galleries\n";
 
 	float goodPercent = ((float)goodDir / (float)totalDir);
