@@ -7,7 +7,7 @@
 #include <fstream>
 #include <algorithm> 
 
-#include "myFileDirDll.h"
+#include "FileUtils.h"
 #include "DatabaseController.h"
 
 #include <Windows.h>
@@ -58,20 +58,20 @@ int main(int argc, const char *argv[])
 	if (dbFilePath.empty() || dbDataDir.empty())
 		invalidParmMessageAndExit();
 
-	if (!MyFileDirDll::doesPathExist(dbDataDir))
+	if (!FileUtils::doesPathExist(dbDataDir))
 	{
 		cout << dbDataDir << "is not valid\n";
 		exit(-1);
 	}
 
-	string dbDir = MyFileDirDll::getPathFromFullyQualifiedPathString(dbFilePath);
-	if (!MyFileDirDll::doesPathExist(dbDir))
+	string dbDir = FileUtils::getPathFromFullyQualifiedPathString(dbFilePath);
+	if (!FileUtils::doesPathExist(dbDir))
 	{
 		cout << dbDir << " is not a valid place to put your db\n";
 		exit(-1);
 	}
 
-	vector<string> allDBTextFiles = MyFileDirDll::getAllFileNamesInDir(dbDataDir);
+	vector<string> allDBTextFiles = FileUtils::getAllFileNamesInDir(dbDataDir);
 	if (allDBTextFiles.size() == 0)
 	{
 		cout << dbDataDir << ": the DB creation data dir is empty!\n";

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string>
 #include <queue>
-#include "Utils.h"
+#include "StringUtils.h"
 
 #include "CreateImageHash.h"
 
@@ -46,7 +46,7 @@ int main(int argc, const char *argv[])
 							recvbuf[iResult] = '\0';
 						//printf("%s -> %d bytes.\n", recvbuf, iResult);
 						argVec.clear();
-						argVec = Utils::tokenize(recvbuf, ",");
+						argVec = StringUtils::Tokenize(recvbuf, ",");
 						HashCmdArg newCommand = parseCommand(argVec);
 						newCommand.dest = i;
 						allArgs.push(newCommand);

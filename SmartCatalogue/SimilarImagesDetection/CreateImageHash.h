@@ -4,16 +4,17 @@
 #include <string>
 #include <vector>
 
-#include "ClipboardUtil.h"
+#include "FileUtils.h"
+#include "WindowsUtils.h"
+#include "TCPUtils.h"
+#include "CommandLineUtils.h"
 
-#include "myFileDirDll.h"
 #include "similarImage.h"
 #include "Database.h"
-#include "Utils.h"
-#include "NetworkConnection.h"
+
 
 #define DELIM "|"
-NetworkConnection conn;
+TCPUtils conn;
 SimilarImage simImage;
 
 bool isServer = false;
@@ -89,7 +90,7 @@ string getMatchesInDir(string img, string dir)
 		//err = true;
 	}
 
-	vector<string> files = MyFileDirDll::getAllFileNamesInDir(dir);
+	vector<string> files = FileUtils::getAllFileNamesInDir(dir);
 	string output = "possible matches:\n";
 	for (size_t j = 0; j < files.size(); j++)
 	{

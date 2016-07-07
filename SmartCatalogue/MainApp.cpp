@@ -72,14 +72,14 @@ void MainApp::initVars()
 	size_t found = temp.find_last_of("/\\");
 	string filePathBase = temp.substr(0,found);
 	string cfgPath = filePathBase + "\\imageViewCfg.txt"; 
-	if(!CFG::CFGReaderDLL::readCfgFile(cfgPath,'|'))
+	if(!CFGUtils::readCfgFile(cfgPath,'|'))
 	{
 		string errorMsg = "Error opening :";
 		errorMsg += cfgPath;
 		MessageBox(getMainWindowHandle(), errorMsg.c_str(),"no cfg text file", MB_OKCANCEL);
 	}
-	mainWorkingPath = CFG::CFGReaderDLL::getCfgStringValue("mainWorkingPath");
-	dontDeleteList = CFG::CFGReaderDLL::getCfgListValue("dontDelete");
+	mainWorkingPath = CFGUtils::getCfgStringValue("mainWorkingPath");
+	dontDeleteList = CFGUtils::getCfgListValue("dontDelete");
 
 }
 void MainApp::setMainWindow(HWND hwnd)
