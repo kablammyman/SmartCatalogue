@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "CFGHelper.h"
 #include "CFGUtils.h"
 

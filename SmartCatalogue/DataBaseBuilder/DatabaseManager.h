@@ -30,7 +30,7 @@ HANDLE				  hDir = NULL;
 HANDLE				  hCreateImageHashProc = NULL;
 
 
-TCPOutput *tcpOut = NULL;
+TCPUtils *tcpOut = NULL;
 
 VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv);
 VOID WINAPI ServiceCtrlHandler(DWORD);

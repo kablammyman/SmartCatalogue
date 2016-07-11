@@ -83,11 +83,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src;G:\programming\my tools\Utils</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\opencv\build\include\;..\common\;C:\SQLite3\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -98,11 +99,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src;G:\programming\my tools\Utils</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\opencv\build\include\;..\common\;C:\SQLite3\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -114,12 +116,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src;G:\programming\my tools\Utils</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\opencv\build\include\;..\common\;C:\SQLite3\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -133,12 +136,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\myLibs\includes;C:\opencv\build\include\;..\;C:\SQLite3\src;G:\programming\my tools\Utils</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\opencv\build\include\;..\common\;C:\SQLite3\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -153,26 +157,11 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Utils\database.h" />
-    <ClInclude Include="..\..\..\Utils\DatabaseController.h" />
-    <ClInclude Include="..\..\..\Utils\ProgressBar.h" />
-    <ClInclude Include="..\..\..\Utils\similarImage.h" />
-    <ClInclude Include="..\..\..\Utils\Utils.h" />
-    <ClInclude Include="..\CFGHelper.h" />
-    <ClInclude Include="..\WinToDBMiddleman.h" />
-    <ClInclude Include="dupeImageFinder.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Utils\database.cpp" />
-    <ClCompile Include="..\..\..\Utils\DatabaseControllercpp.cpp" />
-    <ClCompile Include="..\..\..\Utils\ProgressBar.cpp" />
-    <ClCompile Include="..\..\..\Utils\similarImage.cpp" />
-    <ClCompile Include="..\..\..\Utils\Utils.cpp" />
-    <ClCompile Include="..\CFGHelper.cpp" />
-    <ClCompile Include="..\WinToDBMiddleman.cpp" />
     <ClCompile Include="dupeImageFinder.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

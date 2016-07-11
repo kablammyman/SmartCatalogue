@@ -2,14 +2,12 @@
 
 //hasing code came from this virus infected site:
 //http://www.developermemo.com/1262721/
-#include "stdafx.h"
-
 #include "similarImage.h"
 
 #include <iostream>
 #include <fstream>
 
-#include "myfiledirdll.h"
+#include "FileUtils.h"
 
 using namespace std;
 

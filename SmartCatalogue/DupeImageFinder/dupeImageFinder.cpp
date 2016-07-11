@@ -9,8 +9,7 @@
 #include "dupeImageFinder.h"
 
 #include "similarImage.h"
-#include "myFileDirDll.h"
-#include "Utils.h"
+#include "FileUtils.h"
 #include "CFGHelper.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -21,7 +20,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	CFGHelper::filePathBase = Utils::getExePath();
+	CFGHelper::filePathBase = FileUtils::GetExePath();
 	CFGHelper::loadCFGFile();
 
 	// Initialize global strings

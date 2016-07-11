@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SmartCatalogue", "SmartCatalogue\SmartCatalogue.vcxproj", "{403D25B7-2191-4B1B-9949-1006324B20D3}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CreateImageHash", "SmartCatalogue\SimilarImagesDetection\openCVDetectSimilarImage.vcxproj", "{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModelRecognition", "SmartCatalogue\ModelRecognition\ModelRecognition.vcxproj", "{FA274E55-27CE-47C3-91EC-5C59159494E5}"
@@ -23,14 +21,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{403D25B7-2191-4B1B-9949-1006324B20D3}.Debug|Win32.ActiveCfg = Debug|Win32
-		{403D25B7-2191-4B1B-9949-1006324B20D3}.Debug|Win32.Build.0 = Debug|Win32
-		{403D25B7-2191-4B1B-9949-1006324B20D3}.Debug|x64.ActiveCfg = Debug|x64
-		{403D25B7-2191-4B1B-9949-1006324B20D3}.Debug|x64.Build.0 = Debug|x64
-		{403D25B7-2191-4B1B-9949-1006324B20D3}.Release|Win32.ActiveCfg = Release|Win32
-		{403D25B7-2191-4B1B-9949-1006324B20D3}.Release|Win32.Build.0 = Release|Win32
-		{403D25B7-2191-4B1B-9949-1006324B20D3}.Release|x64.ActiveCfg = Release|x64
-		{403D25B7-2191-4B1B-9949-1006324B20D3}.Release|x64.Build.0 = Release|x64
 		{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}.Debug|Win32.ActiveCfg = Debug|Win32
 		{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}.Debug|Win32.Build.0 = Debug|Win32
 		{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}.Debug|x64.ActiveCfg = Debug|x64

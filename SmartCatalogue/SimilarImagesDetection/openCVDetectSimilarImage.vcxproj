@@ -19,16 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Utils\ClipboardUtil.cpp" />
-    <ClCompile Include="..\..\..\Utils\database.cpp" />
-    <ClCompile Include="..\similarImage.cpp" />
-    <ClCompile Include="CreateImageHash.cpp" />
+    <ClInclude Include="..\common\similarImage.h" />
+    <ClInclude Include="CreateImageHash.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Utils\ClipboardUtil.h" />
-    <ClInclude Include="..\..\..\Utils\database.h" />
-    <ClInclude Include="..\..\..\Utils\similarImage.h" />
-    <ClInclude Include="CreateImageHash.h" />
+    <ClCompile Include="..\common\similarImage.cpp" />
+    <ClCompile Include="CreateImageHash.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}</ProjectGuid>
@@ -100,12 +96,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\common\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\opencv\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\opencv\lib\Debug;$(MY_X86_DEBUG_LIBS);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>myFileDirDll.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -116,12 +112,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\common\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\opencv\lib\Debug\x64;C:\myLibs\libs\debug\x64;C:\SQLite3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\opencv\lib\Debug\x64;$(MY_X64_DEBUG_LIBS);C:\SQLite3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>myFileDirDll.lib;ws2_32.lib;sqlite3.lib;opencv_core300d.lib;opencv_imgproc300d.lib;opencv_highgui300d.lib;opencv_ml300d.lib;opencv_features2d300d.lib;opencv_calib3d300d.lib;opencv_objdetect300d.lib;opencv_flann300d.lib;opencv_imgcodecs300d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -134,7 +130,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\common\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,6 +138,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>myFileDirDll.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(MY_X86_RELEASE_LIBS);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -153,14 +150,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\common\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\myLibs\libs\release\x64;C:\opencv\lib\Release\x64;C:\SQLite3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MY_X64_RELEASE_LIBS);C:\opencv\lib\Release\x64;C:\SQLite3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>myFileDirDll.lib;ws2_32.lib;sqlite3.lib;opencv_core300.lib;opencv_imgproc300.lib;opencv_highgui300.lib;opencv_ml300.lib;opencv_features2d300.lib;opencv_calib3d300.lib;opencv_objdetect300.lib;opencv_flann300.lib;opencv_imgcodecs300.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

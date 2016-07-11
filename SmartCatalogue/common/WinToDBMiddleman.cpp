@@ -1,6 +1,6 @@
-#include "stdafx.h"
 #include "Windows.h"
 #include "WinToDBMiddleman.h"
+#include "FileUtils.h"
 
 DatabaseController *WinToDBMiddleman::dbCtrlr;
 
@@ -30,7 +30,7 @@ bool WinToDBMiddleman::DeleteImageFromDisk(string image)
 	if (image.size() < 3)// I guess the min length is 4... C:\a can be a legit file
 		return false;
 
-	if (!FileUtils::deleteFile(image))
+	if (!FileUtils::Delete_File(image))
 	{
 		string err = ("Error deleting " + image);
 	//	MessageBoxA(NULL, err.c_str(), NULL, NULL);
@@ -43,9 +43,9 @@ bool WinToDBMiddleman::DeleteImageFromDB(string image, string &output)
 {
 	string querey;
 	querey = "DELETE FROM Images WHERE  Images.fileName = \"";
-	querey += FileUtils::getFileNameFromPathString(image);
+	querey += FileUtils::GetFileNameFromPathString(image);
 	querey += "\" AND galleryID IS (SELECT galleryID FROM Gallery WHERE path = \"";
-	querey += FileUtils::getPathFromFullyQualifiedPathString(image);
+	querey += FileUtils::GetPathFromFullyQualifiedPathString(image);
 	querey += "\\\");"; //the DB has the back slashes in the path, so i need to include them here
 
 	dbCtrlr->executeSQL(querey, output);
@@ -81,13 +81,13 @@ int WinToDBMiddleman::GetGalleryIDFromPath(string path)
 
 bool WinToDBMiddleman::MoveImageOnDB(string dest, string src)
 {
-	string fileName = FileUtils::getFileNameFromPathString(dest);
+	string fileName = FileUtils::GetFileNameFromPathString(dest);
 	string  querey, output;
 	//get the old file in DB
 	querey = "SELECT MD5 FROM Images WHERE galleryID = (";
 	querey += GetGalleryIDQuereyStringFromPath(src);
 	querey += ") AND fileName = \"";
-	querey += FileUtils::getFileNameFromPathString(src);
+	querey += FileUtils::GetFileNameFromPathString(src);
 	querey += "\";";
 	dbCtrlr->executeSQL(querey, output);
 
@@ -109,7 +109,7 @@ bool WinToDBMiddleman::MoveImageOnDB(string dest, string src)
 
 bool WinToDBMiddleman::MoveImageOnDisk(string dest, string src)
 {
-	if (!FileUtils::doesPathExist(dest))
+	if (!FileUtils::DoesPathExist(dest))
 	{
 		string err = ("Error, " + dest + " does not exist");
 		//	MessageBoxA(NULL, err.c_str(), NULL, NULL);
@@ -138,8 +138,8 @@ bool WinToDBMiddleman::MoveImage(string dest, string src)
 
 bool WinToDBMiddleman::DeleteGalleryFromDisk(string gallery)
 {
-	string gallDir = FileUtils::getPathFromFullyQualifiedPathString(gallery);
-	string result = FileUtils::deleteAllFilesInDir(gallDir);
+	string gallDir = FileUtils::GetPathFromFullyQualifiedPathString(gallery);
+	string result = FileUtils::DeleteAllFilesInDir(gallDir);
 	RemoveDirectoryA(gallDir.c_str());
 
 	if (!result.empty())
@@ -205,7 +205,7 @@ bool WinToDBMiddleman::DeleteGalleryAndImagesFromDB(string gallery, string &outp
 	string querey;
 
 	querey = "DELETE FROM Images  WHERE galleryID is (select id from Gallery where path = \"";
-	querey += FileUtils::getPathFromFullyQualifiedPathString(gallery);
+	querey += FileUtils::GetPathFromFullyQualifiedPathString(gallery);
 	querey += "\\\");";
 
 	dbCtrlr->executeSQL(querey, output);
@@ -247,7 +247,7 @@ bool WinToDBMiddleman::MoveGalleryOnDB(string dest, string src)
 	dbCtrlr->executeSQL(querey, output);
 
 	querey = "delete FROM Gallery where path = \"";
-	querey += FileUtils::getPathFromFullyQualifiedPathString(src);
+	querey += FileUtils::GetPathFromFullyQualifiedPathString(src);
 	querey += "\\\";";
 
 	dbCtrlr->executeSQL(querey, output);

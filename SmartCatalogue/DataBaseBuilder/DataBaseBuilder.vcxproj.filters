@@ -36,16 +36,16 @@
     <ClInclude Include="DatabaseManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\CFGHelper.h">
+    <ClInclude Include="..\common\DatabaseController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\WinToDBMiddleman.h">
+    <ClInclude Include="..\common\WinToDBMiddleman.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Utils\database.h">
+    <ClInclude Include="..\common\CFGHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Utils\DatabaseController.h">
+    <ClInclude Include="..\common\SQLiteDB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,16 +65,16 @@
     <ClCompile Include="DatabaseBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\CFGHelper.cpp">
+    <ClCompile Include="..\common\DatabaseControllercpp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\WinToDBMiddleman.cpp">
+    <ClCompile Include="..\common\WinToDBMiddleman.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Utils\database.cpp">
+    <ClCompile Include="..\common\CFGHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Utils\DatabaseControllercpp.cpp">
+    <ClCompile Include="..\common\SQLiteDB.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
