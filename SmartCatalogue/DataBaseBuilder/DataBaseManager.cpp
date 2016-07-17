@@ -15,6 +15,9 @@
 #include "DataBaseManager.h"
 #include "DataBaseBuilder.h"
 
+#include "CommandLineUtils.h"
+#include "CFGUtils.h"
+
 #include "WinToDBMiddleman.h"
 #include "CFGReaderDll.h"
 #include "CFGHelper.h"
@@ -50,7 +53,7 @@ void Finish()
 
 int main(int argc, char *argv[])
 {
-	CFGHelper::filePathBase = Utils::setProgramPath(argv[0]);
+	CFGHelper::filePathBase = CommandLineUtils::SetProgramPath(argv[0]);
 	CFGHelper::loadCFGFile();
 	
 	string err;
@@ -401,7 +404,7 @@ int doNetWorkCommunication(void)
 						recvbuf[iResult] = '\0';
 					//printf("%s -> %d bytes.\n", recvbuf, iResult);
 
-					vector<string> argVec = Utils::tokenize(recvbuf, "|");
+					vector<string> argVec = StringUtils::Tokenize(recvbuf, "|");
 					CmdArg newCommand = parseCommand(argVec);
 
 					newCommand.dest = i;
@@ -449,7 +452,7 @@ int doMainWorkerThread(void)
 	dbBuilder.FillMetaWords(CFGHelper::meta);
 	dbBuilder.SetLogRouter(&logRouter);
 
-	vector<string> dbTableValues = CFGUtils::getCfgListValue("tableNames");
+	vector<string> dbTableValues = CFGUtils::GetCfgListValue("tableNames");
 	//if we cant find the table names in the cfg, thejust get out of here
 	if (dbTableValues.size() == 1 && dbTableValues[0].find("could not find") != string::npos)
 	{
@@ -532,7 +535,7 @@ int doMainWorkerThread(void)
 			}
 			else if (command.cmd == "-ADDIMG")
 			{
-				string galleryPath = FileUtils::getPathFromFullyQualifiedPathString(command.data[0]);
+				string galleryPath = FileUtils::GetPathFromFullyQualifiedPathString(command.data[0]);
 				//argh! sometimes i have a trailing slash at the end of the pathi n theDB, sometimes i dont!
 				//galleryPath += "\\";
 				int galleryID = WinToDBMiddleman::GetGalleryIDFromPath(galleryPath);

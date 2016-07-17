@@ -117,7 +117,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\myLibs\libs\debug\x64;%(AdditionalLibraryDirectories);C:\SQLite3\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MY_X64_DEBUG_LIBS);%(AdditionalLibraryDirectories);C:\SQLite3\lib\x64</AdditionalLibraryDirectories>
       <AdditionalDependencies>myFileDirDll.lib;sqlite3.lib;CFGReaderDll.lib;ws2_32.lib;Advapi32.lib;user32.lib</AdditionalDependencies>
     </Link>
     <Manifest>

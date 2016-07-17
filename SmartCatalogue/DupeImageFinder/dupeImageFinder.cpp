@@ -467,7 +467,7 @@ void init(wstring path)
 		///blah! i cant figure out how to do this in one go, so ill have to do 2 :(
 		//nevermind, i needed to use IN...lol
 		string websiteName(path.begin(), path.end());
-		Utils::toProperNoun(websiteName);
+		StringUtils::ToProperNoun(websiteName);
 		string msg = ("loading DB and getting images from website " + websiteName);
 		SetWindowTextA(statusText, msg.c_str());
 

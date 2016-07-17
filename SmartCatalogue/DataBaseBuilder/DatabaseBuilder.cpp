@@ -322,7 +322,7 @@ bool DatabaseBuilder::AddHashDataToDB(string imgeFileName, string hash, string p
 	string output;
 	vector<DatabaseController::dbDataPair> dbImgInfo;
 
-	string fileName = FileUtils::getFileNameFromPathString(imgeFileName);
+	string fileName = FileUtils::GetFileNameFromPathString(imgeFileName);
 
 	vector<DatabaseController::dbDataPair> imgQuerey;
 	imgQuerey.push_back(make_pair("fileName", fileName));
@@ -393,7 +393,7 @@ bool DatabaseBuilder::IsImageInDB(int galleryID, string md5Hash)
 bool DatabaseBuilder::VerifyImage(string imagePath, int &galleryID)
 {
 	string md5Hash = createMD5Hash(imagePath);
-	string galleryPath = FileUtils::getPathFromFullyQualifiedPathString(imagePath);
+	string galleryPath = FileUtils::GetPathFromFullyQualifiedPathString(imagePath);
 	galleryID = WinToDBMiddleman::GetGalleryIDFromPath(galleryPath);
 	if(!IsImageInDB(galleryID, md5Hash))
 		return false;
@@ -480,7 +480,7 @@ bool DatabaseBuilder::AddDirToDB(string curDir, bool doImageHash)
 {
 	//if the current node has folders in it, then it should NOT have images. even if it does, those images
 	//will be ignored since its not following the protocol
-	if (FileUtils::getNumFoldersinDir(curDir) > 0)
+	if (FileUtils::GetNumFoldersinDir(curDir) > 0)
 		return false;
 	
 	//add a trailing slash, so we can be consistant
@@ -551,7 +551,7 @@ bool DatabaseBuilder::AddDirToDB(string curDir, bool doImageHash)
 
 bool DatabaseBuilder::RequestImageHashesForDir(string galleryPath,int galleryID, TCPUtils *conn, int connIndex)
 {
-	vector<string> imgFiles = FileUtils::getAllFileNamesInDir(galleryPath);
+	vector<string> imgFiles = FileUtils::GetAllFileNamesInDir(galleryPath);
 
 	for (size_t i = 0; i < imgFiles.size(); i++)
 	{ 
@@ -579,7 +579,7 @@ bool DatabaseBuilder::RequestImageHash(string imgPath, int galleryID, TCPUtils *
 	if (IsImageInDB(galleryID, md5Hash))
 		return false;
 	
-	if (!InsertImageHashInfoIntoDB(FileUtils::getFileNameFromPathString(imgPath), md5Hash, galleryID))
+	if (!InsertImageHashInfoIntoDB(FileUtils::GetFileNameFromPathString(imgPath), md5Hash, galleryID))
 		return false;
 
 	//createImageHash should send back the hashes and the file path they are made from

@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "DatabaseDataParser.h"
-#include "Utils.h"
+#include "StringUtils.h"
 
 DatabaseDataParser::DatabaseDataParser()
 {
 	/*in the cfg file, theres a list of all the "drop down" db tables name
 	we use that list to know what values are allowed...we dont want miss-spellings
 	*/
-	dictionary = new Trie();
-	keywords = new Trie();
+	dictionary = new StringUtils::Trie();
+	keywords = new StringUtils::Trie();
 
 	nameMarker = "models";//when we see this in a path, we know that the next token is a name for sure
 	fileWalker = new FileWalker();
@@ -41,8 +41,8 @@ bool DatabaseDataParser::fillPartOfSpeechTable(string pofTableName)
 	{
 		string tableName = table[0][i];
 		string pos = table[1][i];
-		Utils::toProperNoun(tableName);
-		Utils::toProperNoun(pos);
+		StringUtils::ToProperNoun(tableName);
+		StringUtils::ToProperNoun(pos);
 		if (pos == "Noun")
 			tableNamePartOfSpeech[tableName] = NOUN;
 		else if (pos == "Adj")
@@ -70,7 +70,7 @@ bool DatabaseDataParser::getDBTableValues(string tableName)
 	if (table.size() < (size_t)numCol)
 		return false;
 	
-	Utils::toProperNoun(tableName);
+	StringUtils::ToProperNoun(tableName);
 	if (!DBTables[tableName])
 	{
 		vector<string> *newData = new vector<string>();
@@ -81,7 +81,7 @@ bool DatabaseDataParser::getDBTableValues(string tableName)
 		//	if (tableName.empty() || tableEntry.empty())
 		//		printf("wtf\n");
 			descriptiveWords[tableEntry] = tableName;
-			dictionary->addWord(tableEntry);
+			dictionary->AddWordToTrie(tableEntry);
 		}
 		DBTables[tableName] = newData;
 	}
@@ -111,7 +111,7 @@ vector<string> DatabaseDataParser::splitModelName(string input)
 	if (foundSymbol != string::npos)
 		input.replace(foundSymbol, 5, ",");
 
-	names = Utils::tokenize(input, ",");
+	names = StringUtils::Tokenize(input, ",");
 
 
 	if (names.size() == 0)//we onyl have 1 name
@@ -130,10 +130,10 @@ vector<ModelName> DatabaseDataParser::doNameLogic(string allNames)
 	for (size_t i = 0; i < modelNames.size(); i++)
 	{
 		ModelName model;
-		vector<string> names = Utils::tokenize(modelNames[i], " ");
+		vector<string> names = StringUtils::Tokenize(modelNames[i], " ");
 		if (!names.empty())
 		{
-			Utils::toProperNoun(names[0]);
+			StringUtils::ToProperNoun(names[0]);
 			//names[0][0] = toupper(names[0][0]);//capatolize the first letter of each name
 			model.firstName = names[0];
 		}
@@ -142,7 +142,7 @@ vector<ModelName> DatabaseDataParser::doNameLogic(string allNames)
 			bool useMiddleName = names.size() > 2 ? true : false;
 			for (size_t j = 1; j < names.size(); j++)
 			{
-				Utils::toProperNoun(names[j]);
+				StringUtils::ToProperNoun(names[j]);
 				//names[j][0] = toupper(names[j][0]);//capatolize the first letter of each name
 				if (useMiddleName && j == 1)
 					model.middleName = names[j];
@@ -175,7 +175,7 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, Gal
 	input = input.substr(pos + ignorePattern.size());
 
 	vector<string> otherModels; //when we have a gallery with more than 1 model in the porn star or amature model catogory
-	vector<string> tokens = Utils::tokenize(input, "\\");
+	vector<string> tokens = StringUtils::Tokenize(input, "\\");
 
 	//minimun is catogory/website/gallery
 	if (tokens.size() < 3)
@@ -211,7 +211,7 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, Gal
 				curState = 1;
 			break;
 		case WEBSITE:
-			Utils::toProperNoun(tokens[i]);
+			StringUtils::ToProperNoun(tokens[i]);
 			website = tokens[i];
 			//if we have more than 1 token left, and ther next one isnt models
 			if (((tokens.size() - 1) - i) > 1 && tokens[i + 1] != "models")
@@ -221,13 +221,13 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, Gal
 
 			break;
 		case SUBWEBSITE:
-			Utils::toProperNoun(tokens[i]);
+			StringUtils::ToProperNoun(tokens[i]);
 			subwebsite = tokens[i];
 			if (i < tokens.size() && tokens[i + 1] != "models")
 				curState = 3;
 			break;
 		case GALLERY:
-			Utils::toProperNoun(tokens[i]);
+			StringUtils::ToProperNoun(tokens[i]);
 			galleryName = tokens[i];
 			if (i < (tokens.size() - 1))
 			{
@@ -284,13 +284,13 @@ bool DatabaseDataParser::calcGalleryData(string input, string ignorePattern, Gal
 void DatabaseDataParser::fillTreeWords(vector<string> &meta)
 {
 	for (size_t i = 0; i < meta.size(); i++)
-		keywords->addWord(meta[i]);
+		keywords->AddWordToTrie(meta[i]);
 }
 //----------------------------------------------------------------------
-string DatabaseDataParser::seaerchForGalleryDescriptor(vector<string> &tokens, Trie *treeType)
+string DatabaseDataParser::seaerchForGalleryDescriptor(vector<string> &tokens, StringUtils::Trie *treeType)
 {
 	for (size_t i = 0; i < tokens.size(); i++)
-		if (treeType->searchWord(tokens[i]))
+		if (treeType->SearchWordInTrie(tokens[i]))
 			return tokens[i];
 	return "";
 }
@@ -299,10 +299,10 @@ string DatabaseDataParser::seaerchForGalleryDescriptor(vector<string> &tokens, T
 void DatabaseDataParser::addMetaWordsToData(GalleryData &data)
 {
 	string metaWords = "";
-	vector<string> tokens = Utils::tokenize(data.path, "- \\");
+	vector<string> tokens = StringUtils::Tokenize(data.path, "- \\");
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
-		if (keywords->searchWord(tokens[i]))
+		if (keywords->SearchWordInTrie(tokens[i]))
 			data.keywords += (tokens[i] + ",");
 	}
 	if(!metaWords.empty())//remove the last comma since its not needed
@@ -425,7 +425,7 @@ vector <ClothingItem> DatabaseDataParser::getOutfitFromGalleryName(string galler
 {
 	transformClothingNameAlias(galleryName);
 	vector <ClothingItem> clothes;
-	vector<string> tokens = Utils::tokenize(galleryName, "- _");
+	vector<string> tokens = StringUtils::Tokenize(galleryName, "- _");
 	ClothingItem curItem;
 	
 
@@ -474,7 +474,7 @@ vector <ClothingItem> DatabaseDataParser::getOutfitFromGalleryName(string galler
 }
 string DatabaseDataParser::getVerfiedWordFromGalleryName(string galleryName, string dbTableName)
 {
-	vector<string> tokens = Utils::tokenize(galleryName, "- _");
+	vector<string> tokens = StringUtils::Tokenize(galleryName, "- _");
 
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
