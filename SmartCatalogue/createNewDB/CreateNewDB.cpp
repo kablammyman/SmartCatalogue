@@ -58,20 +58,20 @@ int main(int argc, const char *argv[])
 	if (dbFilePath.empty() || dbDataDir.empty())
 		invalidParmMessageAndExit();
 
-	if (!FileUtils::doesPathExist(dbDataDir))
+	if (!FileUtils::DoesPathExist(dbDataDir))
 	{
 		cout << dbDataDir << "is not valid\n";
 		exit(-1);
 	}
 
-	string dbDir = FileUtils::getPathFromFullyQualifiedPathString(dbFilePath);
-	if (!FileUtils::doesPathExist(dbDir))
+	string dbDir = FileUtils::GetPathFromFullyQualifiedPathString(dbFilePath);
+	if (!FileUtils::DoesPathExist(dbDir))
 	{
 		cout << dbDir << " is not a valid place to put your db\n";
 		exit(-1);
 	}
 
-	vector<string> allDBTextFiles = FileUtils::getAllFileNamesInDir(dbDataDir);
+	vector<string> allDBTextFiles = FileUtils::GetAllFileNamesInDir(dbDataDir);
 	if (allDBTextFiles.size() == 0)
 	{
 		cout << dbDataDir << ": the DB creation data dir is empty!\n";
@@ -79,7 +79,7 @@ int main(int argc, const char *argv[])
 	}
 
 	//create the new db
-	dbCtrlr.createNewDataBase(dbFilePath);
+	dbCtrlr.createNewDB(dbFilePath);
 
 	
 	for (size_t i = 0; i < allDBTextFiles.size(); i++)

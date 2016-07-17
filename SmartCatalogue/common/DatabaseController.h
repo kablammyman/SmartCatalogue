@@ -2,9 +2,8 @@
 
 #include <string>
 #include <utility>      // std::pair
-#include "SQLiteDB.h"
 #include <vector>
-
+#include "SQLiteDB.h"
 using namespace std;
 
 class DatabaseController

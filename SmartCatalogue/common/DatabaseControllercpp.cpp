@@ -1,5 +1,5 @@
 #include "DatabaseController.h"
-//#include "Utils.h"
+#include "StringUtils.h"
 
 DatabaseController::DatabaseController()
 {
@@ -209,7 +209,7 @@ void DatabaseController::parseDBOutput(string &inputData, int numFields, vector<
 	returnData.clear();
 	returnData.resize(numFields, vector<string>(0));//initialise tahe num vectors we need with 1 elements each
 	int curField = 0;
-	vector<string> tokens = Utils::tokenize(inputData, "|\n");
+	vector<string> tokens = StringUtils::Tokenize(inputData, "|\n");
 	//the first is the field name, the second is the value we want
 	for (size_t i = 1; i < tokens.size(); i += 2)
 	{
