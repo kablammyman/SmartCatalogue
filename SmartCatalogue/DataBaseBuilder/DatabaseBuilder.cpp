@@ -8,7 +8,7 @@
 
 DatabaseBuilder::DatabaseBuilder(string dbPath,string root)
 {
-	dbCtrlr.openDatabase(dbPath);
+	dbCtrlr.openDB(dbPath);
 	dbDataParser.setDBController(&dbCtrlr);
 	WinToDBMiddleman::SetDBController(&dbCtrlr);
 	rootPath = root;

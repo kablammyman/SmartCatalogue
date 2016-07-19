@@ -93,7 +93,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);C:\myLibs\includes;C:\SQLite3\src;..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);..\SQLite3\src;..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,13 +112,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);C:\myLibs\includes;C:\SQLite3\src;..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);..\SQLite3\src;..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(MY_X64_DEBUG_LIBS);%(AdditionalLibraryDirectories);C:\SQLite3\lib\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>myFileDirDll.lib;sqlite3.lib;CFGReaderDll.lib;ws2_32.lib;Advapi32.lib;user32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(MY_X64_DEBUG_LIBS);..\SQLite3\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>StringUtils.lib;FileUtils.lib;sqlite3.lib;CFGUtils.lib;ws2_32.lib;Advapi32.lib;user32.lib</AdditionalDependencies>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>
@@ -134,7 +134,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);C:\myLibs\includes;C:\SQLite3\src;..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);..\SQLite3\src;..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -157,15 +157,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);C:\myLibs\includes;C:\SQLite3\src;..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);..\SQLite3\src;..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\myLibs\libs\release\x64;C:\SQLite3\lib\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>myFileDirDll.lib;sqlite3.lib;CFGReaderDll.lib;ws2_32.lib;Advapi32.lib;user32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(MY_X64_RELEASE_LIBS);..\SQLite3\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>StringUtils.lib;FileUtils.lib;sqlite3.lib;CFGUtils.lib;ws2_32.lib;Advapi32.lib;user32.lib</AdditionalDependencies>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>

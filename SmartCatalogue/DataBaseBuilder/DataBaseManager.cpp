@@ -19,7 +19,7 @@
 #include "CFGUtils.h"
 
 #include "WinToDBMiddleman.h"
-#include "CFGReaderDll.h"
+#include "CFGUtils.h"
 #include "CFGHelper.h"
 #include "LogMessage.h"
 

@@ -96,7 +96,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\common\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\common\;..\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,7 +112,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\common\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\common\;..\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,7 +130,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\common\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\common\;..\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,7 +150,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\common\;C:\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_WINDOWS_UTILS);$(MY_FILE_UTILS);$(MY_STRING_UTILS);$(MY_HASH_UTILS);C:\opencv\build\include\;..\common\;..\SQLite3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

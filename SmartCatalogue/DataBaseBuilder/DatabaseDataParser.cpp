@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "DatabaseDataParser.h"
 #include "StringUtils.h"
 
