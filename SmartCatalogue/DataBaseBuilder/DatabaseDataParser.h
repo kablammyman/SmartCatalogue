@@ -26,8 +26,8 @@ class DatabaseDataParser
 {
 	//dictionary is used to for spellchecking. I use a trie instead of a normal vector for fast lookup times
 	//since the dictionary will be bigger than 10 words, lol
-	StringUtils::Trie *dictionary;
-	StringUtils::Trie *keywords;
+	Trie *dictionary;
+	Trie *keywords;
 	//descriptiveWords is for reverse lookups, so i can see what DB to find a word in, without having to search them all
 	//first is the actual word, the second is the catogory
 	//ex: descriptiveWords["green"] -> color
@@ -45,7 +45,7 @@ class DatabaseDataParser
 	DatabaseController *dbCtrl;
 
 	string nameMarker;
-	string seaerchForGalleryDescriptor(vector<string> &tokens, StringUtils::Trie *treeType);
+	string seaerchForGalleryDescriptor(vector<string> &tokens, Trie *treeType);
 	int getPartfOfSpeech(string word);
 	bool isClothingNoun(string noun);
 	bool isConjunction(string word);

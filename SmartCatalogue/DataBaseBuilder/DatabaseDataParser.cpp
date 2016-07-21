@@ -6,8 +6,8 @@ DatabaseDataParser::DatabaseDataParser()
 	/*in the cfg file, theres a list of all the "drop down" db tables name
 	we use that list to know what values are allowed...we dont want miss-spellings
 	*/
-	dictionary = new StringUtils::Trie();
-	keywords = new StringUtils::Trie();
+	dictionary = new Trie();
+	keywords = new Trie();
 
 	nameMarker = "models";//when we see this in a path, we know that the next token is a name for sure
 	fileWalker = new FileWalker();
@@ -286,7 +286,7 @@ void DatabaseDataParser::fillTreeWords(vector<string> &meta)
 		keywords->AddWordToTrie(meta[i]);
 }
 //----------------------------------------------------------------------
-string DatabaseDataParser::seaerchForGalleryDescriptor(vector<string> &tokens, StringUtils::Trie *treeType)
+string DatabaseDataParser::seaerchForGalleryDescriptor(vector<string> &tokens, Trie *treeType)
 {
 	for (size_t i = 0; i < tokens.size(); i++)
 		if (treeType->SearchWordInTrie(tokens[i]))
