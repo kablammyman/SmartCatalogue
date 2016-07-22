@@ -218,16 +218,16 @@ int SimilarImage::phashDistFrom2Images(string imgPath1, string imgPath2)
 
 void SimilarImage::getAllImagePaths(string path, vector<string> & imgDirs)
 {
-	if (FileUtils::doesPathExist(path) == false)
+	if (FileUtils::DoesPathExist(path) == false)
 		return;
 
-	FileUtils::addDirTree(path,10);
+	FileUtils::AddDirTree(path,10);
 
 	vector<string> allDirs;
-	FileUtils::dumpTreeToVector(path, allDirs, true);
+	FileUtils::DumpTreeToVector(path, allDirs, true);
 	for (size_t i = 0; i < allDirs.size(); i++)
 	{
-		if (FileUtils::getNumFilesInDir(allDirs[i]) != 0)
+		if (FileUtils::GetNumFilesInDir(allDirs[i]) != 0)
 			imgDirs.push_back(allDirs[i]);
 	}		
 }
@@ -345,7 +345,7 @@ string SimilarImage::getAllHash(string imgPath)
 
 void SimilarImage::calcImageHasesForDir(string imgDir)
 {
-	vector<string> Allfiles = FileUtils::getAllFileNamesInDir(imgDir);
+	vector<string> Allfiles = FileUtils::GetAllFileNamesInDir(imgDir);
 	for (size_t i = 0; i < Allfiles.size(); i++)
 		calcImageHash(Allfiles[i]);
 }
@@ -354,9 +354,9 @@ void SimilarImage::calcImageHasesForDir(string imgDir)
 void SimilarImage::findDupes(vector<hashPathPair> & allHashes, map<int, vector<int>> &dupeList)
 {
 	map<int, bool> alreadyIncludedMap;
-	for (int i = 0; i < allHashes.size(); i++)
+	for (size_t i = 0; i < allHashes.size(); i++)
 	{
-		for (int j = i; j < allHashes.size(); j++)
+		for (size_t j = i; j < allHashes.size(); j++)
 		{
 			if (i == j)
 				continue;

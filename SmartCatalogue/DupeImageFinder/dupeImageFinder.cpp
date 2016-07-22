@@ -10,6 +10,7 @@
 
 #include "similarImage.h"
 #include "FileUtils.h"
+#include "CommandLineUtils.h"
 #include "CFGHelper.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -20,7 +21,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	CFGHelper::filePathBase = FileUtils::GetExePath();
+	CFGHelper::filePathBase = CommandLineUtils::GetExePath();
 	CFGHelper::loadCFGFile();
 
 	// Initialize global strings
@@ -298,7 +299,7 @@ HTREEITEM AddItemToTree(HWND hwndTV, wchar_t* lpszItem, int nLevel)
 
 BOOL InitTreeViewItems(HWND hwndTV)
 {	
-	dbCtrlr.openDatabase(CFGHelper::dbPath);
+	dbCtrlr.openDB(CFGHelper::dbPath);
 	
 	wstring rootNodeOutput(CFGHelper::dbPath.begin(), CFGHelper::dbPath.end());
 	AddItemToTree(hwndTV, (LPTSTR)rootNodeOutput.c_str(), 1);
