@@ -353,7 +353,7 @@ void SimilarImage::calcImageHasesForDir(string imgDir)
 //supply the hashes in a vector...either the phash or normal hash
 void SimilarImage::findDupes(vector<hashPathPair> & allHashes, map<int, vector<int>> &dupeList)
 {
-	map<int, bool> alreadyIncludedMap;
+	map<size_t, bool> alreadyIncludedMap;
 	for (size_t i = 0; i < allHashes.size(); i++)
 	{
 		for (size_t j = i; j < allHashes.size(); j++)

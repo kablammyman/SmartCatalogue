@@ -22,6 +22,8 @@
 #include "CFGUtils.h"
 #include "CFGHelper.h"
 #include "LogMessage.h"
+#include "ConsoleOutput.h"
+#include "LogfileOutput.h"
 
 #define SHORT_SLEEP 1
 #define LONG_SLEEP 10000
@@ -51,6 +53,53 @@ void Finish()
 }
 
 
+LogOutput * LogOutputFactory(string logType, string loggerDetails)
+{
+	if (logType.compare(CONSOLE_OUTPUT_STRING) == 0)
+		return new ConsoleOutput();
+
+	else if (logType.compare(FILE_OUTPUT_STRING) == 0)
+		return new LogFileOutput(loggerDetails);
+
+	/*else if (logType.compare(TCP_OUTPUT_STRING) == 0)
+		return new TCPOutput();
+
+	else if (logType.compare(EVENT_LOG_OUTPUT_STRING) == 0)
+		return new WindowsEventLogOutput();*/
+
+
+	//uf we get here, we got an invalid type.
+	//instad of returning null, return a console output
+	return new ConsoleOutput();
+}
+
+void GetLoggingInfoFromCFG()
+{
+	//logRouter.ClearLogEntities();
+
+
+	vector<string> loggerList = CFGUtils::GetCfgListValue("LOGGERS");
+
+	for (size_t i = 0; i < loggerList.size(); i++)
+	{
+		string listName = loggerList[i];
+		vector<string> curLogger = CFGUtils::GetCfgListValue(listName);
+
+		string loggingType = CFGUtils::GetStringValueFromList(listName, "TYPE");//consle, logfile syslog etc
+		string severityLevelString = CFGUtils::GetStringValueFromList(listName, "SEVERITY"); //should have all the logging level values this appender wants
+		string loggerDetails = CFGUtils::GetStringValueFromList(listName, "PATH");
+
+		LogOutput * newLogger = LogOutputFactory(loggingType, loggerDetails); //optional, so far, only textfiles have this data
+		
+		LogEntity * temp = logRouter.AddLogger(newLogger, severityLevelString);
+		if (CFGUtils::GetCfgBoolValue("ADD_TIMESTAMP"))
+			temp->logOut->useTimeStamp = true;
+		if (CFGUtils::GetCfgBoolValue("ADD_SEVERITY"))
+			temp->logOut->useSeverityString = true;
+	}
+
+}
+
 int main(int argc, char *argv[])
 {
 	CFGHelper::filePathBase = CommandLineUtils::SetProgramPath(argv[0]);
@@ -64,7 +113,7 @@ int main(int argc, char *argv[])
 		exit(0);
 	}
 	
-	logRouter.GetLoggingInfoFromCFG();
+	GetLoggingInfoFromCFG();
 
 	logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: Main: Entry");
 
@@ -381,7 +430,7 @@ int doNetWorkCommunication(void)
 	clock_t  heartBeat = 0;
 	
 	if (tcpOut == NULL)
-		tcpOut = new TCPOutput(&conn,0);
+		tcpOut = new TCPUtils(/*&conn,0*/);
 
 	while (g_hasConnections)
 	{

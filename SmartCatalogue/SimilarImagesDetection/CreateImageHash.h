@@ -6,11 +6,12 @@
 
 #include "FileUtils.h"
 #include "WindowsUtils.h"
+#include "ClipboardUtil.h"
 #include "TCPUtils.h"
 #include "CommandLineUtils.h"
 
 #include "similarImage.h"
-#include "Database.h"
+#include "SQLiteDB.h"
 
 
 #define DELIM "|"
@@ -90,7 +91,7 @@ string getMatchesInDir(string img, string dir)
 		//err = true;
 	}
 
-	vector<string> files = FileUtils::getAllFileNamesInDir(dir);
+	vector<string> files = FileUtils::GetAllFileNamesInDir(dir);
 	string output = "possible matches:\n";
 	for (size_t j = 0; j < files.size(); j++)
 	{
@@ -103,6 +104,45 @@ string getMatchesInDir(string img, string dir)
 	return output;
 }
 
+// Hbitmap convert to IplImage
+IplImage * hBitmapToIpl(HBITMAP hBmp)
+{
+	BITMAP bmp;
+	if (!GetObject(hBmp, sizeof(BITMAP), (LPSTR)&bmp))
+	{
+		return NULL;
+	}
+	// Get channels which equal 1 2 3 or 4 BmBitsPixel:
+	// Specifies the number of bits Required to indicate the color of a pixel.
+	int nChannels = bmp.bmBitsPixel == 1 ? 1 : bmp.bmBitsPixel / 8;
+
+	// Get depth color bitmap or grayscale
+	int depth = bmp.bmBitsPixel == 1 ? IPL_DEPTH_1U : IPL_DEPTH_8U;
+
+
+	// Create header image
+	IplImage * img = cvCreateImage(cvSize(bmp.bmWidth, bmp.bmHeight), depth, nChannels);
+	//IplImage * img = cvCreateImage(cvSize(533, 800), IPL_DEPTH_8U, 3);
+	// Allocat memory for the pBuffer
+	BYTE * pBuffer = new   BYTE[bmp.bmHeight * bmp.bmWidth * nChannels];
+	//BYTE * pBuffer = new   BYTE[800 * 533 * 3];
+	// Copies the bitmap bits of a specified device - dependent bitmap into a buffer
+	GetBitmapBits(hBmp, bmp.bmHeight * bmp.bmWidth * nChannels, pBuffer);
+	//GetBitmapBits(hBmp, 800 * 533 * 3, pBuffer);
+	// Copy data to the imagedata
+	memcpy(img->imageData, pBuffer, bmp.bmHeight * bmp.bmWidth * nChannels);
+	//memcpy(img->imageData, pBuffer, 800 * 533 * 3);
+
+	delete pBuffer;
+
+	// Create the image
+	IplImage * dst = cvCreateImage(cvGetSize(img), img->depth, 3);
+	// Convert color
+	cvCvtColor(img, dst, CV_BGRA2BGR);
+	cvReleaseImage(&img);
+	return dst;
+}
+
 //else if (cmdArgUpper == "-ISINDB")// <imgPath> <dbPath> -> compare an image to a a DB of image hashes\n";
 string isClipboardImageInDB(string img, string dbPath)
 {
@@ -111,7 +151,11 @@ string isClipboardImageInDB(string img, string dbPath)
 
 	if(img.empty())
 	{
-		img1Hash = simImage.getImagePHash(ClipboardUtil::GetClipboardImage());
+		HBITMAP tempBitmap = ClipboardUtil::GetClipboardImageData();
+		IplImage* ipl = hBitmapToIpl(tempBitmap);
+		Mat imgData = cv::cvarrToMat(ipl);
+
+		img1Hash = simImage.getImagePHash(imgData);
 		if (img1Hash.empty())
 		{
 			string errorString = "no image data in clipboard or in command line params";
@@ -130,7 +174,7 @@ string isClipboardImageInDB(string img, string dbPath)
 			//err = true;
 		}
 	}
-	DataBase db(dbPath);
+	SQLiteDB db(dbPath);
 
 	string querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID where hammingDistance('";
 	querey += img1Hash;

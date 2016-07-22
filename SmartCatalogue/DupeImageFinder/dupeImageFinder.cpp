@@ -11,6 +11,7 @@
 #include "similarImage.h"
 #include "FileUtils.h"
 #include "CommandLineUtils.h"
+#include "StringUtils.h"
 #include "CFGHelper.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -533,7 +534,7 @@ void finish()
 {
 	stop_s = clock();
 	double milis = (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000;
-	string timeTaken = Utils::getTimeStamp(milis);
+	string timeTaken = "fix me";//Utils::GetTimeStamp(milis);
 
 	ofstream myfile;
 	myfile.open("dupeImageFinder.txt");
