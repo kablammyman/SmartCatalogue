@@ -41,7 +41,7 @@ void createSelectOrDeleteBox(HWND hWnd)
 	intToSQLCatMap[6] = META_STRING;
 
 	//addOrDeleteBoxHandle = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_QUICK_QUERY_BOX), hWnd, selectOrDeleteQuereyBox);
-	addOrDeleteBoxHandle = CreateDialog(MainApp::Instance()->getInstance(), MAKEINTRESOURCE(IDD_QUICK_QUERY_BOX), hWnd, selectOrDeleteQuereyBox);
+	addOrDeleteBoxHandle = CreateDialog(getInstance(), MAKEINTRESOURCE(IDD_QUICK_QUERY_BOX), hWnd, selectOrDeleteQuereyBox);
 	ShowWindow(addOrDeleteBoxHandle, SW_SHOW);
 
 }
@@ -78,7 +78,7 @@ INT_PTR CALLBACK selectOrDeleteQuereyBox(HWND hDlg, UINT message, WPARAM wParam,
 	{
 	case WM_INITDIALOG:
 
-		//CreateWindow(TEXT("Edit"), TEXT(MainApp::Instance()->curDBCommand.c_str()), WS_CHILD | WS_VISIBLE | WS_BORDER,0, 0, MAX_PATH*10, 20, hDlg, (HMENU)FILE_PATH_1, NULL, NULL);
+		//CreateWindow(TEXT("Edit"), TEXT(curDBCommand.c_str()), WS_CHILD | WS_VISIBLE | WS_BORDER,0, 0, MAX_PATH*10, 20, hDlg, (HMENU)FILE_PATH_1, NULL, NULL);
 
 		RadioButtonGroup = CreateWindowEx(WS_EX_TRANSPARENT, TEXT("Button"), TEXT("select or delete?"), WS_CHILD | WS_VISIBLE | BS_GROUPBOX, 2, 2, 290, 50, hDlg, (HMENU)11, NULL, NULL);
 		selectRadioButton = CreateWindow(TEXT("BUTTON"), TEXT("Select"), WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, baseX, 20, 100, 25, RadioButtonGroup, (HMENU)IDC_SELECT_RADIO, NULL, NULL);
@@ -139,7 +139,7 @@ INT_PTR CALLBACK selectOrDeleteQuereyBox(HWND hDlg, UINT message, WPARAM wParam,
 				//MessageBox(NULL,SQLQuery.c_str(),"checks",NULL);
 			}
 			string output;
-			MainApp::Instance()->dbCtrlr.executeSQL(SQLQuery,output);
+			dbCtrlr.executeSQL(SQLQuery,output);
 			return TRUE;
 		}
 		}
