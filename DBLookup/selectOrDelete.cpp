@@ -1,8 +1,10 @@
 #include "stdafx.h"
-#include "MainApp.h"
+//#include "Resource.h"
+#include "DBLookup.h"
 #include <string>
-#include "SmartCatalogue.h"
+#include <Windows.h>
 
+using namespace std;
 HWND addOrDeleteBoxHandle = NULL;
 
 HWND RadioButtonGroup;
@@ -30,6 +32,8 @@ HWND metaText;
 
 std::string intToSQLCatMap[NUM_CHECKS];
 
+
+
 void createSelectOrDeleteBox(HWND hWnd)
 {
 	intToSQLCatMap[0] = CATERGORY_STRING;
@@ -41,7 +45,12 @@ void createSelectOrDeleteBox(HWND hWnd)
 	intToSQLCatMap[6] = META_STRING;
 
 	//addOrDeleteBoxHandle = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_QUICK_QUERY_BOX), hWnd, selectOrDeleteQuereyBox);
-	addOrDeleteBoxHandle = CreateDialog(getInstance(), MAKEINTRESOURCE(IDD_QUICK_QUERY_BOX), hWnd, selectOrDeleteQuereyBox);
+	addOrDeleteBoxHandle = CreateDialog(mainInst, MAKEINTRESOURCE(IDD_QUICK_QUERY_BOX), hWnd, selectOrDeleteQuereyBox);
+	if (addOrDeleteBoxHandle == NULL)
+	{
+		int x = GetLastError();
+		printf("error: %d", x);
+	}
 	ShowWindow(addOrDeleteBoxHandle, SW_SHOW);
 
 }

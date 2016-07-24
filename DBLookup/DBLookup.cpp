@@ -4,18 +4,12 @@
 #include "stdafx.h"
 #include "DBLookup.h"
 
-#define MAX_LOADSTRING 100
 
-// Global Variables:
-HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 
-// Forward declarations of functions included in this code module:
-ATOM                MyRegisterClass(HINSTANCE hInstance);
-BOOL                InitInstance(HINSTANCE, int);
-LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+HINSTANCE mainInst;                                // current instance
+DatabaseController dbCtrlr;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -41,6 +35,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_DBLOOKUP));
 
     MSG msg;
+
+	
 
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
@@ -95,18 +91,22 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // Store instance handle in our global variable
+	mainInst = hInstance; // Store instance handle in our global variable
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+
+   
 
    if (!hWnd)
    {
       return FALSE;
    }
-
+   createSelectOrDeleteBox(hWnd);
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
+
+   
 
    return TRUE;
 }
@@ -132,7 +132,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             switch (wmId)
             {
             case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+                DialogBox(mainInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+				
                 break;
             case IDM_EXIT:
                 DestroyWindow(hWnd);
