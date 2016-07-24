@@ -3,17 +3,25 @@
 // Used by DBLookup.rc
 //
 
-#define IDS_APP_TITLE			103
+#define NUM_CHECKS					7
+#define CATERGORY_STRING            "category = "
+#define WEBSITE_STRING              "websiteName = "
+#define SUB_WEBSITE_STRING          "subWebsiteName = "
+#define MODEL_FIRST_NAME_STRING		"modelFirstName = "
+#define MODEL_LAST_NAME_STRING		"modelLastName = "
+#define GALLERY_STRING				"galleryName = "
+#define META_STRING					"metaData LIKE "
 
-#define IDR_MAINFRAME			128
-#define IDD_DBLOOKUP_DIALOG	102
+#define IDR_MAINFRAME			100
+#define IDS_APP_TITLE			101
+#define IDD_DBLOOKUP_DIALOG		102
 #define IDD_ABOUTBOX			103
 #define IDM_ABOUT				104
 #define IDM_EXIT				105
-#define IDI_DBLOOKUP			107
-#define IDI_SMALL				108
-#define IDC_DBLOOKUP			109
-#define IDD_QUICK_QUERY_BOX     110
+#define IDI_DBLOOKUP			106
+#define IDI_SMALL				107
+#define IDC_DBLOOKUP			108
+#define IDD_QUICK_QUERY_BOX     109
 #define IDC_MYICON				2
 
 #define IDC_SELECT_RADIO                    1000
@@ -27,23 +35,17 @@
 #define IDC_GALLERY_CHECK                   1007
 #define IDC_META_CHECK						1008
 #define IDC_EXECUTE_QUICK_QUERY_BTN			1009
+#define IDC_QUERY_BTN						1010
 
-#define NUM_CHECKS							7
-#define CATERGORY_STRING                "category = "
-#define WEBSITE_STRING                  "websiteName = "
-#define SUB_WEBSITE_STRING              "subWebsiteName = "
-#define MODEL_FIRST_NAME_STRING			"modelFirstName = "
-#define MODEL_LAST_NAME_STRING			"modelLastName = "
-#define GALLERY_STRING					"galleryName = "
-#define META_STRING						"metaData LIKE "
+#define IDC_CATERGORY_TEXT                  1011
+#define IDC_WEBSITE_TEXT                    1012
+#define IDC_SUB_WEBSITE_TEXT                1013
+#define IDC_MODEL_FIRST_NAME_TEXT			1014
+#define IDC_MODEL_LAST_NAME_TEXT			1015
+#define IDC_GALLERY_TEXT					1016
+#define IDC_META_TEXT						1017
 
-#define IDC_CATERGORY_TEXT                  1010
-#define IDC_WEBSITE_TEXT                    1011
-#define IDC_SUB_WEBSITE_TEXT                1012
-#define IDC_MODEL_FIRST_NAME_TEXT			1013
-#define IDC_MODEL_LAST_NAME_TEXT			1014
-#define IDC_GALLERY_TEXT					1015
-#define IDC_META_TEXT						1016
+#define IDC_SQLQUEREY_TEXT					1018
 
 #ifndef IDC_STATIC
 #define IDC_STATIC				-1

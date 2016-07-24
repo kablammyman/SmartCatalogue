@@ -11,6 +11,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 HINSTANCE mainInst;                                // current instance
 DatabaseController dbCtrlr;
 
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -102,10 +103,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    {
       return FALSE;
    }
-   createSelectOrDeleteBox(hWnd);
+   InitInputFields(hWnd);
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
-
+  // createSelectOrDeleteBox(hWnd);
    
 
    return TRUE;
@@ -125,9 +126,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
+			CheckInput(wParam);
+
             // Parse the menu selections:
             switch (wmId)
             {
@@ -167,8 +171,7 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
     case WM_INITDIALOG:
-        return (INT_PTR)TRUE;
-
+		return (INT_PTR)TRUE;
     case WM_COMMAND:
         if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
         {
