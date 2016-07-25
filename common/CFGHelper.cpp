@@ -12,7 +12,25 @@ int CFGHelper::DataBaseManagerPort;
 string CFGHelper::DataBaseManagerIP;
 vector<string> CFGHelper::meta;
 
-void CFGHelper::loadCFGFile(string programBasePath)
+std::string CFGHelper::SetProgramPath(std::string argv)
+{
+	//MAX_PATH???
+	char full[260];
+	if (!argv.empty())
+	{
+		std::string temp = _fullpath(full, argv.c_str(), 260);
+		size_t found = temp.find_last_of("/\\");
+		return temp.substr(0, found);
+	}
+	else
+	{
+		std::string temp = _fullpath(full, argv.c_str(), 260);
+		return temp;
+	}
+}
+
+
+bool CFGHelper::LoadCFGFile(string programBasePath)
 {
 	string cfgPath;
 	if (programBasePath.empty())
@@ -25,6 +43,7 @@ void CFGHelper::loadCFGFile(string programBasePath)
 		string errorMsg = "Error opening :";
 		errorMsg += cfgPath;
 		//cout << errorMsg << "\nno cfg text file" << endl;
+		return false;
 	}
 
 	dbPath = CFGUtils::GetCfgStringValue("DBPath");
@@ -35,7 +54,7 @@ void CFGHelper::loadCFGFile(string programBasePath)
 	CreateImageHashPort = CFGUtils::GetCfgIntValue("CreateImageHashPort");
 	DataBaseManagerIP = CFGUtils::GetCfgStringValue("DataBaseManagerIP");
 	DataBaseManagerPort = CFGUtils::GetCfgIntValue("DataBaseManagerPort");
-
+	return true;
 }
 //check to make sure everything loaded
 bool CFGHelper::IsCFGComplete(string &err)

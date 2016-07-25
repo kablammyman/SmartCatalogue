@@ -3,6 +3,8 @@
 
 #include "stdafx.h"
 #include "DBLookup.h"
+#include "CFGUtils.h"
+#include "CFGHelper.h"
 #include <Commctrl.h> //for listview
 #include <string>
 #include <vector>
@@ -48,7 +50,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
+   // UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: Place code here.
 
@@ -66,8 +68,29 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_DBLOOKUP));
 
     MSG msg;
+	wstring temp(lpCmdLine);
+	string cmdLine(temp.begin(),temp.end());
 
-	
+	CFGHelper::filePathBase = CFGHelper::SetProgramPath(cmdLine);
+	if (!CFGHelper::LoadCFGFile())
+	{
+		MessageBox(NULL, "Couldnt open cfg" , NULL, NULL);
+	}
+
+	string err;
+	if (!CFGHelper::IsCFGComplete(err))
+	{
+		string msg = "CFG file incomplete: " + err;
+		MessageBox(NULL, msg.c_str(), NULL, NULL);
+		exit(0);
+	}
+
+	if (!dbCtrlr.openDB(CFGHelper::dbPath))
+	{
+		string msg = "couldnt open db form file at: " + CFGHelper::dbPath;
+		MessageBox(NULL, msg.c_str(), NULL, NULL);
+		exit(0);
+	}
 
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))

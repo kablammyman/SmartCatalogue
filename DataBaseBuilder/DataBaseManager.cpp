@@ -102,9 +102,9 @@ void GetLoggingInfoFromCFG()
 
 int main(int argc, char *argv[])
 {
-	CFGHelper::filePathBase = CommandLineUtils::SetProgramPath(argv[0]);
+	CFGHelper::filePathBase = CFGHelper::SetProgramPath(argv[0]);
 	CFGHelper::loadCFGFile();
-	
+
 	string err;
 	if (!CFGHelper::IsCFGComplete(err))
 	{

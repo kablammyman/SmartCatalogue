@@ -19,7 +19,8 @@ public:
 	static int DataBaseManagerPort;
 	static string DataBaseManagerIP;
 	
-	static void loadCFGFile(string programBasePath = "");
+	static bool LoadCFGFile(string programBasePath = "");
 
 	static bool IsCFGComplete(string &err);
+	static string SetProgramPath(std::string argv);
 };
