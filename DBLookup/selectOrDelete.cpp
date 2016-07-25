@@ -67,7 +67,7 @@ void InitInputFields(HWND hDlg)
 	deleteRadioButton = CreateWindow(TEXT("BUTTON"), TEXT("Delete"), WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, baseX * 30, 20, 100, 25, RadioButtonGroup, (HMENU)IDC_DELETE_RADIO, NULL, NULL);
 	SendMessage(selectRadioButton, BM_SETCHECK, BST_CHECKED, 0);*/
 	SQLQureyTextHandle = hDlg;
-	CreateWindow(TEXT("Edit"), TEXT("SELECT path FROM galleries where modelFirstName = \"\""), WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | WS_BORDER, baseX, 30, 1000, 20, hDlg, (HMENU)IDC_SQLQUEREY_TEXT, NULL, NULL);
+	CreateWindow(TEXT("Edit"), TEXT("SELECT path FROM galleries where modelFirstName = \"\""), WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | WS_BORDER, baseX, 30, 600, 20, hDlg, (HMENU)IDC_SQLQUEREY_TEXT, NULL, NULL);
 	CreateWindow(TEXT("BUTTON"), TEXT("Querey"), WS_VISIBLE | WS_CHILD, baseX, 60, 100, 30, hDlg, (HMENU)IDC_QUERY_BTN, NULL, NULL);
 
 	CheckBoxButtonGroup = CreateWindowEx(WS_EX_TRANSPARENT, TEXT("Button"), TEXT("Search Criteria"), WS_CHILD | WS_VISIBLE | BS_GROUPBOX, 2, baseY, 290, 450, hDlg, (HMENU)11, NULL, NULL);

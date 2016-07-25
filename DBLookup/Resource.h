@@ -46,6 +46,7 @@
 #define IDC_META_TEXT						1017
 
 #define IDC_SQLQUEREY_TEXT					1018
+#define IDM_LIST_VIEW_RESULTS				1019
 
 #ifndef IDC_STATIC
 #define IDC_STATIC				-1

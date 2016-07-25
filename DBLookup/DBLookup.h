@@ -21,3 +21,7 @@ INT_PTR CALLBACK DlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 void createSelectOrDeleteBox(HWND hWnd);
 void InitInputFields(HWND hDlg);
 BOOL CheckInput(WPARAM wParam);
+
+HWND CreateListView(HWND hwndParent, int x, int y, int w, int h);
+BOOL InsertListViewItems(HWND hWndListView, int cItems);
+LRESULT NotifyHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
