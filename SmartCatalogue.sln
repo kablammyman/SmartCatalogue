@@ -1,17 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CreateImageHash", "SmartCatalogue\SimilarImagesDetection\openCVDetectSimilarImage.vcxproj", "{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CreateImageHash", "SimilarImagesDetection\openCVDetectSimilarImage.vcxproj", "{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModelRecognition", "SmartCatalogue\ModelRecognition\ModelRecognition.vcxproj", "{FA274E55-27CE-47C3-91EC-5C59159494E5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModelRecognition", "ModelRecognition\ModelRecognition.vcxproj", "{FA274E55-27CE-47C3-91EC-5C59159494E5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataBaseManager", "SmartCatalogue\DataBaseBuilder\DataBaseBuilder.vcxproj", "{3100C379-939D-490E-AB4B-090AFA6B0A5F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataBaseManager", "DataBaseBuilder\DataBaseBuilder.vcxproj", "{3100C379-939D-490E-AB4B-090AFA6B0A5F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dupeImageFinder", "SmartCatalogue\DupeImageFinder\dupeImageFinder.vcxproj", "{F55FB916-4311-40DD-B7FB-4CA86C9862AD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dupeImageFinder", "DupeImageFinder\dupeImageFinder.vcxproj", "{F55FB916-4311-40DD-B7FB-4CA86C9862AD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CreateNewDB", "SmartCatalogue\createNewDB\CreateNewDB.vcxproj", "{EE4A54C2-CD28-4251-96F5-02C35B6CE0D5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CreateNewDB", "createNewDB\CreateNewDB.vcxproj", "{EE4A54C2-CD28-4251-96F5-02C35B6CE0D5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DBLookup", "DBLookup\DBLookup.vcxproj", "{09C83E4F-7D87-4896-A0A1-26A4F7BE3BEC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +63,14 @@ Global
 		{EE4A54C2-CD28-4251-96F5-02C35B6CE0D5}.Release|Win32.Build.0 = Release|Win32
 		{EE4A54C2-CD28-4251-96F5-02C35B6CE0D5}.Release|x64.ActiveCfg = Release|x64
 		{EE4A54C2-CD28-4251-96F5-02C35B6CE0D5}.Release|x64.Build.0 = Release|x64
+		{09C83E4F-7D87-4896-A0A1-26A4F7BE3BEC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{09C83E4F-7D87-4896-A0A1-26A4F7BE3BEC}.Debug|Win32.Build.0 = Debug|Win32
+		{09C83E4F-7D87-4896-A0A1-26A4F7BE3BEC}.Debug|x64.ActiveCfg = Debug|x64
+		{09C83E4F-7D87-4896-A0A1-26A4F7BE3BEC}.Debug|x64.Build.0 = Debug|x64
+		{09C83E4F-7D87-4896-A0A1-26A4F7BE3BEC}.Release|Win32.ActiveCfg = Release|Win32
+		{09C83E4F-7D87-4896-A0A1-26A4F7BE3BEC}.Release|Win32.Build.0 = Release|Win32
+		{09C83E4F-7D87-4896-A0A1-26A4F7BE3BEC}.Release|x64.ActiveCfg = Release|x64
+		{09C83E4F-7D87-4896-A0A1-26A4F7BE3BEC}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

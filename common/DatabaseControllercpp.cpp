@@ -281,7 +281,7 @@ void DatabaseController::removeTableNameFromOutput(string &inputData, int numCol
 	colToUse *= 2;
 
 
-	char *p = strtok(const_cast<char *>(inputData.c_str()), delims.c_str());
+	char *p = strtok_s(const_cast<char *>(inputData.c_str()), delims.c_str(),NULL);
 
 	while (p)
 	{
@@ -292,7 +292,7 @@ void DatabaseController::removeTableNameFromOutput(string &inputData, int numCol
 			counter++;
 		else
 			counter = 1;
-		p = strtok(NULL, delims.c_str());
+		p = strtok_s(NULL, delims.c_str(),NULL);
 	}
 
 }
