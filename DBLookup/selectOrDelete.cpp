@@ -95,7 +95,7 @@ void InitInputFields(HWND hDlg)
 	CreateWindow(TEXT("BUTTON"), TEXT("execute"), WS_VISIBLE | WS_CHILD, baseX, baseY + (stepY * 11), 100, 50, hDlg, (HMENU)IDC_EXECUTE_QUICK_QUERY_BTN, NULL, NULL);
 
 }
-BOOL CheckInput(WPARAM wParam)
+BOOL CheckInput(WPARAM wParam, std::string &output)
 {
 	if (wParam == IDC_QUERY_BTN)
 	{
@@ -107,7 +107,6 @@ BOOL CheckInput(WPARAM wParam)
 			x = GetLastError();
 			printf("error: %d", x);
 		}
-		string output;
 		dbCtrlr.executeSQL(buffer, output);
 		return (INT_PTR)TRUE;
 	}
@@ -137,7 +136,7 @@ BOOL CheckInput(WPARAM wParam)
 			}
 			//MessageBox(NULL,SQLQuery.c_str(),"checks",NULL);
 		}
-		string output;
+
 		dbCtrlr.executeSQL(SQLQuery, output);
 		return TRUE;
 	}
@@ -158,8 +157,10 @@ INT_PTR CALLBACK selectOrDeleteQuereyBox(HWND hDlg, UINT message, WPARAM wParam,
 		return (INT_PTR)TRUE;
 
 	case WM_COMMAND:
-			CheckInput( wParam);
-
+	{
+		std::string output;
+		CheckInput(wParam, output);
+	}
 		break;
 	case WM_PAINT:
 		if (addOrDeleteBoxHandle != NULL)

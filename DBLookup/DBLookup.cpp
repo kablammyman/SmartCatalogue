@@ -5,6 +5,7 @@
 #include "DBLookup.h"
 #include "CFGUtils.h"
 #include "CFGHelper.h"
+#include "StringUtils.h"
 #include <Commctrl.h> //for listview
 #include <string>
 #include <vector>
@@ -72,7 +73,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	wstring temp(lpCmdLine);
 	string cmdLine(temp.begin(),temp.end());
 
-	/*CFGHelper::filePathBase = CFGHelper::SetProgramPath(cmdLine);
+	CFGHelper::filePathBase = CFGHelper::SetProgramPath(cmdLine);
 	if (!CFGHelper::LoadCFGFile())
 	{
 		MessageBox(NULL, "Couldnt open cfg" , NULL, NULL);
@@ -92,7 +93,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		string msg = "couldnt open db form file at: " + CFGHelper::dbPath;
 		MessageBox(NULL, msg.c_str(), NULL, NULL);
 		exit(0);
-	}*/
+	}
 
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
@@ -197,15 +198,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
-			CheckInput(wParam);
-
+			string output;
+			CheckInput(wParam, output);
+			vector<string> data = StringUtils::Tokenize(output, "|");
+			FillListViewItems(listView, data); 
             // Parse the menu selections:
             switch (wmId)
             {
             case IDM_ABOUT:
 			{
 				DialogBox(mainInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-				//////test!!!
+				/*//////test!!!
 				ListView_DeleteAllItems(listView);
 				vector<string> testVec;
 				testVec.push_back("message 1,hety");
@@ -215,7 +218,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				testVec.push_back("wtf facebook?!");
 
 
-				FillListViewItems(listView, testVec);
+				FillListViewItems(listView, testVec);*/
 			}
                 break;
             case IDM_EXIT:
