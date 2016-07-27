@@ -74,7 +74,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	wstring temp(lpCmdLine);
 	string cmdLine(temp.begin(),temp.end());
 
-	CFGHelper::filePathBase = CFGHelper::SetProgramPath(cmdLine);
+	/*CFGHelper::filePathBase = CFGHelper::SetProgramPath(cmdLine);
 	if (!CFGHelper::LoadCFGFile())
 	{
 		MessageBox(NULL, "Couldnt open cfg" , NULL, NULL);
@@ -94,7 +94,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		string msg = "couldnt open db form file at: " + CFGHelper::dbPath;
 		MessageBox(NULL, msg.c_str(), NULL, NULL);
 		exit(0);
-	}
+	}*/
 
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))

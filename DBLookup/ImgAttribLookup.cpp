@@ -1,13 +1,79 @@
-//#include "stdafx.h"
+
 #include "ImgAttribLookup.h"
 #include "DBLookup.h"
+#include "StringUtils.h"
 
 using namespace std;
+QueryIDResults idResults;
 
+ HWND addOrDeleteBoxHandle;
+ HWND SQLQureyTextHandle;
+ HWND RadioButtonGroup;
+ HWND CheckBoxButtonGroup;
 
-void ImgAttribLookup::CreateSelectOrDeleteBox(HWND hWnd)
+ HWND selectRadioButton;
+ HWND deleteRadioButton;
+ HWND categoryCheck;
+ HWND categoryText;
+
+ HWND websiteCheck;
+ HWND websiteText;
+
+ HWND subwebsiteCheck;
+ HWND subwebsiteText;
+
+ HWND modelCheck;
+ HWND modelText;
+
+ HWND galleryCheck;
+ HWND galleryText;
+
+ HWND metaCheck;
+ HWND metaText;
+
+ std::string(*QueryLookup[NUM_CHECKS]) (std::string name);
+
+string GetCategoryID(string name)
 {
-	addOrDeleteBoxHandle = CreateDialog(mainInst, MAKEINTRESOURCE(IDD_QUICK_QUERY_BOX), hWnd, selectOrDeleteQuereyBox);
+	idResults.CategoryID;
+	return name;
+}
+string GetWebsiteID(std::string name)
+{
+	idResults.WebsiteID;
+	return name;
+}
+string GetSubWebsiteID(string name)
+{
+	idResults.SubWebsiteID;
+	return name;
+}
+string GetModelID(string name)
+{
+	idResults.ModelID;
+	return name;
+}
+string GetGalleryID(string name)
+{
+	idResults.GalleryID;
+	return name;
+}
+string GetMetaData(string name)
+{
+	return name;
+}
+
+string CreateLookupFromIDs(void)
+{
+	string returnQuerey;
+	idResults.SubWebsiteID;
+	return returnQuerey;
+}
+
+
+void CreateSelectOrDeleteBox(HWND hWnd)
+{
+	addOrDeleteBoxHandle = CreateDialog(mainInst, MAKEINTRESOURCE(IDD_QUICK_QUERY_BOX), hWnd, SelectOrDeleteQuereyBox);
 
 	if (addOrDeleteBoxHandle == NULL)
 	{
@@ -17,18 +83,15 @@ void ImgAttribLookup::CreateSelectOrDeleteBox(HWND hWnd)
 	ShowWindow(addOrDeleteBoxHandle, SW_SHOW);
 }
 
-void ImgAttribLookup::InitInputFields(HWND hDlg)
+void InitInputFields(HWND hDlg)
 {
+	QueryLookup[0] = GetCategoryID;
+	QueryLookup[1] = GetWebsiteID;
+	QueryLookup[2] = GetSubWebsiteID;
+	QueryLookup[3] = GetModelID;
+	QueryLookup[4] = GetGalleryID;
+	QueryLookup[6] = GetMetaData;
 
-	
-
-	/*intToSQLCatMap[0] = "category = ";
-	intToSQLCatMap[1] = "websiteName = ";
-	intToSQLCatMap[2] = "subWebsiteName = ";
-	intToSQLCatMap[3] = "modelFirstName = ";
-	intToSQLCatMap[4] = "modelLastName = ";
-	intToSQLCatMap[5] = "galleryName = ";
-	intToSQLCatMap[6] = "metaData LIKE ";*/
 
 	int baseX = 5, baseY = 100, stepY = 32;
 	int editSize = stepY - 2;
@@ -69,7 +132,7 @@ void ImgAttribLookup::InitInputFields(HWND hDlg)
 	CreateWindow(TEXT("BUTTON"), TEXT("execute"), WS_VISIBLE | WS_CHILD, baseX, baseY + (stepY * 11), 100, 50, hDlg, (HMENU)IDC_EXECUTE_QUICK_QUERY_BTN, NULL, NULL);
 
 }
-BOOL ImgAttribLookup::CheckInput(WPARAM wParam, std::string &output)
+BOOL CheckInput(WPARAM wParam, std::string &output)
 {
 	if (wParam == IDC_QUERY_BTN)
 	{
@@ -92,7 +155,7 @@ BOOL ImgAttribLookup::CheckInput(WPARAM wParam, std::string &output)
 	//	else if (IsDlgButtonChecked(RadioButtonGroup, IDC_DELETE_RADIO))
 	//		SQLQuery += "DELETE FROM galleries WHERE ";
 
-		int numCatogories = 0;
+
 		for (int i = 0; i < NUM_CHECKS; i++)
 		{
 
@@ -102,23 +165,19 @@ BOOL ImgAttribLookup::CheckInput(WPARAM wParam, std::string &output)
 				GetDlgItemText(CheckBoxButtonGroup, IDC_CATERGORY_TEXT + i, buffer, 512);
 				if (buffer[0] == '\0')
 					continue;
-
-				if (numCatogories > 0)
-					SQLQuery += " AND ";
-				SQLQuery += ((*QueryLookup[i]) (buffer) + "\"" + buffer + "\"");
-				numCatogories++;
+					(*QueryLookup[i]) (buffer);
 			}
-			//MessageBox(NULL,SQLQuery.c_str(),"checks",NULL);
 		}
 
 		dbCtrlr.executeSQL(SQLQuery, output);
+		idResults.Clear();//we are done with this, so clear it for next use
 		return TRUE;
 	}
 
 	return FALSE;
 }
 // Message handler for eitehr selecting or deleting record...window dims are in resource.rc
-INT_PTR CALLBACK ImgAttribLookup::SelectOrDeleteQuereyBox(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK SelectOrDeleteQuereyBox(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 
 
@@ -146,3 +205,4 @@ INT_PTR CALLBACK ImgAttribLookup::SelectOrDeleteQuereyBox(HWND hDlg, UINT messag
 	}
 	return (INT_PTR)FALSE;
 }
+
