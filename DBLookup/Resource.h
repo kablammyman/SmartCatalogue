@@ -3,15 +3,6 @@
 // Used by DBLookup.rc
 //
 
-#define NUM_CHECKS					7
-#define CATERGORY_STRING            "category = "
-#define WEBSITE_STRING              "websiteName = "
-#define SUB_WEBSITE_STRING          "subWebsiteName = "
-#define MODEL_FIRST_NAME_STRING		"modelFirstName = "
-#define MODEL_LAST_NAME_STRING		"modelLastName = "
-#define GALLERY_STRING				"galleryName = "
-#define META_STRING					"metaData LIKE "
-
 #define IDR_MAINFRAME			100
 #define IDS_APP_TITLE			101
 #define IDD_DBLOOKUP_DIALOG		102

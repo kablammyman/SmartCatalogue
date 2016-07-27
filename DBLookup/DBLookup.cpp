@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "DBLookup.h"
+#include "ImgAttribLookup.h"
 #include "CFGUtils.h"
 #include "CFGHelper.h"
 #include "StringUtils.h"

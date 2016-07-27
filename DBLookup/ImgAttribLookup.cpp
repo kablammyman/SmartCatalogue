@@ -1,40 +1,11 @@
-#include "stdafx.h"
-//#include "Resource.h"
+//#include "stdafx.h"
+#include "ImgAttribLookup.h"
 #include "DBLookup.h"
-#include <string>
-#include <Windows.h>
 
 using namespace std;
-HWND addOrDeleteBoxHandle = NULL;
-HWND SQLQureyTextHandle;
-HWND RadioButtonGroup;
-HWND CheckBoxButtonGroup;
-
-HWND selectRadioButton;
-HWND deleteRadioButton;
-HWND categoryCheck;
-HWND categoryText;
-
-HWND websiteCheck;
-HWND websiteText;
-
-HWND subwebsiteCheck;
-HWND subwebsiteText;
-
-HWND modelCheck;
-HWND modelText;
-
-HWND galleryCheck;
-HWND galleryText;
-
-HWND metaCheck;
-HWND metaText;
-
-std::string intToSQLCatMap[NUM_CHECKS];
 
 
-
-void createSelectOrDeleteBox(HWND hWnd)
+void ImgAttribLookup::CreateSelectOrDeleteBox(HWND hWnd)
 {
 	addOrDeleteBoxHandle = CreateDialog(mainInst, MAKEINTRESOURCE(IDD_QUICK_QUERY_BOX), hWnd, selectOrDeleteQuereyBox);
 
@@ -46,15 +17,18 @@ void createSelectOrDeleteBox(HWND hWnd)
 	ShowWindow(addOrDeleteBoxHandle, SW_SHOW);
 }
 
-void InitInputFields(HWND hDlg)
+void ImgAttribLookup::InitInputFields(HWND hDlg)
 {
-	intToSQLCatMap[0] = CATERGORY_STRING;
-	intToSQLCatMap[1] = WEBSITE_STRING;
-	intToSQLCatMap[2] = SUB_WEBSITE_STRING;
-	intToSQLCatMap[3] = MODEL_FIRST_NAME_STRING;
-	intToSQLCatMap[4] = MODEL_LAST_NAME_STRING;
-	intToSQLCatMap[5] = GALLERY_STRING;
-	intToSQLCatMap[6] = META_STRING;
+
+	
+
+	/*intToSQLCatMap[0] = "category = ";
+	intToSQLCatMap[1] = "websiteName = ";
+	intToSQLCatMap[2] = "subWebsiteName = ";
+	intToSQLCatMap[3] = "modelFirstName = ";
+	intToSQLCatMap[4] = "modelLastName = ";
+	intToSQLCatMap[5] = "galleryName = ";
+	intToSQLCatMap[6] = "metaData LIKE ";*/
 
 	int baseX = 5, baseY = 100, stepY = 32;
 	int editSize = stepY - 2;
@@ -95,7 +69,7 @@ void InitInputFields(HWND hDlg)
 	CreateWindow(TEXT("BUTTON"), TEXT("execute"), WS_VISIBLE | WS_CHILD, baseX, baseY + (stepY * 11), 100, 50, hDlg, (HMENU)IDC_EXECUTE_QUICK_QUERY_BTN, NULL, NULL);
 
 }
-BOOL CheckInput(WPARAM wParam, std::string &output)
+BOOL ImgAttribLookup::CheckInput(WPARAM wParam, std::string &output)
 {
 	if (wParam == IDC_QUERY_BTN)
 	{
@@ -131,7 +105,7 @@ BOOL CheckInput(WPARAM wParam, std::string &output)
 
 				if (numCatogories > 0)
 					SQLQuery += " AND ";
-				SQLQuery += (intToSQLCatMap[i] + "\"" + buffer + "\"");
+				SQLQuery += ((*QueryLookup[i]) (buffer) + "\"" + buffer + "\"");
 				numCatogories++;
 			}
 			//MessageBox(NULL,SQLQuery.c_str(),"checks",NULL);
@@ -144,7 +118,7 @@ BOOL CheckInput(WPARAM wParam, std::string &output)
 	return FALSE;
 }
 // Message handler for eitehr selecting or deleting record...window dims are in resource.rc
-INT_PTR CALLBACK selectOrDeleteQuereyBox(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK ImgAttribLookup::SelectOrDeleteQuereyBox(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 
 

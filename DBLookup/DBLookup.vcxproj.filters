@@ -30,15 +30,15 @@
     <ClInclude Include="DBLookup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ImgAttribLookup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DBLookup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="selectOrDelete.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\common\DatabaseControllercpp.cpp">
@@ -48,6 +48,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\common\CFGHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImgAttribLookup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
