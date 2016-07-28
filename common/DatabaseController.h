@@ -28,8 +28,11 @@ public:
 	bool insertNewDataEntry(string table, dbDataPair data, string &output);
 	bool insertNewDataEntry(string table, vector<dbDataPair> data, string &output);
 	bool doDBQuerey(string table, string data, string &output);
+	bool doDBQuerey(string table, string data, dbDataPair fromWhere, string &output);
 	bool doDBQuerey(string table, vector<string> data, string &output);
 	bool doDBQuerey(string table, vector<dbDataPair> data, string &output);
+	bool doDBQuerey(string table, string selectData, vector<dbDataPair> whereData, string &output);
+	bool doDBQuerey(string table, vector<string> selectData, vector<dbDataPair> whereData, string &output);
 	bool UpdateEntry(string table, vector<dbDataPair> data, dbDataPair WhereClause, string &output);
 	
 	void parseDBOutput(string &inputData, int numFields, vector <vector<string>> &returnData);

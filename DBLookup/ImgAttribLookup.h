@@ -4,7 +4,7 @@
 #include <vector>
 #include <Windows.h>
 
-#define NUM_CHECKS	7
+#define NUM_CHECKS	5
 struct QueryIDResults
 {
 	std::string CategoryID;
@@ -48,6 +48,7 @@ extern HWND galleryText;
 extern HWND metaCheck;
 extern HWND metaText;
 	
+extern std::vector<std::string> results;
 std::string GetCategoryID(std::string name);
 std::string GetWebsiteID(std::string name);
 std::string GetSubWebsiteID(std::string name);
@@ -59,4 +60,4 @@ INT_PTR CALLBACK SelectOrDeleteQuereyBox(HWND hDlg, UINT message, WPARAM wParam,
 void CreateSelectOrDeleteBox(HWND hWnd);
 void InitInputFields(HWND hDlg);
 BOOL CheckInput(WPARAM wParam, std::string &output);
-std::string CreateLookupFromIDs(void);
+void DoLookupFromIDs(std::vector<std::string> &results);

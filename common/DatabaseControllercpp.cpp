@@ -105,6 +105,12 @@ bool DatabaseController::doDBQuerey(string table, string data, string &output)
 	return db->executeSQL(querey, output);
 }
 
+bool DatabaseController::doDBQuerey(string table, string data, dbDataPair fromWhere, string &output)
+{
+	string querey = ("SELECT " + data + " FROM " + table + " WHERE " + fromWhere.first + " = \"" + fromWhere.second + "\";");
+	return db->executeSQL(querey, output);
+}
+
 bool DatabaseController::doDBQuerey(string table, vector<string> data, string &output)
 {
 	string querey = "SELECT "; 
@@ -118,7 +124,7 @@ bool DatabaseController::doDBQuerey(string table, vector<string> data, string &o
 	querey += (" FROM " + table + ";");
 	return db->executeSQL(querey, output);
 }
-
+//used for quereies like: SELECT path,CategoryID,WebsiteID FROM Gallery WHERE CategoryID = "3" AND WebsiteID = "16";
 bool DatabaseController::doDBQuerey(string table, vector<dbDataPair> data, string &output)
 {
 	string querey = "SELECT ";
@@ -150,6 +156,59 @@ bool DatabaseController::doDBQuerey(string table, vector<dbDataPair> data, strin
 	whereString += ";";
 
 	return db->executeSQL(querey+ fromString+ whereString, output);
+}
+
+//used for quereies like: SELECT path FROM Gallery WHERE CategoryID = "3" AND WebsiteID = "16";
+bool DatabaseController::doDBQuerey(string table, string selectData, vector<dbDataPair> whereData, string &output)
+{
+	string querey = "SELECT ";
+	string whereString = " WHERE ";
+	string fromString = (" FROM " + table);
+
+
+	querey += selectData;
+
+	for (size_t i = 0; i < whereData.size(); i++)
+	{
+		if (i > 0)
+			whereString += " AND ";
+		whereString += (whereData[i].first + " = \"" + whereData[i].second + "\"");
+	}
+	whereString += ";";
+
+	return db->executeSQL(querey + fromString + whereString, output);
+}
+
+//used for quereies like: SELECT ID,path FROM Gallery WHERE CategoryID = "3" AND WebsiteID = "16";
+bool DatabaseController::doDBQuerey(string table, vector<string> selectData, vector<dbDataPair> whereData, string &output)
+{
+	string querey = "SELECT ";
+	string whereString = " WHERE ";
+	string fromString = (" FROM " + table);
+
+	//count how many specific items to querey
+	//ex select * from table where name ="bla" and age = "bla"; \\2 whereArgs here
+	
+	for (size_t i = 0; i < selectData.size(); i++)
+	{
+		if (i > 0)
+			querey += ",";
+
+
+		querey += selectData[i];
+
+	}
+	
+
+	for (size_t i = 0; i < whereData.size(); i++)
+	{
+		if (i > 0)
+			whereString += " AND ";
+		whereString += (whereData[i].first + " = \"" + whereData[i].second + "\"");
+	}
+	whereString += ";";
+
+	return db->executeSQL(querey + fromString + whereString, output);
 }
 
 //returns true when successful
@@ -302,6 +361,9 @@ void DatabaseController::removeTableNameFromOutput(string &inputData)
 	if(f == string::npos)
 		return;
 	inputData.erase(0, f+1);
+
+	if(inputData.back() == '\n')
+		inputData.pop_back();
 }
 
 ///////////////////////////////////////////////////////////test methods

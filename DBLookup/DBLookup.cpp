@@ -74,7 +74,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	wstring temp(lpCmdLine);
 	string cmdLine(temp.begin(),temp.end());
 
-	/*CFGHelper::filePathBase = CFGHelper::SetProgramPath(cmdLine);
+	CFGHelper::filePathBase = CFGHelper::SetProgramPath(cmdLine);
 	if (!CFGHelper::LoadCFGFile())
 	{
 		MessageBox(NULL, "Couldnt open cfg" , NULL, NULL);
@@ -94,7 +94,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		string msg = "couldnt open db form file at: " + CFGHelper::dbPath;
 		MessageBox(NULL, msg.c_str(), NULL, NULL);
 		exit(0);
-	}*/
+	}
 
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
@@ -200,9 +200,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             int wmId = LOWORD(wParam);
 			string output;
-			CheckInput(wParam, output);
-			vector<string> data = StringUtils::Tokenize(output, "|");
-			FillListViewItems(listView, data); 
+			
+			if (CheckInput(wParam, output) == TRUE)
+			{
+				ListView_DeleteAllItems(listView);
+				FillListViewItems(listView, results);
+			}
             // Parse the menu selections:
             switch (wmId)
             {
@@ -216,10 +219,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				testVec.push_back("super street fighter II turbo");
 				testVec.push_back("gimme all da pornz");
 				testVec.push_back("howag");
-				testVec.push_back("wtf facebook?!");
-
-
-				FillListViewItems(listView, testVec);*/
+				testVec.push_back("wtf facebook?!");*/
+				
 			}
                 break;
             case IDM_EXIT:
