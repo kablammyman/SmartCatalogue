@@ -8,6 +8,7 @@
 #include "CFGHelper.h"
 #include "StringUtils.h"
 #include <Commctrl.h> //for listview
+#include "Shellapi.h" //shellExecute
 #include <string>
 #include <vector>
 
@@ -193,7 +194,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
 
 	case WM_NOTIFY:
-		//return(NotifyHandler(hWnd, message, wParam, lParam));
+		return(NotifyHandler(hWnd, message, wParam, lParam));
 		break;
 
     case WM_COMMAND:
@@ -209,18 +210,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Parse the menu selections:
             switch (wmId)
             {
-            case IDM_ABOUT:
+				//this is a fancy way to say "right click"
+			case IDM_ABOUT:
 			{
-				DialogBox(mainInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-				/*//////test!!!
-				ListView_DeleteAllItems(listView);
-				vector<string> testVec;
-				testVec.push_back("message 1,hety");
-				testVec.push_back("super street fighter II turbo");
-				testVec.push_back("gimme all da pornz");
-				testVec.push_back("howag");
-				testVec.push_back("wtf facebook?!");*/
-				
+				DialogBox(mainInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);		
 			}
                 break;
             case IDM_EXIT:
@@ -331,7 +324,9 @@ BOOL FillListViewItems(HWND hWndListView, vector<string> items)
 
 	return TRUE;
 }
-/*
+
+
+
 LRESULT NotifyHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (wParam != IDM_LIST_VIEW_RESULTS)
@@ -339,20 +334,35 @@ LRESULT NotifyHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	LV_DISPINFO *pLvdi = (LV_DISPINFO *)lParam;
 	//NM_LISTVIEW *pNm = (NM_LISTVIEW *)lParam;
-	HOUSEINFO *pHouse = (HOUSEINFO *)(pLvdi->item.lParam);
+//	HOUSEINFO *pHouse = (HOUSEINFO *)(pLvdi->item.lParam);
 
 	switch (pLvdi->hdr.code)
 	{
+	case NM_DBLCLK:
+	{
+		// Get the first selected item
+		int iPos = ListView_GetNextItem(listView, -1, LVNI_SELECTED);
+
+		if (iPos != -1)
+		{
+			char path[MAX_PATH];
+			ListView_GetItemText(listView, iPos, 0, path, MAX_PATH);
+			ShellExecute(NULL, "explore", path, NULL, NULL, SW_SHOWNORMAL);
+		}
+
+	}
+		break;
+
 	case LVN_GETDISPINFO:
 
 		switch (pLvdi->item.iSubItem)
 		{
 		case 0:     // Address
-			pLvdi->item.pszText = pHouse->szAddress;
+			//pLvdi->item.pszText = pHouse->szAddress;
 			break;
 
 		case 1:     // City
-			pLvdi->item.pszText = pHouse->szCity;
+			//pLvdi->item.pszText = pHouse->szCity;
 			break;
 
 		default:
@@ -376,7 +386,8 @@ LRESULT NotifyHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		// Save the new label information
 		if ((pLvdi->item.iItem != -1) &&
 			(pLvdi->item.pszText != NULL))
-			lstrcpy(pHouse->szAddress, pLvdi->item.pszText);
+			//lstrcpy(pHouse->szAddress, pLvdi->item.pszText);
+			lstrcpy("is you is oris you aint", pLvdi->item.pszText);
 		break;
 
 	case LVN_COLUMNCLICK:
@@ -392,4 +403,3 @@ LRESULT NotifyHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	return 0L;
 }
-*/

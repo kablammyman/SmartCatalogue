@@ -498,20 +498,6 @@ void DatabaseDataParser::getAllPaths(string path, vector<string> &dirsWithImages
 	fileWalker->getAllDirsWithImgs(dirsWithImages);
 }
 
-
-
-
-/////////////////////////////are these still needed or useful?////////////////////////////////
-/*size_t DatabaseDataParser::getNameMarkerIndexInTokens(vector<string> & tokens)
-{
-	for (size_t i = 0; i < tokens.size(); i++)
-	{
-		if (tokens[i] == nameMarker)
-			return i;
-	}
-	return -1;
-}*/
-
 /////////////////////////////////////////////////TESTS///////////////////////////////////////////
 void DatabaseDataParser::testNamelogic()
 {
@@ -603,48 +589,3 @@ void DatabaseDataParser::testGalleryCalc()
 			printf("its bad!\n");
 	}
 }
-//-------------------------------------------------------------------------------------
-//this shows paths that dont follow the proper format
-void DatabaseDataParser::GetAllBadPaths()
-{
-	//fileWalker->getAllDirsWithBadPath(ignorePattern,curFileWindowData);
-	/*
-	fileWalker->getAllDirsWithImgs(curFileWindowData, false);
-
-	for (size_t i = curFileWindowData.size() - 1; i > 0; i--)
-	{
-		//remove any paths that are legal, and only show the bad ones
-		vector<GalleryData *> data;
-		if (fileWalker->calcGalleryData(curFileWindowData[i], ignorePattern, data))
-			curFileWindowData.erase(curFileWindowData.begin() + i);
-	}
-	//get last one
-	vector<GalleryData *> data;
-	if (fileWalker->calcGalleryData(curFileWindowData[0], ignorePattern, data))
-		curFileWindowData.erase(curFileWindowData.begin());
-
-	//sendDataToEditWindow(getFileViewHandle(), curFileWindowData);
-	*/
-}
-
-/*
-void DatabaseDataParser::getAllDirsWithBadPath(string ignorePattern, vector<string> & badDirs)
-{
-	
-	//dont in FileWalker
-	vector<string> allDirs = FileUtils::dumpTreeToVector(true);
-	for (size_t i = 0; i < allDirs.size(); i++)
-	{
-		string input = allDirs[i];
-		if (!ignorePattern.empty())
-		{
-			size_t pos = input.find(ignorePattern);
-			input = input.substr(pos + ignorePattern.size());
-		}
-		vector<string> tokens = tokenize(input, "\\");
-		if (tokens.size() > 5)
-		{
-			badDirs.push_back(allDirs[i]);
-		}
-	}
-}*/

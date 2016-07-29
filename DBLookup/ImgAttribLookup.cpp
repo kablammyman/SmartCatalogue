@@ -67,6 +67,17 @@ string GetSubWebsiteID(string name)
 
 	return output;
 }
+
+string GetGalleryID(string name)
+{
+	string output;
+	string querey = "Select ID from Gallery WHERE galleryName LIKE \"%" + name + "%\"";
+	dbCtrlr.executeSQL(querey, output);
+	dbCtrlr.getAllValuesFromCol(output, "ID", idResults.GalleryID);
+	return name;
+}
+
+
 string GetModelID(string name)
 {
 	vector<string> names = StringUtils::Tokenize(name, ",&");
@@ -75,6 +86,7 @@ string GetModelID(string name)
 	for (size_t i = 0; i < names.size(); i++)
 	{
 		string output;
+		StringUtils::TrimWhiteSpace(names[i]);
 		StringUtils::ToProperNoun(names[i]);
 		vector<DatabaseController::dbDataPair> modelQuerey;
 		vector<string> curFullName = StringUtils::Tokenize(names[i], " ");
@@ -103,15 +115,7 @@ string GetModelID(string name)
 	idResults.ModelID = quereyResults;
 	return quereyResults[0];
 }
-string GetGalleryID(string name)
-{
-	string output;
-	idResults.GalleryID;
-	string querey = "Select ID from Gallery WHERE galleryName LIKE %" +name +"%"; 
-	dbCtrlr.executeSQL(querey, output);
-	dbCtrlr.getAllValuesFromCol(output, "ID", idResults.GalleryID);
-	return name;
-}
+
 string GetMetaData(string name)
 {
 	return name;
@@ -120,6 +124,7 @@ string GetMetaData(string name)
 void DoLookupFromIDs(vector<string> &results)
 {
 	vector<DatabaseController::dbDataPair> combinedIDQuerey;
+	int idTypes = 0;
 
 	//first, get teh galleries
 	if(!idResults.CategoryID.empty())
@@ -128,35 +133,93 @@ void DoLookupFromIDs(vector<string> &results)
 		combinedIDQuerey.push_back(make_pair("WebsiteID", idResults.WebsiteID));
 	if (!idResults.SubWebsiteID.empty())
 		combinedIDQuerey.push_back(make_pair("SubWebsiteID", idResults.SubWebsiteID));
-	
+
 	vector<string> classifcationIDs;
 	string combinedIDOutput;
+
+
 	if (!combinedIDQuerey.empty())
 	{
+		idTypes++;
 		dbCtrlr.doDBQuerey("Gallery", "ID", combinedIDQuerey, combinedIDOutput);
 		dbCtrlr.getAllValuesFromCol(combinedIDOutput, "ID", classifcationIDs);
+		
+		if (!idResults.GalleryID.empty())
+		{
+			vector<string>::iterator it;
+			vector<string> temp(idResults.GalleryID.size() + classifcationIDs.size());
+
+			sort(classifcationIDs.begin(), classifcationIDs.end());
+			sort(idResults.GalleryID.begin(), idResults.GalleryID.end());
+
+			it = std::set_intersection(idResults.GalleryID.begin(), idResults.GalleryID.end(), classifcationIDs.begin(), classifcationIDs.end(), temp.begin());
+			temp.resize(it - temp.begin());
+			classifcationIDs.clear();
+			classifcationIDs = temp;
+		}
+
+		
 	}
+	
+	if (!idResults.GalleryID.empty() && combinedIDOutput.empty())
+	{
+		classifcationIDs.insert(classifcationIDs.end(), idResults.GalleryID.begin(), idResults.GalleryID.end());
+		idTypes = 1;
+	}
+
 
 	//then look for the models in the galleries
 	vector<string> modelGalleries;
+	//i got some unintended behavior that i may want to keep in the future
+	//this will take all garreis ech model is in and add them to the list, instead of only taking the common ones
+	bool combineGalleries = false;
 	if (!idResults.ModelID.empty())
 	{
 		for (size_t i = 0; i < idResults.ModelID.size(); i++)
 		{
+			idTypes++;
 			DatabaseController::dbDataPair whereData;
 			whereData.first = "ModelID";
 			whereData.second = idResults.ModelID[i];
 			string modelOutput;
 			dbCtrlr.doDBQuerey("ModelsInGallery", "GalleryID", whereData, modelOutput);
-			dbCtrlr.getAllValuesFromCol(modelOutput, "galleryID", modelGalleries);
+			
 
+			if(i == 0 || combineGalleries)
+				dbCtrlr.getAllValuesFromCol(modelOutput, "galleryID", modelGalleries);
+			else
+			{
+				vector<string> curModelGal;
+				dbCtrlr.getAllValuesFromCol(modelOutput, "galleryID", curModelGal);
+				
+				//we found no galelries for this model, so theres no way a gallery with both models can exist
+				if (curModelGal.empty())
+					break;
+				
+				vector<string>::iterator it;
+				vector<string> temp(modelGalleries.size() + curModelGal.size());
+
+				sort(modelGalleries.begin(), modelGalleries.end());
+				sort(curModelGal.begin(), curModelGal.end());
+
+				it = std::set_intersection(curModelGal.begin(), curModelGal.end(), modelGalleries.begin(), modelGalleries.end(), temp.begin());
+				temp.resize(it - temp.begin());
+				modelGalleries.clear();
+				modelGalleries = temp;
+			}
+			//if we found no models, and we arent combing galleries, then theres no need to continue
+			if(modelGalleries.empty() && !combineGalleries)
+				break;
+
+			
 		}
 
 
 	}
 	vector<string> allGalleries;
 	vector<string> *galleryData;
-	if (!classifcationIDs.empty() && !modelGalleries.empty())
+	//if (!classifcationIDs.empty() && !modelGalleries.empty())
+	if(idTypes == 2)
 	{
 		vector<string>::iterator it;
 		allGalleries.resize(classifcationIDs.size() + modelGalleries.size());
@@ -173,12 +236,20 @@ void DoLookupFromIDs(vector<string> &results)
 	else 
 		galleryData = &modelGalleries;
 
+	if (galleryData->empty())
+	{
+		results.push_back("none");
+		return;
+	}
 	string finalQuerey = " SELECT path  FROM Gallery WHERE ID in (";
 	finalQuerey += (StringUtils::FlattenVector((*galleryData)) + ")");
 	
 	string finalOut;
 	dbCtrlr.executeSQL(finalQuerey, finalOut);
 	dbCtrlr.getAllValuesFromCol(finalOut, "path", results);
+
+
+		
 }
 
 
@@ -208,12 +279,6 @@ void InitInputFields(HWND hDlg)
 	int editSize = stepY - 2;
 	int buttonWidth = (baseX * 2) + 100;
 
-	//CreateWindow(TEXT("Edit"), TEXT(curDBCommand.c_str()), WS_CHILD | WS_VISIBLE | WS_BORDER,0, 0, MAX_PATH*10, 20, hDlg, (HMENU)FILE_PATH_1, NULL, NULL);
-
-	/*RadioButtonGroup = CreateWindowEx(WS_EX_TRANSPARENT, TEXT("Button"), TEXT("select or delete?"), WS_CHILD | WS_VISIBLE | BS_GROUPBOX, 2, 2, 290, 50, hDlg, (HMENU)11, NULL, NULL);
-	selectRadioButton = CreateWindow(TEXT("BUTTON"), TEXT("Select"), WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, baseX, 20, 100, 25, RadioButtonGroup, (HMENU)IDC_SELECT_RADIO, NULL, NULL);
-	deleteRadioButton = CreateWindow(TEXT("BUTTON"), TEXT("Delete"), WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, baseX * 30, 20, 100, 25, RadioButtonGroup, (HMENU)IDC_DELETE_RADIO, NULL, NULL);
-	SendMessage(selectRadioButton, BM_SETCHECK, BST_CHECKED, 0);*/
 	SQLQureyTextHandle = hDlg;
 	CreateWindow(TEXT("Edit"), TEXT("SELECT path FROM galleries where modelFirstName = \"\""), WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | WS_BORDER, baseX, 30, 600, 20, hDlg, (HMENU)IDC_SQLQUEREY_TEXT, NULL, NULL);
 	CreateWindow(TEXT("BUTTON"), TEXT("Querey"), WS_VISIBLE | WS_CHILD, baseX, 60, 100, 30, hDlg, (HMENU)IDC_QUERY_BTN, NULL, NULL);
@@ -231,11 +296,8 @@ void InitInputFields(HWND hDlg)
 	modelCheck = CreateWindow(TEXT("BUTTON"), TEXT("Name(s)"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, baseX, baseY + (stepY * 4), buttonWidth, editSize, CheckBoxButtonGroup, (HMENU)IDC_MODEL_FIRST_NAME_CHECK, NULL, NULL);
 	modelText = CreateWindow(TEXT("Edit"), TEXT(""), WS_CHILD | WS_VISIBLE | WS_BORDER, baseX * 25, baseY + (stepY * 4), 300, editSize, CheckBoxButtonGroup, (HMENU)IDC_MODEL_FIRST_NAME_TEXT, NULL, NULL);
 
-	//modelCheck = CreateWindow(TEXT("BUTTON"), TEXT("Last Name"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, baseX, baseY + (stepY * 5), buttonWidth, editSize, CheckBoxButtonGroup, (HMENU)IDC_MODEL_LAST_NAME_CHECK, NULL, NULL);
-	//modelText = CreateWindow(TEXT("Edit"), TEXT(""), WS_CHILD | WS_VISIBLE | WS_BORDER, baseX * 25, baseY + (stepY * 5), 300, editSize, CheckBoxButtonGroup, (HMENU)IDC_MODEL_LAST_NAME_TEXT, NULL, NULL);
-
-	galleryCheck = CreateWindow(TEXT("BUTTON"), TEXT("gallery"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, baseX, baseY + (stepY * 6), buttonWidth, editSize, CheckBoxButtonGroup, (HMENU)IDC_GALLERY_CHECK, NULL, NULL);
-	galleryText = CreateWindow(TEXT("Edit"), TEXT(""), WS_CHILD | WS_VISIBLE | WS_BORDER, baseX * 25, baseY + (stepY * 6), 300, editSize, CheckBoxButtonGroup, (HMENU)IDC_GALLERY_TEXT, NULL, NULL);
+	galleryCheck = CreateWindow(TEXT("BUTTON"), TEXT("gallery"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, baseX, baseY + (stepY * 5), buttonWidth, editSize, CheckBoxButtonGroup, (HMENU)IDC_GALLERY_CHECK, NULL, NULL);
+	galleryText = CreateWindow(TEXT("Edit"), TEXT(""), WS_CHILD | WS_VISIBLE | WS_BORDER, baseX * 25, baseY + (stepY * 5), 300, editSize, CheckBoxButtonGroup, (HMENU)IDC_GALLERY_TEXT, NULL, NULL);
 
 	//metaCheck = CreateWindow(TEXT("BUTTON"), TEXT("Meta data"), WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, baseX, baseY + (stepY * 7), buttonWidth, editSize, CheckBoxButtonGroup, (HMENU)IDC_META_CHECK, NULL, NULL);
 	//metaText = CreateWindow(TEXT("Edit"), TEXT(""), WS_CHILD | WS_VISIBLE | WS_BORDER, baseX * 25, baseY + (stepY * 7), 300, editSize, CheckBoxButtonGroup, (HMENU)IDC_META_TEXT, NULL, NULL);
@@ -260,16 +322,8 @@ BOOL CheckInput(WPARAM wParam, std::string &output)
 	}
 	else if(wParam == IDC_EXECUTE_QUICK_QUERY_BTN)
 	{
-		std::string SQLQuery = "";
-	//	if (IsDlgButtonChecked(RadioButtonGroup, IDC_SELECT_RADIO))
-			SQLQuery += "SELECT path FROM galleries WHERE ";
-	//	else if (IsDlgButtonChecked(RadioButtonGroup, IDC_DELETE_RADIO))
-	//		SQLQuery += "DELETE FROM galleries WHERE ";
-
-
 		for (int i = 0; i < NUM_CHECKS; i++)
 		{
-
 			//if (IsDlgButtonChecked(CheckBoxButtonGroup, IDC_CATERGORY_CHECK + i))
 			{
 				char buffer[512] = { 0 };

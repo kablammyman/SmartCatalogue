@@ -1,6 +1,6 @@
-mainWorkingPath|D:\source\etc2Sourcetree\TestImages\
-DBPath|C:\Users\BSI\Documents\imgDB.db
-ignorePattern|D:\source\etc2Sourcetree\TestImages\
+mainWorkingPath|F:\porn\porno pics\
+DBPath|E:\documents\pornoDB.db
+ignorePattern|F:\porn\porno pics\
 CreateImageHashIP|127.0.0.1
 CreateImageHashPort|2346
 DataBaseManagerPort|2345

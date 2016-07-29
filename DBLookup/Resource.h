@@ -32,12 +32,11 @@
 #define IDC_WEBSITE_TEXT                    1012
 #define IDC_SUB_WEBSITE_TEXT                1013
 #define IDC_MODEL_FIRST_NAME_TEXT			1014
-#define IDC_MODEL_LAST_NAME_TEXT			1015
-#define IDC_GALLERY_TEXT					1016
-#define IDC_META_TEXT						1017
+#define IDC_GALLERY_TEXT					1015
+#define IDC_META_TEXT						1016
 
-#define IDC_SQLQUEREY_TEXT					1018
-#define IDM_LIST_VIEW_RESULTS				1019
+#define IDC_SQLQUEREY_TEXT					1017
+#define IDM_LIST_VIEW_RESULTS				1018
 
 #ifndef IDC_STATIC
 #define IDC_STATIC				-1

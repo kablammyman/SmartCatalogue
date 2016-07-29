@@ -61,8 +61,7 @@ class DatabaseDataParser
 	//maybe we can add spell check to this?
 	string getVerfiedWordFromGalleryName(string galleryName, string dbTableName);
 	int getEntryIDFromDBTable(string trable, string word);
-	//int getNameMarkerIndexInTokens(vector<string> & tokens);
-	//int isNameMarkerInTokens(vector<string> & tokens);
+
 public:
 	DatabaseDataParser();
 
@@ -75,16 +74,7 @@ public:
 	void transformSexToyAlias(string &phrase);
 	void fillTreeWords(vector<string> &meta);
 	
-	/*
-	bool addToField(string type) {
-	if(type == "Pantytypes")
-		doSomethingt...
-	}
-	*/
 	
-	void GetAllBadPaths();
-
 	void testNamelogic();
-	void testSpellchecker();
 	void testGalleryCalc();
 };
