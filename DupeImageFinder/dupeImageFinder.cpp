@@ -23,7 +23,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	CFGHelper::filePathBase = CommandLineUtils::GetExePath();
-	CFGHelper::loadCFGFile();
+	CFGHelper::LoadCFGFile();
 
 	// Initialize global strings
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);

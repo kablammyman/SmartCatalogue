@@ -100,15 +100,19 @@ bool DatabaseDataParser::getDBTableValues(string tableName)
 vector<string> DatabaseDataParser::splitModelName(string input)
 {
 	vector<string> names;
-	size_t foundSymbol;
-
-	foundSymbol = input.find('&');
-	if (foundSymbol != string::npos)
-		input.replace(foundSymbol, 1, ",");
-
-	foundSymbol = input.find(" and ");
-	if (foundSymbol != string::npos)
-		input.replace(foundSymbol, 5, ",");
+	size_t foundSymbol = string::npos;
+	do
+	{
+		foundSymbol = input.find('&');
+		if (foundSymbol != string::npos)
+		{
+			input.replace(foundSymbol, 1, ",");
+			continue;
+		}
+		foundSymbol = input.find(" And ");
+		if (foundSymbol != string::npos)
+			input.replace(foundSymbol, 5, ",");
+	}while(foundSymbol != string::npos);
 
 	names = StringUtils::Tokenize(input, ",");
 
@@ -122,37 +126,34 @@ vector<string> DatabaseDataParser::splitModelName(string input)
 //if the name contains a '-' or '_' that means the name has 2 in one. ex Jenna Von_Oy -> Von_Oy is 2 names for a last name
 vector<ModelName> DatabaseDataParser::doNameLogic(string allNames)
 {
+	StringUtils::ToProperNoun(allNames);
 	vector<string> modelNames = splitModelName(allNames);
 	vector<ModelName> nameVec;
 
-	//even thouh if theres 2 names, this wont work right, in the porn stars and am dirs, that cant happen, so we are safe
 	for (size_t i = 0; i < modelNames.size(); i++)
 	{
 		ModelName model;
+		//StringUtils::TrimWhiteSpace(modelNames[i]);
 		vector<string> names = StringUtils::Tokenize(modelNames[i], " ");
 		if (!names.empty())
 		{
-			StringUtils::ToProperNoun(names[0]);
-			//names[0][0] = toupper(names[0][0]);//capatolize the first letter of each name
 			model.firstName = names[0];
 		}
 		if (names.size() > 1)
 		{
-			bool useMiddleName = names.size() > 2 ? true : false;
 			for (size_t j = 1; j < names.size(); j++)
 			{
-				StringUtils::ToProperNoun(names[j]);
-				//names[j][0] = toupper(names[j][0]);//capatolize the first letter of each name
-				if (useMiddleName && j == 1)
+				if (j == 1 && names.size() > 2)
+				{
 					model.middleName = names[j];
-				else //we may have a 4 named person...? if so this should cover that
-					model.lastName += (names[j]+ " ");
+					continue;
+				}
+				if(j > 2)//we may have a 4 named person...? if so this should cover that
+					model.lastName += (" " + names[j]);
+				else 
+					model.lastName += (names[j]);
 			}
 		}
-		
-		//remove trailing white space i added
-		if(model.lastName != "")
-			model.lastName.resize(model.lastName.find_last_of(" "));
 
 		if (!model.firstName.empty())
 			nameVec.push_back(model);
@@ -514,8 +515,20 @@ void DatabaseDataParser::getAllPaths(string path, vector<string> &dirsWithImages
 /////////////////////////////////////////////////TESTS///////////////////////////////////////////
 void DatabaseDataParser::testNamelogic()
 {
-	string nameTestString = "first middle last, first2 last2, first3, first4 middle4 midle4-2 last4";
-	doNameLogic(nameTestString);
+	vector<string> nameTestStrings;
+	nameTestStrings.push_back("first middle last, first2 last2, first3, first4 middle4 midle4-2 last4");
+	nameTestStrings.push_back("Veronika Fasterova And Monika");
+	nameTestStrings.push_back("Riley Reid And carter Cruise");
+	nameTestStrings.push_back("verruca james and jessie andrews");
+	nameTestStrings.push_back("Elle Alexandra AND Leanna Decker");
+	nameTestStrings.push_back("Nikita Von James And Harmony");
+	nameTestStrings.push_back("Marketa Brymova And Veronica De Suasa");
+	nameTestStrings.push_back("Jazmine Cashmere & Kaylani Cream & Pleasure Unique & Kandy Kane & Subrina Love");
+	nameTestStrings.push_back("Sharon E And Jenya D");
+	nameTestStrings.push_back("Brigi And Melissa And Muriel And Suzie");
+
+	for(size_t i = 0; i < nameTestStrings.size();i++)
+		doNameLogic(nameTestStrings[i]);
 }
 
 
