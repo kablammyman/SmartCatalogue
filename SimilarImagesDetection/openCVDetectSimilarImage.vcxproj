@@ -159,7 +159,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(MY_X64_RELEASE_LIBS);C:\opencv\lib\Release\x64;C:\SQLite3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>StringUtils.lib;FileUtils.lib;WindowsUtils.lib;CommandLineUtils.lib;TCPUtils.lib;ws2_32.lib;sqlite3.lib;Shell32.lib;user32.lib;Gdi32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>StringUtils.lib;FileUtils.lib;WindowsUtils.lib;CommandLineUtils.lib;TCPUtils.lib;ws2_32.lib;sqlite3.lib;Shell32.lib;user32.lib;Gdi32.lib;opencv_core300.lib;opencv_imgproc300.lib;opencv_objdetect300.lib;opencv_imgcodecs300.lib;opencv_features2d300.lib;opencv_calib3d300.lib;opencv_highgui300.lib;opencv_ml300.lib;opencv_flann300.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

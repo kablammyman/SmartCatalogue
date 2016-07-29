@@ -10,7 +10,7 @@
 
 #include "similarImage.h"
 #include "FileUtils.h"
-#include "CommandLineUtils.h"
+#include "WindowsUtils.h"
 #include "StringUtils.h"
 #include "CFGHelper.h"
 
@@ -22,7 +22,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	CFGHelper::filePathBase = CommandLineUtils::GetExePath();
+	CFGHelper::filePathBase = WindowsUtils::GetEXEPath();
 	CFGHelper::LoadCFGFile();
 
 	// Initialize global strings
