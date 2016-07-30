@@ -280,7 +280,7 @@ void InitInputFields(HWND hDlg)
 	int buttonWidth = (baseX * 2) + 100;
 
 	SQLQureyTextHandle = hDlg;
-	CreateWindow(TEXT("Edit"), TEXT("SELECT path FROM galleries where modelFirstName = \"\""), WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | WS_BORDER, baseX, 30, 600, 20, hDlg, (HMENU)IDC_SQLQUEREY_TEXT, NULL, NULL);
+	CreateWindow(TEXT("Edit"), TEXT("SELECT ID FROM Models WHERE firstName = \"\""), WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | WS_BORDER, baseX, 30, 600, 20, hDlg, (HMENU)IDC_SQLQUEREY_TEXT, NULL, NULL);
 	CreateWindow(TEXT("BUTTON"), TEXT("Querey"), WS_VISIBLE | WS_CHILD, baseX, 60, 100, 30, hDlg, (HMENU)IDC_QUERY_BTN, NULL, NULL);
 
 	CheckBoxButtonGroup = CreateWindowEx(WS_EX_TRANSPARENT, TEXT("Button"), TEXT("Search Criteria"), WS_CHILD | WS_VISIBLE | BS_GROUPBOX, 2, baseY, 290, 450, hDlg, (HMENU)11, NULL, NULL);
@@ -317,7 +317,9 @@ BOOL CheckInput(WPARAM wParam, std::string &output)
 			x = GetLastError();
 			printf("error: %d", x);
 		}
+		results.clear();
 		dbCtrlr.executeSQL(buffer, output);
+		dbCtrlr.removeTableNameFromOutput(output, 1, 0, results);
 		return (INT_PTR)TRUE;
 	}
 	else if(wParam == IDC_EXECUTE_QUICK_QUERY_BTN)
