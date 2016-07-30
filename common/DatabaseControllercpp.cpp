@@ -338,22 +338,19 @@ void DatabaseController::removeTableNameFromOutput(string &inputData, int numCol
 	string delims = "|\n";
 	int counter = 1;
 	colToUse *= 2;
+	char *next_token;
+	vector<string> temp = StringUtils::Tokenize(inputData, delims);
 
-
-	char *p = strtok_s(const_cast<char *>(inputData.c_str()), delims.c_str(),NULL);
-
-	while (p)
+	for (size_t i = 0; i < temp.size(); i++)
 	{
 		if (counter == colToUse)
-			returnData.push_back(p);
+			returnData.push_back(temp[i]);
 		//x2 becasue it goes colName|data, we only want the data, not the col name
 		if (counter < (numCols * 2))
 			counter++;
 		else
 			counter = 1;
-		p = strtok_s(NULL, delims.c_str(),NULL);
 	}
-
 }
 void DatabaseController::removeTableNameFromOutput(string &inputData)
 {

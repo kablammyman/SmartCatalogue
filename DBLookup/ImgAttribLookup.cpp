@@ -319,7 +319,8 @@ BOOL CheckInput(WPARAM wParam, std::string &output)
 		}
 		results.clear();
 		dbCtrlr.executeSQL(buffer, output);
-		dbCtrlr.removeTableNameFromOutput(output, 1, 0, results);
+		//dbCtrlr.getAllValuesFromCol(combinedIDOutput, "ID", classifcationIDs);
+		dbCtrlr.removeTableNameFromOutput(output, 1, 1, results);
 		return (INT_PTR)TRUE;
 	}
 	else if(wParam == IDC_EXECUTE_QUICK_QUERY_BTN)
