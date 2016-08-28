@@ -21,7 +21,7 @@ bool DatabaseController::openDB(string path)
 	//prob should parse the path and seperate that from the name at some point
 	//right nopw, path should only eb the name of the db file
 	dbName = path;
-	db = new SQLiteDB(path);
+	db = new SQLiteUtils(path);
 	
 	string output;
 
@@ -75,7 +75,7 @@ bool DatabaseController::createNewDB(string newDBName, string createCommand)
 	fclose(pFile);*/
 
 	//create the new db
-	db = new SQLiteDB(newDBName);
+	db = new SQLiteUtils(newDBName);
 
 	//create the table, if we have a create command
 	if(createCommand != "")
@@ -338,7 +338,7 @@ void DatabaseController::removeTableNameFromOutput(string &inputData, int numCol
 	string delims = "|\n";
 	int counter = 1;
 	colToUse *= 2;
-	char *next_token;
+	
 	vector<string> temp = StringUtils::Tokenize(inputData, delims);
 
 	for (size_t i = 0; i < temp.size(); i++)

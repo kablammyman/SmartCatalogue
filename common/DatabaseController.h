@@ -3,12 +3,12 @@
 #include <string>
 #include <utility>      // std::pair
 #include <vector>
-#include "SQLiteDB.h"
+#include "SQLiteUtils.h"
 using namespace std;
 
 class DatabaseController
 {
-	SQLiteDB *db;
+	SQLiteUtils *db;
 	string dbName;
 	string dataGrabber(string &word, size_t &startPos);
 
