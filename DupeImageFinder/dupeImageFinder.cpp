@@ -481,7 +481,7 @@ void init(wstring path)
 	dbCtrlr.executeSQL(querey, output);
 	dbCtrlr.getDataPairFromOutput(output,"hash","MD5",hashes);
 	//dbCtrlr.removeTableNameFromOutput(output, 2, 1, 2, hashes);
-	progress.setRange(hashes.size());
+	progress.setRange((unsigned int)hashes.size());
 	thread d1(mainLogic);
 	dupeSearch = &d1;
 	dupeSearch->detach();
@@ -499,7 +499,7 @@ void mainLogic()
 	{
 		if (foundItems[hashes[i].second])
 		{
-			progress.updateProgressBar(i);
+			progress.updateProgressBar((int)i);
 			continue;
 		}
 		querey = "SELECT  Images.fileName, Gallery.path, Images.MD5 FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 != \"";

@@ -88,12 +88,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_WINDOWS_UTILS);$(MY_STRING_UTILS);$(MY_FILE_UTILS);..\sqlite3\src;..\common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_WINDOWS_UTILS);$(MY_STRING_UTILS);$(MY_FILE_UTILS);$(MY_SQLITE3_UTILS);..\common\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>FileUtils.lib;sqlite3.lib;StringUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FileUtils.lib;SQLiteUtils.lib;StringUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -103,13 +103,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_WINDOWS_UTILS);$(MY_STRING_UTILS);$(MY_FILE_UTILS);..\sqlite3\src;..\common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_WINDOWS_UTILS);$(MY_STRING_UTILS);$(MY_FILE_UTILS);$(MY_SQLITE3_UTILS);..\common\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>FileUtils.lib;sqlite3.lib;StringUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(MY_X64_DEBUG_LIBS);..\SQLite3\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>FileUtils.lib;SQLiteUtils.lib;StringUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(MY_X64_DEBUG_LIBS)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -121,14 +121,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_WINDOWS_UTILS);$(MY_STRING_UTILS);$(MY_FILE_UTILS);..\sqlite3\src;..\common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_WINDOWS_UTILS);$(MY_STRING_UTILS);$(MY_FILE_UTILS);$(MY_SQLITE3_UTILS);..\common\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>FileUtils.lib;sqlite3.lib;StringUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FileUtils.lib;SQLiteUtils.lib;StringUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -140,15 +140,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_WINDOWS_UTILS);$(MY_STRING_UTILS);$(MY_FILE_UTILS);..\sqlite3\src;..\common\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_WINDOWS_UTILS);$(MY_STRING_UTILS);$(MY_FILE_UTILS);$(MY_SQLITE3_UTILS);..\common\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>FileUtils.lib;sqlite3.lib;StringUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(MY_X64_RELEASE_LIBS);..\SQLite3\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>FileUtils.lib;SQLiteUtils.lib;StringUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(MY_X64_RELEASE_LIBS)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -160,7 +160,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\DatabaseControllercpp.cpp" />
-    <ClCompile Include="..\common\SQLiteDB.cpp" />
     <ClCompile Include="CreateNewDB.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>

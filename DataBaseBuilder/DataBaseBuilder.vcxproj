@@ -93,12 +93,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);..\SQLite3\src;..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);$(MY_SQLITE3_UTILS);..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>StringUtils.lib;FileUtils.lib;TCPUtils.lib;LogUtils.lib;HashUtils.lib;CFGUtils.lib;CommandLineUtils.lib;sqlite3.lib;ws2_32.lib;Advapi32.lib;Shell32.lib;user32.lib</AdditionalDependencies>
+      <AdditionalDependencies>StringUtils.lib;FileUtils.lib;TCPUtils.lib;LogUtils.lib;HashUtils.lib;CFGUtils.lib;CommandLineUtils.lib;SQLiteUtils.lib;ws2_32.lib;Advapi32.lib;Shell32.lib;user32.lib</AdditionalDependencies>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>
@@ -112,13 +112,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);..\SQLite3\src;..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);$(MY_SQLITE3_UTILS);..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(MY_X64_DEBUG_LIBS);..\SQLite3\lib\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>StringUtils.lib;FileUtils.lib;TCPUtils.lib;LogUtils.lib;HashUtils.lib;CFGUtils.lib;CommandLineUtils.lib;sqlite3.lib;ws2_32.lib;Advapi32.lib;Shell32.lib;user32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(MY_X64_DEBUG_LIBS)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>StringUtils.lib;FileUtils.lib;TCPUtils.lib;LogUtils.lib;HashUtils.lib;CFGUtils.lib;CommandLineUtils.lib;SQLiteUtils.lib;ws2_32.lib;Advapi32.lib;Shell32.lib;user32.lib</AdditionalDependencies>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>
@@ -134,14 +134,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);..\SQLite3\src;..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);$(MY_SQLITE3_UTILS);..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>StringUtils.lib;FileUtils.lib;TCPUtils.lib;LogUtils.lib;HashUtils.lib;CFGUtils.lib;CommandLineUtils.lib;sqlite3.lib;ws2_32.lib;Advapi32.lib;Shell32.lib;user32.lib</AdditionalDependencies>
+      <AdditionalDependencies>StringUtils.lib;FileUtils.lib;TCPUtils.lib;LogUtils.lib;HashUtils.lib;CFGUtils.lib;CommandLineUtils.lib;SQLiteUtils.lib;ws2_32.lib;Advapi32.lib;Shell32.lib;user32.lib</AdditionalDependencies>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>
@@ -157,15 +157,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);..\SQLite3\src;..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MY_CFG_UTILS);$(MY_FILE_UTILS);$(MY_HASH_UTILS);$(MY_LOG_UTILS);$(MY_TCP_UTILS);$(MY_COMMANDLINE_UTILS);$(MY_STRING_UTILS);$(MY_SQLITE3_UTILS);..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(MY_X64_RELEASE_LIBS);..\SQLite3\lib\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>StringUtils.lib;FileUtils.lib;TCPUtils.lib;LogUtils.lib;HashUtils.lib;CFGUtils.lib;CommandLineUtils.lib;sqlite3.lib;ws2_32.lib;Advapi32.lib;Shell32.lib;user32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(MY_X64_RELEASE_LIBS)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>StringUtils.lib;FileUtils.lib;TCPUtils.lib;LogUtils.lib;HashUtils.lib;CFGUtils.lib;CommandLineUtils.lib;SQLiteUtils.lib;ws2_32.lib;Advapi32.lib;Shell32.lib;user32.lib</AdditionalDependencies>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>
@@ -175,7 +175,6 @@
   <ItemGroup>
     <ClInclude Include="..\common\CFGHelper.h" />
     <ClInclude Include="..\common\DatabaseController.h" />
-    <ClInclude Include="..\common\SQLiteDB.h" />
     <ClInclude Include="..\common\WinToDBMiddleman.h" />
     <ClInclude Include="DataBaseBuilder.h" />
     <ClInclude Include="DatabaseDataParser.h" />
@@ -188,7 +187,6 @@
   <ItemGroup>
     <ClCompile Include="..\common\CFGHelper.cpp" />
     <ClCompile Include="..\common\DatabaseControllercpp.cpp" />
-    <ClCompile Include="..\common\SQLiteDB.cpp" />
     <ClCompile Include="..\common\WinToDBMiddleman.cpp" />
     <ClCompile Include="DatabaseBuilder.cpp" />
     <ClCompile Include="DataBaseManager.cpp" />
