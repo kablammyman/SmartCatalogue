@@ -62,9 +62,6 @@
     <ClCompile Include="DatabaseBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\DatabaseControllercpp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\WinToDBMiddleman.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

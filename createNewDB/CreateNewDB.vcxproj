@@ -108,7 +108,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>FileUtils.lib;SQLiteUtils.lib;StringUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FileUtils.lib;SQLiteUtils.lib;StringUtils.lib;sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(MY_X64_DEBUG_LIBS)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -147,7 +147,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>FileUtils.lib;SQLiteUtils.lib;StringUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FileUtils.lib;SQLiteUtils.lib;StringUtils.lib;sqlite3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(MY_X64_RELEASE_LIBS)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -159,7 +159,6 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\DatabaseControllercpp.cpp" />
     <ClCompile Include="CreateNewDB.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>

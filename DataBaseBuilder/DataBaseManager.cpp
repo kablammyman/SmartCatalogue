@@ -16,7 +16,6 @@
 #include "DataBaseBuilder.h"
 
 #include "CommandLineUtils.h"
-#include "CFGUtils.h"
 
 #include "WinToDBMiddleman.h"
 #include "CFGUtils.h"

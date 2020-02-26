@@ -181,7 +181,7 @@ string isClipboardImageInDB(string img, string dbPath)
 	querey += "',phash) < ";
 	querey += to_string(simImage.getMinHammingDist());
 	querey += ";";
-	db.executeSQL(querey, output);
+	db.DoDBQuerey(querey, output);
 	if (output.empty())
 		output = "no matches found";
 	

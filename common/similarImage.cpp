@@ -224,7 +224,7 @@ void SimilarImage::getAllImagePaths(string path, vector<string> & imgDirs)
 	FileUtils::AddDirTree(path,10);
 
 	vector<string> allDirs;
-	FileUtils::DumpTreeToVector(path, allDirs, true);
+	FileUtils::DumpTreeToVector(allDirs);
 	for (size_t i = 0; i < allDirs.size(); i++)
 	{
 		if (FileUtils::GetNumFilesInDir(allDirs[i]) != 0)

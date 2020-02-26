@@ -300,7 +300,7 @@ HTREEITEM AddItemToTree(HWND hwndTV, wchar_t* lpszItem, int nLevel)
 
 BOOL InitTreeViewItems(HWND hwndTV)
 {	
-	dbCtrlr.openDB(CFGHelper::dbPath);
+	dbCtrlr.OpenDB(CFGHelper::dbPath);
 	
 	wstring rootNodeOutput(CFGHelper::dbPath.begin(), CFGHelper::dbPath.end());
 	AddItemToTree(hwndTV, (LPTSTR)rootNodeOutput.c_str(), 1);
@@ -413,14 +413,14 @@ void addNewItemToTree(HWND hwndTV, string curMD5,  string quereyOutput)
 	HTREEITEM hti;
 	//put all dupes for this image in a list
 	vector<DatabaseController::dbDataPair> dupeList;
-	dbCtrlr.getDataPairFromOutput(quereyOutput, "fileName","path", dupeList);
+	dbCtrlr.GetDataPairFromOutput(quereyOutput, "fileName","path", dupeList);
 
 	//get the path and filename for current image
 	string querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID WHERE Images.MD5 = '";
 	querey += curMD5;
 	querey += "';";
 	string output;
-	dbCtrlr.executeSQL(querey, output);
+	dbCtrlr.ExecuteSQL(querey, output);
 
 	//not sure how this happens, but it does wqhen mulit thraded...
 	//oh...i see...this is why...lol
@@ -435,7 +435,7 @@ void addNewItemToTree(HWND hwndTV, string curMD5,  string quereyOutput)
 
 	//make this "branch" from the current image file name and path
 	vector<DatabaseController::dbDataPair> branchName;
-	dbCtrlr.getDataPairFromOutput(output,"fileName","path", branchName);
+	dbCtrlr.GetDataPairFromOutput(output,"fileName","path", branchName);
 	string imagePath = (branchName[0].second + branchName[0].first);
 	
 	string text = ("lastMatch: " + imagePath);
@@ -478,9 +478,9 @@ void init(wstring path)
 		querey += "\"));";
 	}
 	
-	dbCtrlr.executeSQL(querey, output);
-	dbCtrlr.getDataPairFromOutput(output,"hash","MD5",hashes);
-	//dbCtrlr.removeTableNameFromOutput(output, 2, 1, 2, hashes);
+	dbCtrlr.ExecuteSQL(querey, output);
+	dbCtrlr.GetDataPairFromOutput(output,"hash","MD5",hashes);
+	//dbCtrlr.RemoveTableNameFromOutput(output, 2, 1, 2, hashes);
 	progress.setRange((unsigned int)hashes.size());
 	thread d1(mainLogic);
 	dupeSearch = &d1;
@@ -509,15 +509,15 @@ void mainLogic()
 		querey += "\",hash) < ";
 		querey += to_string(/*simImage.getMinHammingDist() + 2*/ minHammingDist);
 		querey += ";";
-		dbCtrlr.executeSQL(querey, output);
+		dbCtrlr.ExecuteSQL(querey, output);
 		//we have a match
 		if (output.find("path|") != string::npos)
 		{
 			//thread newMatch(addNewItemToTree, hwndTreeView, hashes[i].second, output);
 			//newMatch.detach();
 			vector<string> dataToCache;
-			//dbCtrlr.removeTableNameFromOutput(output, 3, 3, dataToCache);
-			dbCtrlr.getAllValuesFromCol(output, "MD5", dataToCache);
+			//dbCtrlr.RemoveTableNameFromOutput(output, 3, 3, dataToCache);
+			dbCtrlr.GetAllValuesFromCol(output, "MD5", dataToCache);
 			addNewItemToTree(hwndTreeView, hashes[i].second, output);
 
 			foundItems[hashes[i].second] = true;

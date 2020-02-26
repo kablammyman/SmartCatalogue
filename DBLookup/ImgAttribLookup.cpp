@@ -39,8 +39,8 @@ string GetCategoryID(string name)
 {
 	string output;
 	string querey = "SELECT id FROM Category WHERE name = \""  + name +"\"";
-	dbCtrlr.executeSQL(querey, output);
-	dbCtrlr.removeTableNameFromOutput(output);
+	dbCtrlr.ExecuteSQL(querey, output);
+	dbCtrlr.RemoveTableNameFromOutput(output);
 	idResults.CategoryID = output;
 
 	return output;
@@ -50,8 +50,8 @@ string GetWebsiteID(std::string name)
 	string output;
 	StringUtils::ToProperNoun(name);
 	string querey = "SELECT id FROM Website WHERE name = \"" + name + "\"";
-	dbCtrlr.executeSQL(querey, output);
-	dbCtrlr.removeTableNameFromOutput(output);
+	dbCtrlr.ExecuteSQL(querey, output);
+	dbCtrlr.RemoveTableNameFromOutput(output);
 	idResults.WebsiteID = output;
 
 	return output;
@@ -61,8 +61,8 @@ string GetSubWebsiteID(string name)
 	string output;
 	StringUtils::ToProperNoun(name);
 	string querey = "SELECT id FROM SubWebsite WHERE name = \"" + name + "\"";
-	dbCtrlr.executeSQL(querey, output);
-	dbCtrlr.removeTableNameFromOutput(output);
+	dbCtrlr.ExecuteSQL(querey, output);
+	dbCtrlr.RemoveTableNameFromOutput(output);
 	idResults.SubWebsiteID = output;
 
 	return output;
@@ -72,8 +72,8 @@ string GetGalleryID(string name)
 {
 	string output;
 	string querey = "Select ID from Gallery WHERE galleryName LIKE \"%" + name + "%\"";
-	dbCtrlr.executeSQL(querey, output);
-	dbCtrlr.getAllValuesFromCol(output, "ID", idResults.GalleryID);
+	dbCtrlr.ExecuteSQL(querey, output);
+	dbCtrlr.GetAllValuesFromCol(output, "ID", idResults.GalleryID);
 	return name;
 }
 
@@ -107,8 +107,8 @@ string GetModelID(string name)
 			modelQuerey.push_back(make_pair("middleName", ""));
 			modelQuerey.push_back(make_pair("lastName", ""));
 		}
-		dbCtrlr.doDBQuerey("Models", "ID",modelQuerey, output);
-		dbCtrlr.removeTableNameFromOutput(output);
+		dbCtrlr.DoDBQuerey("Models", "ID",modelQuerey, output);
+		dbCtrlr.RemoveTableNameFromOutput(output);
 		quereyResults.push_back(output);
 	}
 	
@@ -141,8 +141,8 @@ void DoLookupFromIDs(vector<string> &results)
 	if (!combinedIDQuerey.empty())
 	{
 		idTypes++;
-		dbCtrlr.doDBQuerey("Gallery", "ID", combinedIDQuerey, combinedIDOutput);
-		dbCtrlr.getAllValuesFromCol(combinedIDOutput, "ID", classifcationIDs);
+		dbCtrlr.DoDBQuerey("Gallery", "ID", combinedIDQuerey, combinedIDOutput);
+		dbCtrlr.GetAllValuesFromCol(combinedIDOutput, "ID", classifcationIDs);
 		
 		if (!idResults.GalleryID.empty())
 		{
@@ -182,15 +182,15 @@ void DoLookupFromIDs(vector<string> &results)
 			whereData.first = "ModelID";
 			whereData.second = idResults.ModelID[i];
 			string modelOutput;
-			dbCtrlr.doDBQuerey("ModelsInGallery", "GalleryID", whereData, modelOutput);
+			dbCtrlr.DoDBQuerey("ModelsInGallery", "GalleryID", whereData, modelOutput);
 			
 
 			if(i == 0 || combineGalleries)
-				dbCtrlr.getAllValuesFromCol(modelOutput, "galleryID", modelGalleries);
+				dbCtrlr.GetAllValuesFromCol(modelOutput, "galleryID", modelGalleries);
 			else
 			{
 				vector<string> curModelGal;
-				dbCtrlr.getAllValuesFromCol(modelOutput, "galleryID", curModelGal);
+				dbCtrlr.GetAllValuesFromCol(modelOutput, "galleryID", curModelGal);
 				
 				//we found no galelries for this model, so theres no way a gallery with both models can exist
 				if (curModelGal.empty())
@@ -245,8 +245,8 @@ void DoLookupFromIDs(vector<string> &results)
 	finalQuerey += (StringUtils::FlattenVector((*galleryData)) + ")");
 	
 	string finalOut;
-	dbCtrlr.executeSQL(finalQuerey, finalOut);
-	dbCtrlr.getAllValuesFromCol(finalOut, "path", results);
+	dbCtrlr.ExecuteSQL(finalQuerey, finalOut);
+	dbCtrlr.GetAllValuesFromCol(finalOut, "path", results);
 
 
 		
@@ -318,9 +318,9 @@ BOOL CheckInput(WPARAM wParam, std::string &output)
 			printf("error: %d", x);
 		}
 		results.clear();
-		dbCtrlr.executeSQL(buffer, output);
-		//dbCtrlr.getAllValuesFromCol(combinedIDOutput, "ID", classifcationIDs);
-		dbCtrlr.removeTableNameFromOutput(output, 1, 1, results);
+		dbCtrlr.ExecuteSQL(buffer, output);
+		//dbCtrlr.GetAllValuesFromCol(combinedIDOutput, "ID", classifcationIDs);
+		dbCtrlr.RemoveTableNameFromOutput(output, 1, 1, results);
 		return (INT_PTR)TRUE;
 	}
 	else if(wParam == IDC_EXECUTE_QUICK_QUERY_BTN)
