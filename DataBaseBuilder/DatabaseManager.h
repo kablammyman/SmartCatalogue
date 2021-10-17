@@ -12,7 +12,9 @@
 #include <condition_variable>
 
 #include "CFGHelper.h"
-#include "TCPUtils.h"
+
+
+
 #include "CommandLineUtils.h"
 #include "LogRouter.h"
 
@@ -30,7 +32,7 @@ HANDLE				  hDir = NULL;
 HANDLE				  hCreateImageHashProc = NULL;
 
 
-TCPUtils *tcpOut = NULL;
+
 
 VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv);
 VOID WINAPI ServiceCtrlHandler(DWORD);
@@ -40,7 +42,11 @@ int doDirWatch(void);
 int doMainWorkerThread(void);
 
 queue<CmdArg> tasks;
-TCPUtils conn;
+
+
+//TCPServer server;
+//Client conn;
+//TCPServer conn;
 LogRouter logRouter;
 
 bool isService = true;
@@ -204,7 +210,7 @@ void StartAndConnectToCreateImageHash()
 	Sleep(1000);
 
 	//now try to connect to it
-	createImageHashSocket = conn.connectToServer(CFGHelper::CreateImageHashIP, CFGHelper::CreateImageHashPort);
+	//createImageHashSocket = conn.ConnectToServer(CFGHelper::CreateImageHashIP.c_str(), CFGHelper::CreateImageHashPort.c_str());
 	g_hasConnections = true;
 	networkThread = new thread(doNetWorkCommunication); 
 }
@@ -214,7 +220,7 @@ void ShutdownCreateImageHash()
 	if(hCreateImageHashProc == NULL)
 		return;
 	
-	conn.sendData(createImageHashSocket,"-exit");
+	//conn.SendDataTCP(createImageHashSocket,"-exit");
 	createImageHashSocket = -1;
 	hCreateImageHashProc = NULL;
 }
@@ -233,6 +239,6 @@ void SendReportBackOriginator(string msg, int dest)
 {
 	if(dest == -1)
 		logRouter.Log(LOG_LEVEL_INFORMATIONAL, msg);
-	else
-		conn.sendData(dest, msg.c_str());
+	//else
+	//	conn.SendDataTCP(dest, msg.c_str());
 }

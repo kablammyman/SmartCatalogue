@@ -37,7 +37,7 @@ struct ModelName
 	string firstName;
 	string lastName;
 	string middleName; //for names like "Carmen Del Ray"
-	int dbID; //used when collecting\inserting data
+	int dbID = -1; //used when collecting\inserting data
 };
 
 //gernal model database
@@ -55,8 +55,8 @@ struct GalleryModel
 {
 	ModelName name;
 	vector <ClothingItem> outfit;
-	int sexActionIndex;
-	int hairColorIndex; //uses colors.color
+	int sexActionIndex = 0;
+	int hairColorIndex = 0; //uses colors.color
 	
 	/*
 	int nude; // 0 = no, 1 = strips, 2 = started nude? 
@@ -76,6 +76,6 @@ struct GalleryData
 	string galleryName;
 	string category;
 	string keywords;
-	int dbID; //used when collecting\inserting data
+	int dbID = -1; //used when collecting\inserting data
 };
 

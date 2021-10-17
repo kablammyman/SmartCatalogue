@@ -15,8 +15,8 @@ public:
 	static string ignorePattern;
 	static vector<string> meta;
 	static string CreateImageHashIP;
-	static int CreateImageHashPort;
-	static int DataBaseManagerPort;
+	static string CreateImageHashPort;
+	static string DataBaseManagerPort;
 	static string DataBaseManagerIP;
 	
 	static bool LoadCFGFile(string programBasePath = "");

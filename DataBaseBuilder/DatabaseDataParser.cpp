@@ -25,13 +25,13 @@ void DatabaseDataParser::setDBController(DatabaseController *dbc)
 bool DatabaseDataParser::fillPartOfSpeechTable(string pofTableName)
 {
 	int numCol = 2;
-	string result = dbCtrl->getTable(pofTableName);
+	string result = dbCtrl->GetTable(pofTableName);
 
 	if (result == "")
 		return false;
 
 	vector<vector<string>> table; 
-	dbCtrl->parseDBOutput(result, numCol, table);
+	dbCtrl->ParseDBOutput(result, numCol, table);
 
 	if (table.size() < (size_t)numCol)
 		return false;
@@ -58,13 +58,13 @@ bool DatabaseDataParser::fillPartOfSpeechTable(string pofTableName)
 bool DatabaseDataParser::getDBTableValues(string tableName)
 {
 	int numCol = 2;
-	string result = dbCtrl->getTable(tableName);
+	string result = dbCtrl->GetTable(tableName);
 
 	if (result == "")
 		return false;
 
 	vector<vector<string>> table;  
-	dbCtrl->parseDBOutput(result, numCol,table);
+	dbCtrl->ParseDBOutput(result, numCol,table);
 	
 	if (table.size() < (size_t)numCol)
 		return false;

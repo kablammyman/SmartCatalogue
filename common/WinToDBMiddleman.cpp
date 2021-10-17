@@ -1,4 +1,4 @@
-#include "Windows.h"
+#include <Windows.h>
 #include "WinToDBMiddleman.h"
 #include "FileUtils.h"
 
@@ -48,7 +48,7 @@ bool WinToDBMiddleman::DeleteImageFromDB(string image, string &output)
 	querey += FileUtils::GetPathFromFullyQualifiedPathString(image);
 	querey += "\\\");"; //the DB has the back slashes in the path, so i need to include them here
 
-	dbCtrlr->executeSQL(querey, output);
+	dbCtrlr->ExecuteSQL(querey, output);
 	//cout << output << endl;
 	if (output.empty())
 		return true;
@@ -68,11 +68,11 @@ int WinToDBMiddleman::GetGalleryIDFromPath(string path)
 {
 	string output;
 	string querey = GetGalleryIDQuereyStringFromPath(path);
-	dbCtrlr->executeSQL(querey, output);
+	dbCtrlr->ExecuteSQL(querey, output);
 	
 	if(output.empty())
 		return -1;
-	dbCtrlr->removeTableNameFromOutput(output);
+	dbCtrlr->RemoveTableNameFromOutput(output);
 	//get rid of new line
 	output.pop_back();
 	int x = atoi(output.c_str());
@@ -89,10 +89,10 @@ bool WinToDBMiddleman::MoveImageOnDB(string dest, string src)
 	querey += ") AND fileName = \"";
 	querey += FileUtils::GetFileNameFromPathString(src);
 	querey += "\";";
-	dbCtrlr->executeSQL(querey, output);
+	dbCtrlr->ExecuteSQL(querey, output);
 
 	vector<string> oldPathResult;
-	dbCtrlr->getAllValuesFromCol(output, "MD5", oldPathResult);
+	dbCtrlr->GetAllValuesFromCol(output, "MD5", oldPathResult);
 
 
 	querey = "UPDATE Images Set Images.galleryID = (";
@@ -100,7 +100,7 @@ bool WinToDBMiddleman::MoveImageOnDB(string dest, string src)
 	querey += ") WHERE MD5 IS \"";
 	querey += oldPathResult[0];
 	querey += "\";"; //the DB has the back slashes in the path, so i need to include them here
-	dbCtrlr->executeSQL(querey, output);
+	dbCtrlr->ExecuteSQL(querey, output);
 	//cout << output << endl;
 	if (output.empty())
 		return true;
@@ -159,7 +159,7 @@ bool WinToDBMiddleman::DeleteGalleryFromDB(string gallery, string &output)
 	querey += gallery;
 	querey += "\";";
 
-	dbCtrlr->executeSQL(querey, output);
+	dbCtrlr->ExecuteSQL(querey, output);
 	
 	if (!output.empty())
 	{
@@ -175,7 +175,7 @@ bool WinToDBMiddleman::DeleteGalleryFromDB(string gallery, string &output)
 	querey += gallery;
 	querey += "\\\";";
 
-	dbCtrlr->executeSQL(querey, output);
+	dbCtrlr->ExecuteSQL(querey, output);
 
 	if (!output.empty())
 	{
@@ -208,7 +208,7 @@ bool WinToDBMiddleman::DeleteGalleryAndImagesFromDB(string gallery, string &outp
 	querey += FileUtils::GetPathFromFullyQualifiedPathString(gallery);
 	querey += "\\\");";
 
-	dbCtrlr->executeSQL(querey, output);
+	dbCtrlr->ExecuteSQL(querey, output);
 	if(!output.empty())
 		return false;
 
@@ -231,7 +231,7 @@ bool WinToDBMiddleman::MoveGalleryOnDB(string dest, string src)
 
 	//gotta see if this location exists already, if not, we have to create it
 	string getDest = GetGalleryIDQuereyStringFromPath(dest);
-	dbCtrlr->executeSQL(querey, output);
+	dbCtrlr->ExecuteSQL(querey, output);
 
 	//if the new gallery path doesnt exist, create it now!
 	if (output.empty())
@@ -244,13 +244,13 @@ bool WinToDBMiddleman::MoveGalleryOnDB(string dest, string src)
 	querey += " WHERE galleryID = ";
 	querey += GetGalleryIDQuereyStringFromPath(src);
 	querey += ";";
-	dbCtrlr->executeSQL(querey, output);
+	dbCtrlr->ExecuteSQL(querey, output);
 
 	querey = "delete FROM Gallery where path = \"";
 	querey += FileUtils::GetPathFromFullyQualifiedPathString(src);
 	querey += "\\\";";
 
-	dbCtrlr->executeSQL(querey, output);
+	dbCtrlr->ExecuteSQL(querey, output);
 	if (output.empty())
 		return true;
 	return false;

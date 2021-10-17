@@ -173,7 +173,7 @@ int main(int argc, const char *argv[])
 				vector<DatabaseController::dbDataPair> entry;
 				entry.push_back(make_pair(colNames[0], id));
 				entry.push_back(make_pair(colNames[1], value));
-				dbCtrlr.insertNewDataEntry(tableName,entry, output);
+				dbCtrlr.InsertNewDataEntry(tableName,entry, output);
 				if(!output.empty())
 					cout << "error: " << output << endl;
 			}

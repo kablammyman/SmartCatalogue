@@ -15,12 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DatabaseDataParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -36,23 +30,14 @@
     <ClInclude Include="DatabaseManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\DatabaseController.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\WinToDBMiddleman.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\CFGHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\SQLiteDB.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DatabaseDataParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -65,16 +50,10 @@
     <ClCompile Include="DatabaseBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\DatabaseControllercpp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\WinToDBMiddleman.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\common\CFGHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\SQLiteDB.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

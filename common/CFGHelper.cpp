@@ -7,8 +7,8 @@ string CFGHelper::dbPath;
 string CFGHelper::pathToProcess;
 string CFGHelper::ignorePattern;
 string CFGHelper::CreateImageHashIP;
-int CFGHelper::CreateImageHashPort;
-int CFGHelper::DataBaseManagerPort;
+string CFGHelper::CreateImageHashPort;
+string CFGHelper::DataBaseManagerPort;
 string CFGHelper::DataBaseManagerIP;
 vector<string> CFGHelper::meta;
 
@@ -51,9 +51,9 @@ bool CFGHelper::LoadCFGFile(string programBasePath)
 	ignorePattern = CFGUtils::GetCfgStringValue("ignorePattern");
 	meta = CFGUtils::GetCfgListValue("metaWords");
 	CreateImageHashIP = CFGUtils::GetCfgStringValue("CreateImageHashIP");
-	CreateImageHashPort = CFGUtils::GetCfgIntValue("CreateImageHashPort");
+	CreateImageHashPort = CFGUtils::GetCfgStringValue("CreateImageHashPort");
 	DataBaseManagerIP = CFGUtils::GetCfgStringValue("DataBaseManagerIP");
-	DataBaseManagerPort = CFGUtils::GetCfgIntValue("DataBaseManagerPort");
+	DataBaseManagerPort = CFGUtils::GetCfgStringValue("DataBaseManagerPort");
 	return true;
 }
 //check to make sure everything loaded
@@ -84,12 +84,14 @@ bool CFGHelper::IsCFGComplete(string &err)
 		err = "DataBaseManagerIP is missing";
 		return false;
 	}
-	if (CreateImageHashPort < 1000)
+	int portCheck = atoi(CreateImageHashPort.c_str());
+	if (portCheck < 1000)
 	{
 		err = "CreateImageHashPort is missing or is less than 1000";
 		return false;
 	}
-	if (DataBaseManagerPort < 1000)
+	portCheck = atoi(DataBaseManagerPort.c_str());
+	if (portCheck < 1000)
 	{
 		err = "DataBaseManagerPort is missing or is less than 1000";
 		return false;

@@ -8,7 +8,7 @@
 
 DatabaseBuilder::DatabaseBuilder(string dbPath,string root)
 {
-	dbCtrlr.openDB(dbPath);
+	dbCtrlr.OpenDB(dbPath);
 	dbDataParser.setDBController(&dbCtrlr);
 
 	WinToDBMiddleman::SetDBController(&dbCtrlr);
@@ -41,20 +41,6 @@ bool DatabaseBuilder::ParsePath(string curDir, GalleryData galleryData, string e
 	return dbDataParser.calcGalleryData(curDir, rootPath, galleryData, err);
 }
 //---------------------------------------------------------------------------------------------------------
-int DatabaseBuilder::GetLatestID()
-{
-	string output;
-	//get the id that was just created from the insert
-	dbCtrlr.executeSQL("SELECT last_insert_rowid()", output);
-	//othe ouput looks like: last_insert_rowid()|6
-
-	size_t found = output.find_last_of("|");
-	string rowID = output.substr(found + 1);
-	return atoi(rowID.c_str());
-}
-
-
-//---------------------------------------------------------------------------------------------------------
 int DatabaseBuilder::InsertCategoryInfoIntoDB(GalleryData &galleryData)
 {
 	//add the model to gallery info
@@ -62,7 +48,7 @@ int DatabaseBuilder::InsertCategoryInfoIntoDB(GalleryData &galleryData)
 	vector<DatabaseController::dbDataPair> categoryQuerey;
 	categoryQuerey.push_back(make_pair("ID", ""));
 	categoryQuerey.push_back(make_pair("name", galleryData.category));
-	dbCtrlr.doDBQuerey("Category", categoryQuerey, output);
+	dbCtrlr.DoDBQuerey("Category", categoryQuerey, output);
 	//empty output means there name wasnt found
 	if (!output.empty())
 	{
@@ -72,13 +58,13 @@ int DatabaseBuilder::InsertCategoryInfoIntoDB(GalleryData &galleryData)
 			return -1;
 		}
 		vector <vector<string>> categoryInfo; 
-		dbCtrlr.parseDBOutput(output, 2, categoryInfo);
+		dbCtrlr.ParseDBOutput(output, 2, categoryInfo);
 		return atoi(categoryInfo[0][0].c_str());
 	}
 
 	vector<DatabaseController::dbDataPair> categoryInfo;
 	categoryInfo.push_back(make_pair("name", galleryData.category));
-	dbCtrlr.insertNewDataEntry("Category", categoryInfo, output);
+	dbCtrlr.InsertNewDataEntry("Category", categoryInfo, output);
 
 	if (!output.empty())
 	{
@@ -99,7 +85,7 @@ int DatabaseBuilder::InsertWebsiteInfoIntoDB(GalleryData &galleryData, int categ
 	websiteQuerey.push_back(make_pair("ID", ""));
 	websiteQuerey.push_back(make_pair("name", galleryData.websiteName));
 	websiteQuerey.push_back(make_pair("path", path));
-	dbCtrlr.doDBQuerey("Website", websiteQuerey, output);
+	dbCtrlr.DoDBQuerey("Website", websiteQuerey, output);
 
 	//empty output means there name wasnt found
 	if (!output.empty())
@@ -110,7 +96,7 @@ int DatabaseBuilder::InsertWebsiteInfoIntoDB(GalleryData &galleryData, int categ
 			return -1;
 		}
 		vector <vector<string>> websiteInfo;
-		dbCtrlr.parseDBOutput(output, 2, websiteInfo);
+		dbCtrlr.ParseDBOutput(output, 2, websiteInfo);
 		return atoi(websiteInfo[0][0].c_str());
 	}
 
@@ -119,7 +105,7 @@ int DatabaseBuilder::InsertWebsiteInfoIntoDB(GalleryData &galleryData, int categ
 	dbWebInfo.push_back(make_pair("path", path));
 	dbWebInfo.push_back(make_pair("name", galleryData.websiteName));
 	dbWebInfo.push_back(make_pair("categoryID", to_string(categoryID)));
-	dbCtrlr.insertNewDataEntry("Website", dbWebInfo, output);
+	dbCtrlr.InsertNewDataEntry("Website", dbWebInfo, output);
 	if (!output.empty())
 	{
 		logRouter->Log(LOG_LEVEL_ERROR, "website input error " + output + ("website = " + galleryData.websiteName + "\npath = " + galleryData.path));
@@ -144,7 +130,7 @@ int DatabaseBuilder::InsertSubWebsiteInfoIntoDB(GalleryData &galleryData, int we
 	subWebsiteQuerey.push_back(make_pair("name", galleryData.subWebsiteName));
 	subWebsiteQuerey.push_back(make_pair("path", path));
 	subWebsiteQuerey.push_back(make_pair("ParentID", to_string(websiteID)));
-	dbCtrlr.doDBQuerey("SubWebsite", subWebsiteQuerey, output);
+	dbCtrlr.DoDBQuerey("SubWebsite", subWebsiteQuerey, output);
 
 	if (!output.empty())
 	{
@@ -154,7 +140,7 @@ int DatabaseBuilder::InsertSubWebsiteInfoIntoDB(GalleryData &galleryData, int we
 			return -1;
 		}
 		vector <vector<string>> modelsInDB; 
-		dbCtrlr.parseDBOutput(output, 2, modelsInDB);
+		dbCtrlr.ParseDBOutput(output, 2, modelsInDB);
 		return atoi(modelsInDB[0][0].c_str());
 	}
 
@@ -162,7 +148,7 @@ int DatabaseBuilder::InsertSubWebsiteInfoIntoDB(GalleryData &galleryData, int we
 	dbSubWebInfo.push_back(make_pair("path", path));
 	dbSubWebInfo.push_back(make_pair("name", galleryData.subWebsiteName));
 	dbSubWebInfo.push_back(make_pair("ParentID", to_string(websiteID)));
-	dbCtrlr.insertNewDataEntry("SubWebsite", dbSubWebInfo, output);
+	dbCtrlr.InsertNewDataEntry("SubWebsite", dbSubWebInfo, output);
 
 	if (!output.empty())
 	{
@@ -180,7 +166,7 @@ int DatabaseBuilder::InsertGalleryInfoIntoDB(GalleryData &galleryData, int websi
 	galleryeQuerey.push_back(make_pair("ID", ""));
 	galleryeQuerey.push_back(make_pair("galleryName", galleryData.galleryName));
 	galleryeQuerey.push_back(make_pair("path", galleryData.path));
-	dbCtrlr.doDBQuerey("Gallery", galleryeQuerey, output);
+	dbCtrlr.DoDBQuerey("Gallery", galleryeQuerey, output);
 
 	if (!output.empty())
 	{
@@ -190,7 +176,7 @@ int DatabaseBuilder::InsertGalleryInfoIntoDB(GalleryData &galleryData, int websi
 			return -1;
 		}
 		vector <vector<string>> modelsInDB; 
-		dbCtrlr.parseDBOutput(output, 2, modelsInDB);
+		dbCtrlr.ParseDBOutput(output, 2, modelsInDB);
 		return atoi(modelsInDB[0][0].c_str());
 	}
 
@@ -201,7 +187,7 @@ int DatabaseBuilder::InsertGalleryInfoIntoDB(GalleryData &galleryData, int websi
 	dbGalleryInfo.push_back(make_pair("WebsiteID", to_string(websiteID)));
 	dbGalleryInfo.push_back(make_pair("SubWebsiteID", to_string(subWebsiteID)));
 	dbGalleryInfo.push_back(make_pair("categoryID", to_string(categoryID)));
-	dbCtrlr.insertNewDataEntry("Gallery", dbGalleryInfo, output);
+	dbCtrlr.InsertNewDataEntry("Gallery", dbGalleryInfo, output);
 	if (!output.empty())
 	{
 		logRouter->Log(LOG_LEVEL_ERROR, "gallery input error " + output + ("gallery = " + galleryData.galleryName + "\npath = " + galleryData.path));
@@ -219,7 +205,7 @@ bool DatabaseBuilder::InsertModelInfoIntoDB(GalleryModel &model)
 	modelQuerey.push_back(make_pair("firstName", model.name.firstName));
 	modelQuerey.push_back(make_pair("middleName", model.name.middleName));
 	modelQuerey.push_back(make_pair("lastName", model.name.lastName));
-	dbCtrlr.doDBQuerey("Models", modelQuerey, output);
+	dbCtrlr.DoDBQuerey("Models", modelQuerey, output);
 
 	//empty output means there name wasnt found
 	if (!output.empty())
@@ -230,7 +216,7 @@ bool DatabaseBuilder::InsertModelInfoIntoDB(GalleryModel &model)
 			return false;
 		}
 		vector <vector<string>> modelsInDB; 
-		dbCtrlr.parseDBOutput(output, 3, modelsInDB);
+		dbCtrlr.ParseDBOutput(output, 3, modelsInDB);
 		model.name.dbID = atoi(modelsInDB[0][0].c_str());
 		return true;
 	}
@@ -240,7 +226,7 @@ bool DatabaseBuilder::InsertModelInfoIntoDB(GalleryModel &model)
 	dbModelInfo.push_back(make_pair("firstName", model.name.firstName));
 	dbModelInfo.push_back(make_pair("middleName", model.name.middleName));
 	dbModelInfo.push_back(make_pair("lastName", model.name.lastName));
-	dbCtrlr.insertNewDataEntry("Models", dbModelInfo, output);
+	dbCtrlr.InsertNewDataEntry("Models", dbModelInfo, output);
 
 	if (!output.empty())
 	{
@@ -263,7 +249,7 @@ bool DatabaseBuilder::InsertModelOutfitInfoIntoDB(GalleryModel &model, size_t cl
 	dbOutfitInfo.push_back(make_pair("PrintID", to_string(model.outfit[clothingIndex].ClothingPrintIndex)));
 	dbOutfitInfo.push_back(make_pair("ModelID", to_string(model.name.dbID)));
 	dbOutfitInfo.push_back(make_pair("GalleryID", to_string(galleryID)));
-	dbCtrlr.insertNewDataEntry("Outfit", dbOutfitInfo, output);
+	dbCtrlr.InsertNewDataEntry("Outfit", dbOutfitInfo, output);
 	if (!output.empty())
 	{
 		logRouter->Log(LOG_LEVEL_ERROR, "model outfit input error "+ output+ ("model = " + model.name.firstName + " " + model.name.middleName + " " + model.name.lastName + "\ngalleryID = " + to_string(galleryID)));
@@ -281,7 +267,7 @@ bool DatabaseBuilder::InsertImageHashInfoIntoDB(string imgeFileName, string hash
 	dbImgInfo.push_back(make_pair("phash", phash));
 	dbImgInfo.push_back(make_pair("MD5", md5));
 	dbImgInfo.push_back(make_pair("galleryID", to_string(galleryID)));
-	dbCtrlr.insertNewDataEntry("Images", dbImgInfo, output);
+	dbCtrlr.InsertNewDataEntry("Images", dbImgInfo, output);
 
 	if (!output.empty())
 	{
@@ -303,7 +289,7 @@ bool DatabaseBuilder::InsertImageHashInfoIntoDB(string imgeFileName, string md5,
 	dbImgInfo.push_back(make_pair("fileName", imgeFileName));
 	dbImgInfo.push_back(make_pair("MD5", md5));
 	dbImgInfo.push_back(make_pair("galleryID", to_string(galleryID)));
-	dbCtrlr.insertNewDataEntry("Images", dbImgInfo, output);
+	dbCtrlr.InsertNewDataEntry("Images", dbImgInfo, output);
 
 	if (!output.empty())
 	{
@@ -327,7 +313,7 @@ bool DatabaseBuilder::AddHashDataToDB(string imgeFileName, string hash, string p
 
 	vector<DatabaseController::dbDataPair> imgQuerey;
 	imgQuerey.push_back(make_pair("fileName", fileName));
-	dbCtrlr.doDBQuerey("Images", imgQuerey, output);
+	dbCtrlr.DoDBQuerey("Images", imgQuerey, output);
 
 	//empty output means there name wasnt found
 	if (!output.empty())
@@ -363,7 +349,7 @@ bool DatabaseBuilder::InsertModelsInGalleryInfoIntoDB(int modelID, int galleryID
 	vector<DatabaseController::dbDataPair> modelsInGalleryInfo;
 	modelsInGalleryInfo.push_back(make_pair("modelID", to_string(modelID)));
 	modelsInGalleryInfo.push_back(make_pair("galleryID", to_string(galleryID)));
-	dbCtrlr.insertNewDataEntry("ModelsInGallery", modelsInGalleryInfo, output);
+	dbCtrlr.InsertNewDataEntry("ModelsInGallery", modelsInGalleryInfo, output);
 
 	if (!output.empty())
 		return false;
@@ -378,7 +364,7 @@ bool DatabaseBuilder::IsImageInDB(int galleryID, string md5Hash)
 	imageQuerey.push_back(make_pair("MD5", md5Hash));
 	imageQuerey.push_back(make_pair("galleryID", to_string(galleryID)));
 
-	dbCtrlr.doDBQuerey("Images", imageQuerey, output);
+	dbCtrlr.DoDBQuerey("Images", imageQuerey, output);
 
 	if (!output.empty())
 	{
@@ -413,8 +399,8 @@ void DatabaseBuilder::VerifyDB(string root)
 		//now get all the galleries in the currentDB
 		string querey, output;
 		querey = ("SELECT path FROM Gallery WHERE path LIKE \"" + root + "%\"");
-		dbCtrlr.executeSQL(querey, output);
-		dbCtrlr.getAllValuesFromCol(output,"path", dbPAths);
+		dbCtrlr.ExecuteSQL(querey, output);
+		dbCtrlr.GetAllValuesFromCol(output,"path", dbPAths);
 		sort(dbPAths.begin(), dbPAths.end());
 	});
 
@@ -550,7 +536,7 @@ bool DatabaseBuilder::AddDirToDB(string curDir, bool doImageHash)
 	return true;
 }
 
-bool DatabaseBuilder::RequestImageHashesForDir(string galleryPath,int galleryID, TCPUtils *conn, int connIndex)
+bool DatabaseBuilder::RequestImageHashesForDir(string galleryPath,int galleryID, /*NetUtils *conn,*/ int connIndex)
 {
 	vector<string> imgFiles = FileUtils::GetAllFileNamesInDir(galleryPath);
 
@@ -568,12 +554,12 @@ bool DatabaseBuilder::RequestImageHashesForDir(string galleryPath,int galleryID,
 		//createImageHash should send back the hashes and the file path they are made from
 		//when the data comes back, we will add the hash/phash info
 		string hashingCommand = ("-allHash," + imgeFilePath);
-		conn->sendData(connIndex, hashingCommand.c_str());
+		//conn->sendData(connIndex, hashingCommand.c_str());
 	}
 	return true;
 }
 //since the dir watcher gets all the images we add, this makes more sense
-bool DatabaseBuilder::RequestImageHash(string imgPath, int galleryID, TCPUtils *conn, int connIndex)
+bool DatabaseBuilder::RequestImageHash(string imgPath, int galleryID, /*NetUtils*conn,*/ int connIndex)
 {
 	string md5Hash = createMD5Hash(imgPath);
 
@@ -586,7 +572,7 @@ bool DatabaseBuilder::RequestImageHash(string imgPath, int galleryID, TCPUtils *
 	//createImageHash should send back the hashes and the file path they are made from
 	//when the data comes back, we will add the hash/phash info
 	string hashingCommand = ("-allHash," + imgPath);
-	conn->sendData(connIndex, hashingCommand.c_str());
+	//conn->sendData(connIndex, hashingCommand.c_str());
 	
 	return true;
 }

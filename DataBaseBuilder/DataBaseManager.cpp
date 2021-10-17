@@ -1,13 +1,11 @@
 // DataBaseBuilder.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
-
 #include <iostream>
 #include <algorithm>
 #include <string>
 #include <windows.h>
-#include <winsock.h>
+
 #include <stdio.h>
 
 #include <vector>
@@ -17,10 +15,10 @@
 
 #include "CommandLineUtils.h"
 #include "CFGUtils.h"
-
-#include "WinToDBMiddleman.h"
-#include "CFGUtils.h"
 #include "CFGHelper.h"
+#include "WinToDBMiddleman.h"
+
+
 #include "LogMessage.h"
 #include "ConsoleOutput.h"
 #include "LogfileOutput.h"
@@ -34,7 +32,7 @@ void Start()
 	//START STUFF
 	//Sleep(10000);
 	logRouter.Log(LOG_LEVEL_INFORMATIONAL,"starting server");
-	conn.startServer(SOMAXCONN, CFGHelper::DataBaseManagerPort);
+	//conn.StartServer(/*SOMAXCONN,*/ CFGHelper::DataBaseManagerPort.c_str());
 
 	 networkThread = NULL;
 	 dirWatchThread = new thread(doDirWatch);
@@ -44,7 +42,7 @@ void Start()
 
 void Finish()
 {
-	conn.shutdown();
+	//conn.Shutdown();
 	CancelIo(hDir);
 	
 	//int exitCode = 0;
@@ -409,8 +407,8 @@ int doWaitForRemoteConnections(void)
 {
 	while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
 	{
-		conn.waitForFirstClientConnect();
-		if (conn.getNumConnections() > 0)
+		//conn.WaitForFirstClientConnect();
+		//if (conn.GetNumConnections() > 0)
 		{
 			g_hasConnections = true;
 			if(networkThread == NULL)
@@ -423,19 +421,20 @@ int doWaitForRemoteConnections(void)
 int doNetWorkCommunication(void)
 {
 	int iResult;
-	char recvbuf[DEFAULT_BUFLEN];
+	int DEFAULT_BUFLEN = 512;
+	char recvbuf[512];
 	int recvbuflen = DEFAULT_BUFLEN;
 	int numConn = 0;
 	bool recvData = false;
 	clock_t  heartBeat = 0;
 	
-	if (tcpOut == NULL)
-		tcpOut = new TCPUtils(/*&conn,0*/);
+//	if (conn == NULL)
+//		conn = new TCPOutput(/*&conn,0*/);
 
 	while (g_hasConnections)
 	{
 		recvData = false;
-		numConn = (int)conn.getNumConnections();
+		//numConn = (int)conn.GetNumConnections();
 		if (numConn == 0)
 		{
 			g_hasConnections = false;
@@ -443,10 +442,10 @@ int doNetWorkCommunication(void)
 		}
 		for (int i = 0; i < numConn; i++)
 		{
-			if (conn.hasRecivedData(i))
+		//	if (conn.HasRecivedData(i))
 			{
 				recvData = true;
-				iResult = conn.getData(i, recvbuf, DEFAULT_BUFLEN);
+				//iResult = conn.GetData(i, recvbuf, DEFAULT_BUFLEN);
 				if (iResult > 0)
 				{
 					if (iResult < DEFAULT_BUFLEN)
@@ -469,20 +468,20 @@ int doNetWorkCommunication(void)
 				//client disconnected
 				else if (iResult == 0)
 				{
-					conn.closeConnection(i);
+					//conn.CloseConnection(i);
 				}
 				else
 				{
 					string errString = "network communication error: " + to_string(GetLastError());
 					logRouter.Log(LOG_LEVEL_ERROR, errString);
-					conn.closeConnection(i);
+					//conn.CloseConnection(i);
 				}
 			}
 		}
 		if (!recvData)
 		{
 			Sleep(SHORT_SLEEP);  
-			float curTime = (clock() - heartBeat) / CLOCKS_PER_SEC;
+			float curTime =(float) (clock() - heartBeat) / CLOCKS_PER_SEC;
 			if(curTime > 60000)
 				ShutdownCreateImageHash();
 		}
@@ -490,8 +489,8 @@ int doNetWorkCommunication(void)
 
 	logRouter.Log(LOG_LEVEL_INFORMATIONAL, "PornoDB Manager: network communication: Exit");
 	networkThread = NULL;
-	delete tcpOut;
-	tcpOut = NULL;
+//	delete tcpOut;
+//	tcpOut = NULL;
 	return ERROR_SUCCESS;
 }
 
@@ -580,7 +579,7 @@ int doMainWorkerThread(void)
 			{
 				int galleryID = -1;
 				if (!dbBuilder.VerifyImage(command.data[0], galleryID))
-					dbBuilder.RequestImageHash(command.data[0], galleryID, &conn, createImageHashSocket);
+					dbBuilder.RequestImageHash(command.data[0], galleryID, /*&conn,*/ createImageHashSocket);
 			}
 			else if (command.cmd == "-ADDIMG")
 			{
@@ -593,7 +592,7 @@ int doMainWorkerThread(void)
 				if (galleryID == -1)
 					continue;
 
-				dbBuilder.RequestImageHash(command.data[0], galleryID, &conn, createImageHashSocket);
+				dbBuilder.RequestImageHash(command.data[0], galleryID, /*&conn,*/ createImageHashSocket);
 				
 			}
 			else if (command.cmd == "-DELIMG")

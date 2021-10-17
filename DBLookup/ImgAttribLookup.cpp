@@ -38,7 +38,7 @@ std::vector<std::string> results;
 string GetCategoryID(string name)
 {
 	string output;
-	string querey = "SELECT id FROM Category WHERE name = \""  + name +"\"";
+	string querey = "SELECT id FROM Category WHERE name LIKE \"%"  + name +"%\"";
 	dbCtrlr.executeSQL(querey, output);
 	dbCtrlr.removeTableNameFromOutput(output);
 	idResults.CategoryID = output;
@@ -49,7 +49,7 @@ string GetWebsiteID(std::string name)
 {
 	string output;
 	StringUtils::ToProperNoun(name);
-	string querey = "SELECT id FROM Website WHERE name = \"" + name + "\"";
+	string querey = "SELECT id FROM Website WHERE name LIKE \"%" + name + "%\"";
 	dbCtrlr.executeSQL(querey, output);
 	dbCtrlr.removeTableNameFromOutput(output);
 	idResults.WebsiteID = output;
@@ -60,7 +60,7 @@ string GetSubWebsiteID(string name)
 {
 	string output;
 	StringUtils::ToProperNoun(name);
-	string querey = "SELECT id FROM SubWebsite WHERE name = \"" + name + "\"";
+	string querey = "SELECT id FROM SubWebsite WHERE name LIKE \"%" + name + "%\"";
 	dbCtrlr.executeSQL(querey, output);
 	dbCtrlr.removeTableNameFromOutput(output);
 	idResults.SubWebsiteID = output;
@@ -107,7 +107,7 @@ string GetModelID(string name)
 			modelQuerey.push_back(make_pair("middleName", ""));
 			modelQuerey.push_back(make_pair("lastName", ""));
 		}
-		dbCtrlr.doDBQuerey("Models", "ID",modelQuerey, output);
+		dbCtrlr.DoDBQuerey("Models", "ID",modelQuerey, output);
 		dbCtrlr.removeTableNameFromOutput(output);
 		quereyResults.push_back(output);
 	}
@@ -141,7 +141,7 @@ void DoLookupFromIDs(vector<string> &results)
 	if (!combinedIDQuerey.empty())
 	{
 		idTypes++;
-		dbCtrlr.doDBQuerey("Gallery", "ID", combinedIDQuerey, combinedIDOutput);
+		dbCtrlr.DoDBQuerey("Gallery", "ID", combinedIDQuerey, combinedIDOutput);
 		dbCtrlr.getAllValuesFromCol(combinedIDOutput, "ID", classifcationIDs);
 		
 		if (!idResults.GalleryID.empty())
@@ -182,7 +182,7 @@ void DoLookupFromIDs(vector<string> &results)
 			whereData.first = "ModelID";
 			whereData.second = idResults.ModelID[i];
 			string modelOutput;
-			dbCtrlr.doDBQuerey("ModelsInGallery", "GalleryID", whereData, modelOutput);
+			dbCtrlr.DoDBQuerey("ModelsInGallery", "GalleryID", whereData, modelOutput);
 			
 
 			if(i == 0 || combineGalleries)
