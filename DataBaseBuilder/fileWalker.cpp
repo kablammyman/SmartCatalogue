@@ -44,7 +44,6 @@ void FileWalker::takeDirSnapShot(string path, int numThreads, bool refresh)
 //----------------------------------------------------------------------
 void FileWalker::getAllDirPaths(vector<string> &ret)
 {
-	//FileUtils::DumpTreeToVector(curPath, ret, true);
 	FileUtils::DumpTreeToVector(ret);
 }
 //----------------------------------------------------------------------

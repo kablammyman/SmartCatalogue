@@ -11,7 +11,7 @@
 #include "CommandLineUtils.h"
 
 #include "similarImage.h"
-#include "SQLiteDB.h"
+#include "SQLiteUtils.h"
 
 
 #define DELIM "|"
@@ -174,14 +174,14 @@ string isClipboardImageInDB(string img, string dbPath)
 			//err = true;
 		}
 	}
-	SQLiteDB db(dbPath);
+	SQLiteUtils db(dbPath);
 
 	string querey = "SELECT  Images.fileName, Gallery.path FROM Images INNER JOIN Gallery ON Gallery.ID = Images.galleryID where hammingDistance('";
 	querey += img1Hash;
 	querey += "',phash) < ";
 	querey += to_string(simImage.getMinHammingDist());
 	querey += ";";
-	db.executeSQL(querey, output);
+	db.DoDBQuerey(querey, output);
 	if (output.empty())
 		output = "no matches found";
 	

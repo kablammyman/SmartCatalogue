@@ -90,7 +90,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		exit(0);
 	}
 
-	if (!dbCtrlr.openDB(CFGHelper::dbPath))
+	if (!dbCtrlr.OpenDB(CFGHelper::dbPath))
 	{
 		string msg = "couldnt open db form file at: " + CFGHelper::dbPath;
 		MessageBox(NULL, msg.c_str(), NULL, NULL);

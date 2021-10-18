@@ -41,9 +41,12 @@
     <ClCompile Include="DBLookup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="..\common\DatabaseControllercpp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+=======
+>>>>>>> 556c6e3e9b887ef519182ccf1d914741bc46ba9a
     <ClCompile Include="..\common\CFGHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

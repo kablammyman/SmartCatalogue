@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CreateImageHash", "SimilarImagesDetection\openCVDetectSimilarImage.vcxproj", "{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModelRecognition", "ModelRecognition\ModelRecognition.vcxproj", "{FA274E55-27CE-47C3-91EC-5C59159494E5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataBaseManager", "DataBaseBuilder\DataBaseBuilder.vcxproj", "{3100C379-939D-490E-AB4B-090AFA6B0A5F}"
@@ -23,14 +21,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}.Debug|Win32.ActiveCfg = Debug|Win32
-		{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}.Debug|Win32.Build.0 = Debug|Win32
-		{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}.Debug|x64.ActiveCfg = Debug|x64
-		{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}.Debug|x64.Build.0 = Debug|x64
-		{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}.Release|Win32.ActiveCfg = Release|Win32
-		{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}.Release|Win32.Build.0 = Release|Win32
-		{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}.Release|x64.ActiveCfg = Release|x64
-		{DA398A6B-0E48-47C7-9C8D-8630A478A1EB}.Release|x64.Build.0 = Release|x64
 		{FA274E55-27CE-47C3-91EC-5C59159494E5}.Debug|Win32.ActiveCfg = Debug|Win32
 		{FA274E55-27CE-47C3-91EC-5C59159494E5}.Debug|Win32.Build.0 = Debug|Win32
 		{FA274E55-27CE-47C3-91EC-5C59159494E5}.Debug|x64.ActiveCfg = Debug|x64
@@ -74,5 +64,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DB670264-3564-453F-8ED6-32E2CA08F1EB}
 	EndGlobalSection
 EndGlobal

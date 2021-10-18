@@ -79,7 +79,7 @@ int main(int argc, const char *argv[])
 	}
 
 	//create the new db
-	dbCtrlr.createNewDB(dbFilePath);
+	dbCtrlr.CreateNewDB(dbFilePath);
 
 	
 	for (size_t i = 0; i < allDBTextFiles.size(); i++)
@@ -109,7 +109,7 @@ int main(int argc, const char *argv[])
 			if (lineCounter == 0 || found != string::npos)
 			{
 				tableName.clear();
-				dbCtrlr.executeSQL(line,output);
+				dbCtrlr.ExecuteSQL(line,output);
 				if (!output.empty())
 					cout << "error: " << output << endl;
 				//find the table name in the statement
@@ -131,7 +131,7 @@ int main(int argc, const char *argv[])
 					cout << "created table: " << tableName << endl;
 
 				string colCmd = ("PRAGMA table_info(" + tableName + ")");
-				dbCtrlr.executeSQL(colCmd, output);
+				dbCtrlr.ExecuteSQL(colCmd, output);
 
 				found = output.find("name|");
 

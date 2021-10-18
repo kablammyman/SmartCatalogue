@@ -15,6 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
+=======
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+>>>>>>> 556c6e3e9b887ef519182ccf1d914741bc46ba9a
     <ClInclude Include="DatabaseDataParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -30,6 +39,12 @@
     <ClInclude Include="DatabaseManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+<<<<<<< HEAD
+=======
+    <ClInclude Include="..\common\DatabaseController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+>>>>>>> 556c6e3e9b887ef519182ccf1d914741bc46ba9a
     <ClInclude Include="..\common\WinToDBMiddleman.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -38,6 +53,12 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
+=======
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+>>>>>>> 556c6e3e9b887ef519182ccf1d914741bc46ba9a
     <ClCompile Include="DatabaseDataParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
